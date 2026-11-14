@@ -32,8 +32,12 @@ takes about half a minute.)
 
 ## Table S11. Matching schedule (A) and temporal trends (B)
 
+### Panel A. Matching schedule and participation
+
 ```{r s5-schedule}
 ```
+
+### Panel B. Linear trends in tokens sent
 
 ```{r s5-temporal-models}
 ```
@@ -50,7 +54,14 @@ takes about half a minute.)
 
 ## Figure S10 and Table S13. Giving over the session
 
+### Mean tokens sent in classroom rounds 1–7
+
 ```{r s5-round-means}
+```
+
+### Mean tokens sent by fifth of each child's session
+
+```{r s5-means-by-fifth}
 ```
 
 ```{r s5-figure-s10}
@@ -58,15 +69,29 @@ takes about half a minute.)
 #| fig-height: 6
 ```
 
+### Table S13. Classroom coverage by round
+
 ```{r s5-coverage}
 ```
 
 ## Figure S11 and Table S14. By friendship type
 
+### Mean tokens sent by friendship group in classroom rounds 1–2
+
 ```{r s5-by-friendship}
+```
+
+### Mean tokens sent by friendship group in the first and final fifths
+
+```{r s5-friendship-by-fifth}
+```
+
+```{r s5-figure-s11}
 #| fig-width: 9
 #| fig-height: 6.5
 ```
+
+### Table S14. Giving trends by friendship group
 
 ```{r s5-friendship-slopes}
 ```
@@ -78,10 +103,19 @@ within friendship groups and changes in the mix of groups. Then, within the
 same children, we compare the change toward classmates they named with the
 change toward the others.
 
+### Change within friendship groups and change in group composition
+
 ```{r s5-decomposition}
 ```
 
+### Within-child comparison and bootstrap interval
+
 ```{r s5-within-child}
+```
+
+### Table S15. Within-child regression estimates
+
+```{r s5-within-child-models}
 ```
 
 ```{r s5-figure-s12}

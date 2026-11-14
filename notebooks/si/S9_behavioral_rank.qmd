@@ -33,12 +33,72 @@ PageRank on the network of tokens sent. Code: `code/si/S9_behavioral_rank.R`.
 
 ## Tables S52–S53. Cooperation GAP on the behavioral rank gap
 
+Each table estimates how the Cooperation GAP changes with the sender's Behavioral Social Rank minus the receiver's. Column (1) has no fixed effects, column (2) adds classroom fixed effects, and column (3) adds sender fixed effects. Standard errors are in parentheses.
+
 ```{r s9-regressions}
+```
+
+### Table S52. Observed tokens
+
+These models use the Cooperation GAP calculated from all observed transfers in each sample.
+
+#### All dyads
+
+```{r}
+knitr::kable(table_s52[["All dyads"]])
+```
+
+#### Mutual friends
+
+```{r}
+knitr::kable(table_s52[["Mutual friends"]])
+```
+
+#### Non-friends
+
+```{r}
+knitr::kable(table_s52[["Non-friends"]])
+```
+
+### Table S53. Filtered tokens
+
+These models use the Cooperation GAP for pairs in which both transfers survive the null-model filter.
+
+#### All dyads
+
+```{r}
+knitr::kable(table_s53[["All dyads"]])
+```
+
+#### Mutual friends
+
+```{r}
+knitr::kable(table_s53[["Mutual friends"]])
+```
+
+#### Non-friends
+
+```{r}
+knitr::kable(table_s53[["Non-friends"]])
 ```
 
 ## Table S54. Asymmetric friendships
 
+These models use filtered tokens for one-sided friendship nominations. Direction is defined by the nominator's Behavioral Social Rank relative to the recipient's. The higher-to-lower group includes equal ranks, following the rule used in the code.
+
 ```{r s9-asymmetric}
+```
+
+### Lower to higher Behavioral Social Rank
+
+```{r}
+knitr::kable(table_s54[["Lower-to-higher"]])
+```
+
+### Higher to lower Behavioral Social Rank
+
+```{r}
+knitr::kable(table_s54[["Higher-to-lower"]])
 ```
 
 ## Figure S29

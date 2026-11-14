@@ -144,10 +144,18 @@ expresses the same estimate in three other ways:
 ```{r table1-panel-b}
 ```
 
-## The table
+## Regression results {#the-table}
+
+### Coefficient summary by sample
+
+One row per sample, with the estimated slope, standard error, model fit, and effect sizes.
 
 ```{r table1-assemble}
 ```
+
+### Table 1. Results in the manuscript layout
+
+Each column corresponds to a sample. Standard errors are shown in parentheses.
 
 ```{r table1-display}
 ```

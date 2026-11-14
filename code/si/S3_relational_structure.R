@@ -92,9 +92,6 @@ table_s5 <- table_s6 %>%
   pivot_longer(-network, names_to = "statistic") %>%
   pivot_wider(names_from = network, values_from = value)
 
-table_s5
-
-
 ## ---- s3-sociogram-function ----
 # One sociogram: one classroom, one layer. Node size = nominations received
 # (or tokens received/sent), fill = sex. The layout is fixed per classroom

@@ -26,14 +26,39 @@ Code: `code/si/S7_main_regressions.R` and the helper `fe_progression()` in
 ```{r s7-setup}
 ```
 
-## Tables S17–S19. All dyads, non-friends, mutual friends
+## Tables S17–S19. Observed Cooperation GAP by friendship group
+
+Each table fits the same five specifications to a different sample. Standard errors are in parentheses.
+
+### Table S17. All dyads
 
 ```{r s7-fe-tables}
 ```
 
+### Table S18. Non-friends
+
+```{r s7-fe-non-friends}
+```
+
+### Table S19. Mutual friends
+
+```{r s7-fe-mutual}
+```
+
 ## Table S20. Pooled friendship moderation
 
+### Pooled model with the friendship interaction
+
+This model estimates how the Social Rank GAP slope differs between non-friends and mutual friends.
+
 ```{r s7-pooled}
+```
+
+### Implied slope for mutual friends
+
+This combines the Social Rank GAP coefficient and the interaction coefficient within each model.
+
+```{r s7-pooled-mutual-slope}
 ```
 
 ## Table S21. Support for the two asymmetric directions
@@ -43,7 +68,18 @@ Code: `code/si/S7_main_regressions.R` and the helper `fe_progression()` in
 
 ## Table S22. Asymmetric friendships by direction
 
+### Lower to higher rank
+
+The child making the nomination has the lower Social Rank.
+
 ```{r s7-asymmetric-directions}
+```
+
+### Higher to lower rank
+
+This group follows Table 1's rule and includes ties in Social Rank.
+
+```{r s7-high-to-low}
 ```
 
 ## Table S23. Direct contrast between the two directions
@@ -56,10 +92,26 @@ Code: `code/si/S7_main_regressions.R` and the helper `fe_progression()` in
 
 ## Table S24 and Figures S22–S24. Size of the effect
 
+### Table S24. Predicted gaps at selected rank differences
+
 ```{r s7-magnitudes}
 ```
 
+### Share of decisions by distance between rank quartiles
+
 ```{r s7-quartiles}
+```
+
+### Share of decisions across different quartiles, by classroom
+
+```{r s7-quartiles-cross}
+```
+
+### Decisions from the highest to the lowest quartile
+
+The observed mean Cooperation GAP is shown alongside the value predicted by the main coefficient.
+
+```{r s7-quartiles-extremes}
 ```
 
 ```{r s7-figures}

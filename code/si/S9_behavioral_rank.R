@@ -89,10 +89,6 @@ samples <- list("All dyads" = dyads,
 table_s52 <- map(samples, ~ regression_table(bsr_models(.x, "coop_gap"), terms = "bsr_gap"))
 table_s53 <- map(samples, ~ regression_table(bsr_models(.x, "coop_gap_filtered"), terms = "bsr_gap"))
 
-table_s52
-table_s53
-
-
 ## ---- s9-asymmetric ----
 # Table S54: one-sided friendships (filtered tokens), split by who has the
 # higher behavioral rank
@@ -103,9 +99,6 @@ asymmetric <- dyads %>%
 table_s54 <- asymmetric %>%
   split(.$direction) %>%
   map(~ regression_table(bsr_models(.x, "coop_gap_filtered"), terms = "bsr_gap"))
-table_s54
-
-
 ## ---- s9-figure-s29 ----
 # Figure 3 panels B and C using the behavioral rank gap: per-child
 # averages, 7 equal-width bins (as in 05_figure3_cooperation.R)

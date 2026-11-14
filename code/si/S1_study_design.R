@@ -73,6 +73,8 @@ table_s2 <- tribble(
 
 table_s2
 
+
+## ---- s1-decision-coverage ----
 # Every classroom has the full census of directed decisions, n(n - 1)
 dyads %>%
   count(class_id, name = "decisions") %>%

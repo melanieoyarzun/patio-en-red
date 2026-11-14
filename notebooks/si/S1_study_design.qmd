@@ -51,10 +51,18 @@ The table counts mixed classrooms, classrooms with only girls, and classrooms wi
 
 ## Table S2. Completeness
 
-All variables used in the analyses are complete. Every classroom has the full
-census of directed decisions, $n(n-1)$.
+### Completeness by variable
+
+The table reports the percentage of nonmissing values for each variable.
 
 ```{r s1-table-completeness}
+```
+
+### Coverage of directed game decisions
+
+This check verifies whether each classroom has the expected $n(n-1)$ directed decisions.
+
+```{r s1-decision-coverage}
 ```
 
 ```{r s1-save}

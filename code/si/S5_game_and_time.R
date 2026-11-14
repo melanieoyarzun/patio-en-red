@@ -181,6 +181,8 @@ by_order    <- mean_ci(dyads, decision_order)
 by_fifth    <- mean_ci(dyads, fifth)
 
 by_round %>% filter(round <= 7)
+
+## ---- s5-means-by-fifth ----
 by_fifth
 
 
@@ -222,8 +224,12 @@ by_order_f <- mean_ci(dyads, decision_order, friend_group)
 by_fifth_f <- mean_ci(dyads, fifth, friend_group)
 
 by_round_f %>% filter(round <= 2)
+
+## ---- s5-friendship-by-fifth ----
 by_fifth_f %>% filter(fifth %in% c(1, 5))
 
+
+## ---- s5-figure-s11 ----
 friend_colors <- c("Non-friends" = color_non_friends, "Asymmetric ties" = color_asymmetric,
                    "Mutual friends" = color_mutual)
 
@@ -364,6 +370,8 @@ bootstrap <- map_dfr(1:4999, function(b) {
 bootstrap %>% filter(model == 1) %>%
   summarise(ci_low = quantile(mean_D, 0.025), ci_high = quantile(mean_D, 0.975))
 
+
+## ---- s5-within-child-models ----
 table_s15 <- map2_dfr(within_child_models(child_level), 1:3, function(fit, m) {
   draws <- bootstrap %>% filter(model == m) %>% pull(coefficients) %>% do.call(rbind, .)
   tibble(model = m, term = names(coef(fit)), estimate = coef(fit),

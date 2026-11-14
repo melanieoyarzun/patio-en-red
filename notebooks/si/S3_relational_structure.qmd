@@ -27,8 +27,7 @@ Code: `code/si/S3_relational_structure.R`.
 
 ## Network statistics, classroom by classroom (Table S6)
 
-For each classroom and question: number of ties, density, nominations
-received, reciprocity (share of ties that are returned) and isolates.
+Table S6 computes the number of ties, density, nominations received, reciprocity (the share of ties that are returned), and isolates by classroom and question. The preview shows classroom 1. The R script exports the results for all classrooms.
 
 ```{r s3-network-statistics}
 ```

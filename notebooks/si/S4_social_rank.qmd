@@ -68,13 +68,16 @@ Explicit negative = 0 and explicit positive = 2 are kept; the weight of
 
 ## Table S9. Social Rank and student characteristics
 
-Panel A: correlations (nomination counts and continuous variables as
-within-classroom z-scores; "within" removes classroom means).
-Panel B: differences by guardian education. Religion, also in the SI table,
-is not part of the public data.
+### Panel A. Correlations with Social Rank
+
+The within-classroom correlations remove classroom means. Nomination counts and continuous variables are standardized within classrooms.
 
 ```{r s4-correlates}
 ```
+
+### Panel B. Differences by guardian education
+
+The table reports tests for differences in Social Rank by guardian education. The public data do not include religion.
 
 ```{r s4-background}
 ```

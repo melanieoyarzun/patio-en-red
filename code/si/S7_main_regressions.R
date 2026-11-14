@@ -42,7 +42,11 @@ fe_non    <- fe_progression(filter(dyads, friendship == "Non-friends"))
 fe_mutual <- fe_progression(filter(dyads, friendship == "Mutual"))
 
 regression_table(fe_all,    terms = "rank_gap")
+
+## ---- s7-fe-non-friends ----
 regression_table(fe_non,    terms = "rank_gap")
+
+## ---- s7-fe-mutual ----
 regression_table(fe_mutual, terms = "rank_gap")
 
 
@@ -56,6 +60,8 @@ fe_pooled <- fe_progression(non_and_mutual, formula_rhs = "rank_gap * mutual")
 
 regression_table(fe_pooled, terms = c("rank_gap", "mutual", "rank_gap:mutual"))
 
+
+## ---- s7-pooled-mutual-slope ----
 implied_mutual_slope <- map_dfr(fe_pooled, ~ linear_combination(.x, c("rank_gap", "rank_gap:mutual")),
                                 .id = "model")
 implied_mutual_slope
@@ -100,6 +106,8 @@ fe_low_to_high <- fe_progression(filter(asymmetric, direction == "L->H"))
 fe_high_to_low <- fe_progression(filter(asymmetric, direction == "H->L"))
 
 regression_table(fe_low_to_high, terms = "rank_gap")
+
+## ---- s7-high-to-low ----
 regression_table(fe_high_to_low, terms = "rank_gap")
 
 
@@ -193,9 +201,13 @@ quartiled %>%
   count(distance) %>% mutate(share = 100 * n / sum(n)) %>%
   group_by(distance) %>% summarise(mean_share = mean(share))
 
+
+## ---- s7-quartiles-cross ----
 quartiled %>% group_by(class_id) %>% summarise(cross = 100 * mean(distance > 0)) %>%
   summarise(mean = mean(cross), min = min(cross), max = max(cross))
 
+
+## ---- s7-quartiles-extremes ----
 quartile_cells <- quartiled %>%
   group_by(sender_q, receiver_q) %>%
   summarise(n = n(), mean_gap = mean(rank_gap), observed = mean(coop_gap), .groups = "drop") %>%

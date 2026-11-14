@@ -69,21 +69,43 @@ fe_filtered_pooled <- fe_progression(filter(filtered, friendship %in% c("Non-fri
                                      outcome = "coop_gap_filtered", formula_rhs = "rank_gap * mutual")
 
 regression_table(fe_filtered_all,    terms = "rank_gap")
+
+## ---- s8-filtered-non ----
 regression_table(fe_filtered_non,    terms = "rank_gap")
+
+## ---- s8-filtered-mutual ----
 regression_table(fe_filtered_mutual, terms = "rank_gap")
+
+## ---- s8-filtered-pooled ----
 regression_table(fe_filtered_pooled, terms = c("rank_gap", "mutual", "rank_gap:mutual"))
 
+
+## ---- s8-filtered-low-to-high ----
 filtered_asymmetric <- filtered %>%
   filter(friendship == "Sender declares") %>%
   mutate(high_to_low = as.integer(rank_gap >= 0))
 
 fe_filtered_lh <- fe_progression(filter(filtered_asymmetric, high_to_low == 0), outcome = "coop_gap_filtered")
-fe_filtered_hl <- fe_progression(filter(filtered_asymmetric, high_to_low == 1), outcome = "coop_gap_filtered")
 fe_filtered_contrast <- fe_progression(filtered_asymmetric, outcome = "coop_gap_filtered",
                                        formula_rhs = "rank_gap * high_to_low")
 
 regression_table(fe_filtered_lh, terms = "rank_gap")
+
+## ---- s8-filtered-high-to-low ----
+filtered_high_to_low <- filter(filtered_asymmetric, high_to_low == 1)
+fe_filtered_hl <- fe_progression(filtered_high_to_low, outcome = "coop_gap_filtered")
+
+# A saturated fixed-effects design leaves no variation for the rank gap.
+fixed_effects_4 <- model.matrix(~ factor(class_id) + factor(sender_id) + factor(round),
+                               data = filtered_high_to_low)
+fixed_effects_5 <- model.matrix(~ factor(sender_id) + factor(class_round),
+                               data = filtered_high_to_low)
+if (qr(fixed_effects_4)$rank == nrow(filtered_high_to_low)) fe_filtered_hl["(4)"] <- list(NULL)
+if (qr(fixed_effects_5)$rank == nrow(filtered_high_to_low)) fe_filtered_hl["(5)"] <- list(NULL)
+
 regression_table(fe_filtered_hl, terms = "rank_gap")
+
+## ---- s8-filtered-contrast ----
 regression_table(fe_filtered_contrast, terms = c("rank_gap", "rank_gap:high_to_low"))
 
 
@@ -251,16 +273,24 @@ dyads <- dyads %>%
 
 dyads %>% distinct(class_id, size_group) %>% count(size_group)
 
+
+## ---- s8-class-size-slopes ----
 size_slopes <- dyads %>%
   group_by(size_group) %>%
   group_modify(~ term_estimate(preferred_model(.x))) %>% ungroup()
 size_slopes
 
+
+## ---- s8-class-size-joint-test ----
 size_interaction <- preferred_model(dyads, rhs = "rank_gap * size_group")
 lfe::waldtest(size_interaction, grep("rank_gap:size_group", names(coef(size_interaction))))[["p.F"]]
 
+
+## ---- s8-class-size-continuous ----
 term_estimate(preferred_model(dyads, rhs = "rank_gap * class_size"), "rank_gap:class_size")
 
+
+## ---- s8-class-size-figure ----
 quartile_cuts <- quantile(c(dyads$sender_rank, dyads$receiver_rank), c(0.25, 0.5, 0.75))
 figure_s27 <- dyads %>%
   mutate(sender_q   = findInterval(sender_rank, quartile_cuts, left.open = TRUE) + 1,
@@ -342,6 +372,8 @@ lagged <- dyads %>% filter(!is.na(lagged_rank_gap))
 fe_placebo <- fe_progression(lagged, formula_rhs = "lagged_rank_gap")
 regression_table(fe_placebo, terms = "lagged_rank_gap")
 
+
+## ---- s8-placebo-by-group ----
 placebo_samples <- list(
   "All"                    = list(lagged, "coop_gap"),
   "All (filtered)"         = list(lagged, "coop_gap_filtered"),
@@ -495,6 +527,8 @@ table_s51 %>%
   select(measure, sample, cell) %>%
   pivot_wider(names_from = sample, values_from = cell)
 
+
+## ---- s8-affiliation-agreement ----
 # agreement with the primary rank (median within-class Spearman)
 affiliation_ranks %>%
   group_by(class_id) %>%

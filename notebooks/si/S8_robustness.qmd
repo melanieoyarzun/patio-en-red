@@ -27,7 +27,51 @@ controls, a lagged placebo, and other ways of measuring rank.
 
 ## 8.1 Filtered tokens (Tables S25–S30, Figure S25)
 
+These regressions use the Cooperation GAP for pairs in which both transfers survive the null-model filter. Standard errors are in parentheses.
+
+### Estimates by friendship group
+
+#### Table S25. All dyads
+
 ```{r s8-filtered-tables}
+```
+
+#### Table S26. Non-friends
+
+```{r s8-filtered-non}
+```
+
+#### Table S27. Mutual friends
+
+```{r s8-filtered-mutual}
+```
+
+#### Table S28. Pooled non-friends and mutual friends
+
+The interaction tests whether the slope differs for mutual friends.
+
+```{r s8-filtered-pooled}
+```
+
+### One-sided friendship nominations
+
+#### Table S29. Lower to higher rank
+
+```{r s8-filtered-low-to-high}
+```
+
+#### Table S29. Higher to lower rank
+
+This group includes ties in Social Rank, following the rule in the main analysis.
+
+Specifications (4) and (5) are not estimable for this filtered sample. The fixed effects absorb all variation in its 116 observations.
+
+```{r s8-filtered-high-to-low}
+```
+
+#### Table S30. Direct contrast between directions
+
+```{r s8-filtered-contrast}
 ```
 
 ```{r s8-figure-s25}
@@ -60,7 +104,27 @@ figure_s26
 
 ## 8.4 Classroom size (Figure S27)
 
+### Number of classrooms in each size group
+
 ```{r s8-class-size}
+```
+
+### Social Rank GAP slope by classroom size group
+
+```{r s8-class-size-slopes}
+```
+
+### Joint test of differences across size groups
+
+```{r s8-class-size-joint-test}
+```
+
+### Interaction with classroom size as a continuous measure
+
+```{r s8-class-size-continuous}
+```
+
+```{r s8-class-size-figure}
 #| fig-width: 9
 #| fig-height: 3.2
 ```
@@ -72,10 +136,19 @@ figure_s26
 
 ## 8.6 Lagged placebo (Tables S37–S38)
 
+### Table S37. Previous decision's rank gap in the full sample
+
 ```{r s8-placebo}
 ```
 
+### Table S38. Placebo estimates by sample and token filter
+
+```{r s8-placebo-by-group}
+```
+
 ## 8.7 Sex and grade level (Tables S39–S50)
+
+The code builds all twelve subgroup tables. The preview below shows the sex specifications for all dyads using observed tokens. Run the script to export the full set.
 
 ```{r s8-sex-grade}
 ```
@@ -89,7 +162,16 @@ figure_s26
 
 ## 8.9 Rank from affiliation networks (Table S51)
 
+### Table S51. Regression estimates using affiliation-based ranks
+
 ```{r s8-affiliation-ranks}
+```
+
+### Agreement with the popularity-based Social Rank
+
+Each entry is the median of the classroom-level Spearman correlations.
+
+```{r s8-affiliation-agreement}
 ```
 
 ```{r s8-save}
