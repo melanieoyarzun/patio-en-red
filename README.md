@@ -19,7 +19,11 @@ The [notebook index](notebooks/README.md) links to the main analyses and all nin
 [Clone and reproduce the analysis](#clone-and-reproduce) using the R scripts or notebooks.
 
 > [!NOTE]
-> **Two ways to run the same analysis.** The R scripts run the pipeline directly. The Quarto notebooks (`.qmd`) pull labeled code chunks from those scripts and add explanations. The Jupyter notebooks (`.ipynb`) are exported from the Quarto sources with their code and outputs. After changing the scripts or Quarto sources, [rebuild the viewer and Jupyter files](#build-the-notebook-viewer-and-jupyter-files) to keep all three formats in sync.
+> **How the code stays in sync: R scripts → Quarto notebooks → Jupyter notebooks.**
+>
+> The R scripts in `code/` are the source for the analysis code. The Quarto notebooks (`.qmd`) use `knitr::read_chunk()` to read labeled chunks from those scripts (`## ---- name ----`) and add explanations around them. Quarto renders the website and exports the Jupyter notebooks (`.ipynb`), which include the code and saved tables and figures.
+>
+> Edit the analysis code in the R scripts and the explanations in the Quarto notebooks. Then [rebuild the website and Jupyter notebooks](#build-the-notebook-viewer-and-jupyter-files) so both reflect the changes.
 
 ## Replication at a glance
 
