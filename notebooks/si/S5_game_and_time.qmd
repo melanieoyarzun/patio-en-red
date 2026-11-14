@@ -1,5 +1,7 @@
 ---
 title: "S5 · Social-dilemma game and cooperation over time"
+aliases:
+  - /analysis/si/S5_game_and_time.html
 code-links:
   - text: Jupyter notebook on GitHub
     icon: journal-code

@@ -1,5 +1,7 @@
 ---
 title: "S8 · Robustness and sensitivity analyses"
+aliases:
+  - /analysis/si/S8_robustness.html
 code-links:
   - text: Jupyter notebook on GitHub
     icon: journal-code

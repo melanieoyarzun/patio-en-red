@@ -1,5 +1,7 @@
 ---
 title: "Main Results"
+aliases:
+  - /analysis/main/index.html
 ---
 
 ## Notebook index

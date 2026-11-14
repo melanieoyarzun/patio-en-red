@@ -1,6 +1,6 @@
 # Paper website
 
-The [home page source](index.qmd) contains the abstract, study design figure, and links to the replication package. The rendered Main Results and Supporting Information pages come from [`notebooks/`](../notebooks/README.md).
+The [home page](../notebooks/index.qmd) contains the abstract, study design figure, and links to the replication package. The home page and the Main Results and Supporting Information pages share the [Quarto website configuration](../notebooks/_quarto.yml).
 
 [Open the public test website](https://melanieoyarzun.github.io/patio-en-red/) or see its [GitHub Actions runs](https://github.com/melanieoyarzun/patio-en-red/actions/workflows/pages.yml).
 
@@ -9,13 +9,10 @@ The [home page source](index.qmd) contains the abstract, study design figure, an
 Install [Quarto](https://quarto.org/) and the [analysis and build dependencies](../README.md#main-workflows). Run these commands from the repository root to build the same site as GitHub Actions.
 
 ```sh
-quarto render website
 quarto render notebooks
-mkdir -p website/_site/analysis
-cp -R notebooks/_site/. website/_site/analysis/
 ```
 
-Open `website/_site/index.html` in your browser. To edit the landing page with live reload, run `quarto preview website`.
+Open `notebooks/_site/index.html` in your browser. Run `quarto preview notebooks` to preview the whole site with live reload.
 
 ## GitHub Pages
 

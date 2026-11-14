@@ -1,5 +1,7 @@
 ---
 title: "S4 · Construction and validation of Social Rank"
+aliases:
+  - /analysis/si/S4_social_rank.html
 code-links:
   - text: Jupyter notebook on GitHub
     icon: journal-code

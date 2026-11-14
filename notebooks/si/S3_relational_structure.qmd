@@ -1,5 +1,7 @@
 ---
 title: "S3 · Classroom relational structure"
+aliases:
+  - /analysis/si/S3_relational_structure.html
 code-links:
   - text: Jupyter notebook on GitHub
     icon: journal-code

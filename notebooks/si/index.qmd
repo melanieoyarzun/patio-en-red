@@ -1,5 +1,7 @@
 ---
 title: "Supporting Information"
+aliases:
+  - /analysis/si/index.html
 ---
 
 ## Notebook index

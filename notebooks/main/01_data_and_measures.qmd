@@ -1,5 +1,7 @@
 ---
 title: "1 · Data and measures"
+aliases:
+  - /analysis/main/01_data_and_measures.html
 code-links:
   - text: Jupyter notebook on GitHub
     icon: journal-code

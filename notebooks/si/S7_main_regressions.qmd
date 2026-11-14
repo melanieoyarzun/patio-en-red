@@ -1,5 +1,7 @@
 ---
 title: "S7 · Main regression framework and results"
+aliases:
+  - /analysis/si/S7_main_regressions.html
 code-links:
   - text: Jupyter notebook on GitHub
     icon: journal-code

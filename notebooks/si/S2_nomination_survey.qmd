@@ -1,5 +1,7 @@
 ---
 title: "S2 · Peer-nomination survey"
+aliases:
+  - /analysis/si/S2_nomination_survey.html
 code-links:
   - text: Jupyter notebook on GitHub
     icon: journal-code

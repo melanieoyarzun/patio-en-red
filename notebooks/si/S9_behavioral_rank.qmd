@@ -1,5 +1,7 @@
 ---
 title: "S9 · Game-based Behavioral Social Rank"
+aliases:
+  - /analysis/si/S9_behavioral_rank.html
 code-links:
   - text: Jupyter notebook on GitHub
     icon: journal-code

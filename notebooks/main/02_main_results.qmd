@@ -1,5 +1,7 @@
 ---
 title: "2 · Table 1 and Figures 1D, 2 and 3"
+aliases:
+  - /analysis/main/02_main_results.html
 code-links:
   - text: Jupyter notebook on GitHub
     icon: journal-code

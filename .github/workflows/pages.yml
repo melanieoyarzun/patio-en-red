@@ -33,14 +33,10 @@ jobs:
           dependencies: '"hard"'
           install-quarto: false
       - name: Build paper website and rendered analyses
-        run: |
-          quarto render website
-          quarto render notebooks
-          mkdir -p website/_site/analysis
-          cp -R notebooks/_site/. website/_site/analysis/
+        run: quarto render notebooks
       - uses: actions/upload-pages-artifact@v4
         with:
-          path: website/_site
+          path: notebooks/_site
           retention-days: 7
 
   deploy:
