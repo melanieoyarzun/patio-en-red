@@ -16,6 +16,7 @@
 ## ---- s4-setup ----
 source(here::here("code", "00_helpers.R"))
 source(here("code", "00_style.R"))
+source(here("code", "si", "figures", "S4_figures.R"))   # plotting functions of this section
 library(igraph)
 library(patchwork)
 dir.create(here("output", "figures", "si"), recursive = TRUE, showWarnings = FALSE)
@@ -144,16 +145,16 @@ construction_agreement <- ranks_long %>%
 
 construction_agreement
 
-figure_s6 <- construction_agreement %>%
-  ggplot(aes(x = pooled_spearman, y = reorder(measure, pooled_spearman))) +
-  geom_col(fill = "#4B6587", width = 0.6) +
-  geom_text(aes(label = sprintf("%.2f", pooled_spearman)), hjust = -0.2, size = 3) +
-  scale_x_continuous(limits = c(0, 1.08)) +
-  labs(x = "Spearman correlation with Social Rank (pooled)", y = NULL) +
-  theme_paper(base_size = 10)
 
+## ---- s4-figure-s6 ----
+# Quick look: Spearman correlations between the rank constructions
+cor(alternative_ranks[, c("social_rank", names(alternative_labels))], method = "spearman") %>%
+  round(2)
+
+## ---- s4-figure-s6-si ----
+# Supporting Information layout (plotting code in figures/S4_figures.R)
+figure_s6 <- plot_figure_s6(alternative_ranks)
 figure_s6
-
 
 ## ---- s4-reference-weight ----
 # Figure S7: keep explicit negative = 0 and explicit positive = 2, and give
@@ -181,28 +182,44 @@ reference_weight_agreement %>%
 
 example_class <- 40   # an 18-child classroom, as in the SI
 
-panel_a <- rank_with_weight %>%
-  filter(class_id == example_class) %>%
-  left_join(students %>% select(student_id, social_rank), by = "student_id") %>%
-  ggplot(aes(w, rank, group = student_id, color = social_rank)) +
-  geom_line(linewidth = 0.5) +
-  geom_vline(xintercept = 1, linetype = "dashed") +
-  scale_color_viridis_c(name = "Rank at w = 1") +
-  labs(title = "A. One classroom (n = 18)", x = "Weight of non-nominations (w)", y = "Social Rank") +
-  theme_paper(base_size = 9) + theme(legend.position = "right")
+# a finer grid of weights for the drawing
+fine_weights <- seq(0, 2, by = 0.05)
+fine_ranks <- map_dfr(fine_weights, function(w) {
+  pagerank_by_class(case_when(nom_q4 - nom_q5 ==  1 ~ 2,
+                              nom_q4 - nom_q5 == -1 ~ 0,
+                              TRUE                  ~ w)) %>%
+    group_by(class_id) %>%
+    mutate(rank = rescale_01(value), w = w) %>%
+    ungroup()
+}) %>%
+  left_join(students %>% select(student_id, social_rank), by = "student_id")
 
-panel_c <- reference_weight_agreement %>%
-  ggplot(aes(w, spearman, group = class_id)) +
-  geom_line(color = "grey60", linewidth = 0.3) +
-  stat_summary(aes(group = 1), fun = median, geom = "line", color = "#C95A3A", linewidth = 1) +
-  geom_vline(xintercept = 1, linetype = "dashed") +
-  labs(title = "C. All classrooms (median in red)", x = "Weight of non-nominations (w)",
-       y = "Spearman with primary rank") +
-  theme_paper(base_size = 9)
+# share of pairs of children ordered as in the primary rank
+pairs_preserved <- function(rank, primary) {
+  pairs <- combn(length(rank), 2)
+  same <- sign(rank[pairs[1, ]] - rank[pairs[2, ]]) == sign(primary[pairs[1, ]] - primary[pairs[2, ]])
+  mean(same)
+}
 
-figure_s7 <- panel_a + panel_c
+agreement_by_weight <- fine_ranks %>%
+  group_by(w, class_id) %>%
+  summarise(spearman = cor(rank, social_rank, method = "spearman"),
+            pairs    = pairs_preserved(rank, social_rank), .groups = "drop")
+
+
+## ---- s4-figure-s7 ----
+# Quick look: median agreement with the primary rank across classrooms, by w
+agreement_by_weight %>%
+  group_by(w) %>%
+  summarise(median_spearman = median(spearman)) %>%
+  ggplot(aes(w, median_spearman)) +
+  geom_line() +
+  geom_vline(xintercept = 1, linetype = "dashed")
+
+## ---- s4-figure-s7-si ----
+# Supporting Information layout (plotting code in figures/S4_figures.R)
+figure_s7 <- plot_figure_s7(fine_ranks, agreement_by_weight, example_class)
 figure_s7
-
 
 ## ---- s4-correlates ----
 # Table S9, Panel A: correlations between Social Rank and other student
@@ -304,24 +321,22 @@ table_s10 %>% mutate(across(where(is.double), ~ round(.x, 3)))
 
 
 ## ---- s4-figure-s8 ----
-# Figure S8 (continuous correlates): Social Rank against each characteristic,
-# binned means with a linear fit
-figure_s8 <- correlates %>%
-  select(social_rank, all_of(setdiff(names(correlate_labels), c("female", "repeated_grade")))) %>%
-  pivot_longer(-social_rank, names_to = "variable", values_to = "value") %>%
-  filter(!is.na(value)) %>%
-  mutate(variable = factor(correlate_labels[variable], levels = correlate_labels)) %>%
+# Figure S8: Social Rank against each student characteristic. Gray points are
+# children; black points are binned means with 95% CI; the orange line is a
+# linear fit, with the pooled Pearson correlation in the box.
+# Quick look: Social Rank against a few characteristics
+correlates %>%
+  select(social_rank, nom_q3, nom_q4, nom_q5, gpa) %>%
+  pivot_longer(-social_rank) %>%
   ggplot(aes(social_rank, value)) +
-  stat_summary_bin(fun.data = mean_cl_normal, bins = 8, size = 0.2) +
-  geom_smooth(method = "lm", color = "#C95A3A", linewidth = 0.6) +
-  facet_wrap(~ variable, ncol = 4, scales = "free_y",
-             labeller = label_wrap_gen(width = 28)) +
-  labs(x = "Social Rank", y = "Within-class z-score") +
-  theme_paper(base_size = 8) +
-  theme(strip.background = element_blank())
+  geom_point(alpha = 0.2) +
+  geom_smooth(method = "lm") +
+  facet_wrap(~ name)
 
+## ---- s4-figure-s8-si ----
+# Supporting Information layout (plotting code in figures/S4_figures.R)
+figure_s8 <- plot_figure_s8(correlates, students)
 figure_s8
-
 
 ## ---- s4-save ----
 save_table(table_s7, "S4_table_s7_coding")
@@ -335,6 +350,6 @@ save_si_figure <- function(plot, name, width, height) {
   ggsave(here("output", "figures", "si", paste0(name, ".pdf")), plot, width = width, height = height)
   ggsave(here("output", "figures", "si", paste0(name, ".png")), plot, width = width, height = height, dpi = 300)
 }
-save_si_figure(figure_s6, "S4_figure_s6_construction_correlations", 6, 3)
-save_si_figure(figure_s7, "S4_figure_s7_reference_weight", 9, 3.5)
-save_si_figure(figure_s8, "S4_figure_s8_correlates", 9, 9)
+save_si_figure(figure_s6, "S4_figure_s6_construction_correlations", 6.5, 5.5)
+save_si_figure(figure_s7, "S4_figure_s7_reference_weight", 10, 3.4)
+save_si_figure(figure_s8, "S4_figure_s8_correlates", 9, 10.5)

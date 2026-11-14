@@ -16,6 +16,7 @@
 ## ---- s9-setup ----
 source(here::here("code", "00_helpers.R"))
 source(here("code", "00_style.R"))
+source(here("code", "si", "figures", "S9_figures.R"))   # plotting functions of this section
 library(igraph)
 library(patchwork)
 dir.create(here("output", "figures", "si"), recursive = TRUE, showWarnings = FALSE)
@@ -100,8 +101,11 @@ table_s55 <- asymmetric %>%
   split(.$direction) %>%
   map(~ regression_table(bsr_models(.x, "coop_gap_filtered"), terms = "bsr_gap"))
 ## ---- s9-figure-s29 ----
-# Figure 3 panels B and C using the behavioral rank gap: per-child
-# averages, 7 equal-width bins (as in 05_figure3_cooperation.R)
+# Figure 3 panels B and C with the behavioral rank gap: per-child averages,
+# 7 equal-width bins (as in 05_figure3_cooperation.R), 95% CIs across children
+mean_ci <- function(x) c(mean = mean(x, na.rm = TRUE),
+                         ci = 1.96 * sd(x, na.rm = TRUE) / sqrt(sum(!is.na(x))))
+
 bsr_bins <- dyads %>%
   filter(friendship %in% c("Non-friends", "Mutual", "Sender declares")) %>%
   group_by(friendship, sender_id) %>%
@@ -112,65 +116,72 @@ bsr_bins <- dyads %>%
             coop_filtered = mean(coop_gap_filtered, na.rm = TRUE), .groups = "drop") %>%
   group_by(friendship) %>% mutate(bin = cut_interval(gap, 7)) %>%
   group_by(friendship, bin) %>%
-  summarise(gap = mean(gap), sent = mean(sent, na.rm = TRUE), received = mean(received, na.rm = TRUE),
-            Observed = mean(coop_observed), Filtered = mean(coop_filtered, na.rm = TRUE), .groups = "drop")
+  # (the CIs are computed first: summarise() replaces each column as it goes)
+  summarise(gap = mean(gap),
+            sent_ci     = mean_ci(sent)[["ci"]],          sent     = mean_ci(sent)[["mean"]],
+            received_ci = mean_ci(received)[["ci"]],      received = mean_ci(received)[["mean"]],
+            Observed_ci = mean_ci(coop_observed)[["ci"]], Observed = mean_ci(coop_observed)[["mean"]],
+            Filtered_ci = mean_ci(coop_filtered)[["ci"]], Filtered = mean_ci(coop_filtered)[["mean"]],
+            .groups = "drop")
 
-friend_colors <- c("Non-friends" = color_non_friends, Mutual = color_mutual, "Sender declares" = color_asymmetric)
+# Quick look: filtered Cooperation GAP along the behavioral rank gap
+ggplot(bsr_bins, aes(gap, Filtered)) +
+  geom_hline(yintercept = 0) +
+  geom_line() +
+  geom_point() +
+  facet_wrap(~ friendship)
 
-row_tokens <- ggplot(bsr_bins, aes(gap, color = friendship)) +
-  geom_ribbon(aes(ymin = received, ymax = sent), fill = "#F0E5A8", alpha = 0.6, color = NA) +
-  geom_line(aes(y = sent)) + geom_point(aes(y = sent), shape = 18, size = 2.5) +
-  geom_line(aes(y = received)) + geom_point(aes(y = received), shape = 15, size = 2) +
-  facet_wrap(~ friendship) + scale_color_manual(values = friend_colors) +
-  labs(x = "Behavioral Social Rank GAP", y = "Filtered tokens") +
-  theme_paper(9) + theme(strip.background = element_blank())
-
-row_gap <- bsr_bins %>%
-  pivot_longer(c(Observed, Filtered), names_to = "version", values_to = "coop_gap") %>%
-  ggplot(aes(gap, coop_gap, color = friendship, alpha = version)) +
-  geom_hline(yintercept = 0, linetype = "dashed") +
-  geom_line() + geom_point() +
-  facet_wrap(~ friendship) + scale_color_manual(values = friend_colors) +
-  scale_alpha_manual(values = c(Observed = 0.4, Filtered = 1)) +
-  labs(x = "Behavioral Social Rank GAP", y = "Cooperation GAP") +
-  theme_paper(9) + theme(strip.background = element_blank())
-
-figure_s29 <- row_tokens / row_gap
+## ---- s9-figure-s29-si ----
+# Supporting Information layout (plotting code in figures/S9_figures.R)
+figure_s29 <- plot_figure_s29(bsr_bins, dyads)
 figure_s29
 
-
 ## ---- s9-figure-s30 ----
-# BSR against other student characteristics (within-class z-scores)
+# Figure S30: (A) the two PageRank scores, log scales; (B-H) Behavioral Social
+# Rank against other characteristics (within-class z-scores), with binned
+# means, a linear fit and the pooled Pearson correlation
 nominations_received <- dyads %>%
   group_by(student_id = receiver_id) %>%
   summarise(friendship = sum(nom_q3), popular = sum(nom_q4),
-            liked = sum(nom_q1), disliked = sum(nom_q2))
+            liked = sum(nom_q1), disliked = sum(nom_q2),
+            aggression = sum(nom_q6) + sum(nom_q7))
+
+s30_titles <- c(friendship = "B. Friendship nominations", attendance = "C. Attendance previous term",
+                gpa = "D. Overall GPA previous term", liked = "E. Liked", disliked = "F. Disliked",
+                aggression = "G. Aggression", popular = "H. Popularity")
 
 bsr_correlates <- students %>%
   left_join(nominations_received, by = "student_id") %>%
   group_by(class_id) %>%
-  mutate(across(c(social_rank, friendship, popular, liked, disliked, attendance, gpa),
-                ~ (.x - mean(.x)) / sd(.x))) %>%
+  mutate(across(all_of(names(s30_titles)), ~ (.x - mean(.x, na.rm = TRUE)) / sd(.x, na.rm = TRUE))) %>%
   ungroup() %>%
-  select(bsr, `Social Rank` = social_rank, `Friendship nominations` = friendship,
-         `Popular nominations` = popular, `Liked (hang out)` = liked,
-         `Disliked (not hang out)` = disliked, Attendance = attendance, GPA = gpa) %>%
-  pivot_longer(-bsr)
+  select(bsr, all_of(names(s30_titles))) %>%
+  pivot_longer(-bsr) %>%
+  filter(!is.na(value)) %>%
+  mutate(panel = factor(s30_titles[name], levels = s30_titles))
 
-bsr_correlates %>% group_by(name) %>% summarise(r = cor(bsr, value, use = "complete.obs"))
+s30_labels <- bsr_correlates %>%
+  group_by(panel) %>%
+  summarise(test = list(cor.test(bsr, value))) %>%
+  mutate(label = map_chr(test, ~ sprintf("R = %.2f, %s", .x$estimate, format_p(.x$p.value))))
 
-figure_s30 <- ggplot(bsr_correlates, aes(bsr, value)) +
-  geom_point(alpha = 0.15, size = 0.6) +
-  geom_smooth(method = "lm", color = "#C95A3A") +
-  facet_wrap(~ name, ncol = 4, scales = "free_y") +
-  labs(x = "Behavioral Social Rank", y = "Within-class z-score") +
-  theme_paper(8) + theme(strip.background = element_blank())
+bsr_correlates %>% group_by(panel) %>% summarise(r = cor(bsr, value))
 
+# Quick look: Behavioral Social Rank against each characteristic
+ggplot(bsr_correlates, aes(bsr, value)) +
+  geom_point(alpha = 0.2) +
+  geom_smooth(method = "lm") +
+  facet_wrap(~ panel)
+
+## ---- s9-figure-s30-si ----
+# Supporting Information layout (plotting code in figures/S9_figures.R)
+figure_s30 <- plot_figure_s30(students, bsr_correlates, s30_labels, s30_titles)
+figure_s30
 
 ## ---- s9-save ----
 iwalk(table_s53, ~ save_table(.x, paste0("S9_table_s53_observed_", str_replace_all(tolower(.y), "[^a-z]+", "_"))))
 iwalk(table_s54, ~ save_table(.x, paste0("S9_table_s54_filtered_", str_replace_all(tolower(.y), "[^a-z]+", "_"))))
 iwalk(table_s55, ~ save_table(.x, paste0("S9_table_s55_asymmetric_", str_replace_all(tolower(.y), "[^a-z]+", "_"))))
 write_csv(students %>% select(student_id, class_id, bsr_pagerank, bsr), here("data", "generated", "behavioral_rank.csv"))
-save_si_figure(figure_s29, "S9_figure_s29_bsr_cooperation", 9, 6)
-save_si_figure(figure_s30, "S9_figure_s30_bsr_correlates", 9, 4.5)
+save_si_figure(figure_s29, "S9_figure_s29_bsr_cooperation", 9, 5.5)
+save_si_figure(figure_s30, "S9_figure_s30_bsr_correlates", 10, 6)

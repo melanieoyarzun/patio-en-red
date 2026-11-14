@@ -15,6 +15,7 @@ code-links:
 #| include: false
 here::i_am("notebooks/si/S6_identification.qmd")
 knitr::read_chunk(here::here("code", "si", "S6_identification.R"))
+knitr::read_chunk(here::here("code", "si", "figures", "S6_figures.R"))
 ```
 
 Partners were assigned at random within each classroom and round. This
@@ -45,16 +46,46 @@ with the rank the child could expect in that classroom and round.
 ## Figure S15. Coefficients on a common scale
 
 ```{r s6-figure-s15}
-#| fig-width: 8
-#| fig-height: 2.6
+#| fig-width: 7
+#| fig-height: 2.8
 ```
+
+::: {.callout-note collapse="true" appearance="simple"}
+## Supporting Information layout
+
+Plotting code from `code/si/figures/S6_figures.R`. This is the version
+saved to `output/figures/si/`.
+
+```{r plot-figure-s15}
+```
+
+```{r s6-figure-s15-si}
+#| fig-width: 7
+#| fig-height: 2.8
+```
+:::
 
 ## Figure S16. Round by round
 
 ```{r s6-figure-s16}
-#| fig-width: 9
+#| fig-width: 7
+#| fig-height: 5
+```
+
+::: {.callout-note collapse="true" appearance="simple"}
+## Supporting Information layout
+
+Plotting code from `code/si/figures/S6_figures.R`. This is the version
+saved to `output/figures/si/`.
+
+```{r plot-figure-s16}
+```
+
+```{r s6-figure-s16-si}
+#| fig-width: 8
 #| fig-height: 6
 ```
+:::
 
 ## Figure S17. Demeaned exposure by covariate groups
 
@@ -63,19 +94,77 @@ with the rank the child could expect in that classroom and round.
 #| fig-height: 3
 ```
 
+::: {.callout-note collapse="true" appearance="simple"}
+## Supporting Information layout
+
+Plotting code from `code/si/figures/S6_figures.R`. This is the version
+saved to `output/figures/si/`.
+
+```{r plot-figure-s17}
+```
+
+```{r s6-figure-s17-si}
+#| fig-width: 10
+#| fig-height: 3.2
+```
+:::
+
 ## Figures S18–S19. Rank gaps by round
 
 ```{r s6-figures-s18-s19}
+#| fig-width: 7
+#| fig-height: 3.5
+```
+
+::: {.callout-note collapse="true" appearance="simple"}
+## Supporting Information layout
+
+Plotting code from `code/si/figures/S6_figures.R`. This is the version
+saved to `output/figures/si/`.
+
+```{r plot-figure-s18}
+```
+
+```{r plot-figure-s19}
+```
+
+```{r s6-figures-s18-s19-si}
 #| fig-width: 8
 #| fig-height: 3.5
 ```
 
+```{r}
+#| fig-width: 8
+#| fig-height: 10
+figure_s19
+```
+:::
+
+Figure S19 shows one classroom round by round: class 20 (21 children, 31
+rounds), the classroom used for this figure in the SI.
+
+
 ## Figure S20. By classroom
 
 ```{r s6-figure-s20}
-#| fig-width: 10
-#| fig-height: 5
+#| fig-width: 9
+#| fig-height: 3.5
 ```
+
+::: {.callout-note collapse="true" appearance="simple"}
+## Supporting Information layout
+
+Plotting code from `code/si/figures/S6_figures.R`. This is the version
+saved to `output/figures/si/`.
+
+```{r plot-figure-s20}
+```
+
+```{r s6-figure-s20-si}
+#| fig-width: 10
+#| fig-height: 6
+```
+:::
 
 ## Figure S21. Support among mutual friends
 
@@ -83,6 +172,21 @@ with the rank the child could expect in that classroom and round.
 #| fig-width: 7
 #| fig-height: 3.5
 ```
+
+::: {.callout-note collapse="true" appearance="simple"}
+## Supporting Information layout
+
+A "raincloud" for each group, with the support statistics under it. This is
+the version saved to `output/figures/si/`.
+
+```{r plot-figure-s21}
+```
+
+```{r s6-figure-s21}
+#| fig-width: 6
+#| fig-height: 6.5
+```
+:::
 
 ```{r s6-save}
 ```

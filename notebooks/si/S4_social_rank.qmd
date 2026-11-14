@@ -15,6 +15,7 @@ code-links:
 #| include: false
 here::i_am("notebooks/si/S4_social_rank.qmd")
 knitr::read_chunk(here::here("code", "si", "S4_social_rank.R"))
+knitr::read_chunk(here::here("code", "si", "figures", "S4_figures.R"))
 ```
 
 Social Rank is PageRank on the signed popularity network, with weights
@@ -49,12 +50,32 @@ nominations:
 ## Figure S6. Agreement with the primary Social Rank
 
 The median within-classroom Spearman correlation is the number quoted in
-the SI text; the pooled correlation is plotted.
+the SI text. The figure shows the pooled Spearman correlation between every
+pair of constructions; the framed top row compares each alternative with the
+primary Social Rank.
 
 ```{r s4-construction-correlations}
-#| fig-width: 6
-#| fig-height: 3
 ```
+
+```{r s4-figure-s6}
+#| fig-width: 7
+#| fig-height: 3.5
+```
+
+::: {.callout-note collapse="true" appearance="simple"}
+## Supporting Information layout
+
+Plotting code from `code/si/figures/S4_figures.R`. This is the version
+saved to `output/figures/si/`.
+
+```{r plot-figure-s6}
+```
+
+```{r s4-figure-s6-si}
+#| fig-width: 6.5
+#| fig-height: 5.5
+```
+:::
 
 ## Figure S7. Weight given to non-nominations
 
@@ -62,9 +83,27 @@ Explicit negative = 0 and explicit positive = 2 are kept; the weight of
 "not named" goes from 0 to 2. The primary measure is $w = 1$.
 
 ```{r s4-reference-weight}
-#| fig-width: 9
+```
+
+```{r s4-figure-s7}
+#| fig-width: 7
 #| fig-height: 3.5
 ```
+
+::: {.callout-note collapse="true" appearance="simple"}
+## Supporting Information layout
+
+Plotting code from `code/si/figures/S4_figures.R`. This is the version
+saved to `output/figures/si/`.
+
+```{r plot-figure-s7}
+```
+
+```{r s4-figure-s7-si}
+#| fig-width: 10
+#| fig-height: 3.4
+```
+:::
 
 ## Table S9. Social Rank and student characteristics
 
@@ -82,12 +121,32 @@ The table reports tests for differences in Social Rank by guardian education. Th
 ```{r s4-background}
 ```
 
-## Figure S8
+## Figure S8. Social Rank and student characteristics
+
+Panels A-O: within-classroom z-scores against Social Rank, with binned
+means and a linear fit. Panels P, Q and S: Social Rank by sex, guardian
+education and grade repetition. (The SI figure also shows religion, which
+is not part of the public data.)
 
 ```{r s4-figure-s8}
-#| fig-width: 9
-#| fig-height: 9
+#| fig-width: 7
+#| fig-height: 5
 ```
+
+::: {.callout-note collapse="true" appearance="simple"}
+## Supporting Information layout
+
+Plotting code from `code/si/figures/S4_figures.R`. This is the version
+saved to `output/figures/si/`.
+
+```{r plot-figure-s8}
+```
+
+```{r s4-figure-s8-si}
+#| fig-width: 9
+#| fig-height: 10.5
+```
+:::
 
 ## Table S10. Distribution of the Social Rank GAP
 

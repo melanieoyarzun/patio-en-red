@@ -16,6 +16,7 @@
 ## ---- s7-setup ----
 source(here::here("code", "00_helpers.R"))
 source(here("code", "00_style.R"))
+source(here("code", "si", "figures", "S7_figures.R"))   # plotting functions of this section
 library(patchwork)
 dir.create(here("output", "figures", "si"), recursive = TRUE, showWarnings = FALSE)
 
@@ -215,39 +216,45 @@ quartile_cells <- quartiled %>%
 quartile_cells %>% filter(sender_q == 4, receiver_q == 1)
 
 
-## ---- s7-figures ----
-figure_s22 <- ggplot(dyads, aes(rank_gap)) +
-  geom_histogram(binwidth = 0.05, fill = "grey60", color = "white") +
-  geom_vline(xintercept = c(-1, 1), linetype = "dashed") +
-  geom_vline(xintercept = c(-1, 1) * quantile(abs_gap, 0.9)) +
-  labs(x = "Social Rank GAP", y = "Directed dyads") + theme_paper(10)
+## ---- s7-figure-s22 ----
+# Figure S22: distribution of the Social Rank GAP; orange lines at the 90th
+# percentile of |GAP|, dashed lines at the extreme top-vs-bottom contrast
+# Quick look: histogram of the Social Rank GAP
+ggplot(dyads, aes(rank_gap)) +
+  geom_histogram(binwidth = 0.05)
 
-binned <- dyads %>%
+## ---- s7-figure-s22-si ----
+# Supporting Information layout (plotting code in figures/S7_figures.R)
+figure_s22 <- plot_figure_s22(dyads, abs_gap)
+figure_s22
+
+## ---- s7-figure-s23 ----
+# Figure S23: binned means and the linear prediction over the observed range
+# Quick look: binned means and the line beta * GAP
+dyads %>%
   mutate(bin = ntile(rank_gap, 20)) %>%
   group_by(bin) %>%
-  summarise(gap = mean(rank_gap), mean = mean(coop_gap), se = sd(coop_gap) / sqrt(n()))
+  summarise(gap = mean(rank_gap), mean = mean(coop_gap)) %>%
+  ggplot(aes(gap, mean)) +
+  geom_point() +
+  geom_abline(slope = beta_main, intercept = 0)
 
-figure_s23 <- ggplot(binned, aes(gap, mean)) +
-  annotate("rect", xmin = quantile(dyads$rank_gap, 0.05), xmax = quantile(dyads$rank_gap, 0.95),
-           ymin = -Inf, ymax = Inf, fill = "grey93") +
-  annotate("rect", xmin = quantile(dyads$rank_gap, 0.25), xmax = quantile(dyads$rank_gap, 0.75),
-           ymin = -Inf, ymax = Inf, fill = "grey85") +
-  geom_abline(slope = beta_main, intercept = 0, color = "#C95A3A", linewidth = 1) +
-  geom_pointrange(aes(ymin = mean - 1.96 * se, ymax = mean + 1.96 * se), size = 0.2) +
-  labs(x = "Social Rank GAP", y = "Cooperation GAP") + theme_paper(10)
-
-quartile_panel <- function(value, title) {
-  ggplot(quartile_cells, aes(factor(receiver_q), factor(sender_q), fill = .data[[value]])) +
-    geom_tile() +
-    geom_text(aes(label = sprintf("%.2f\n(%.0f%%)", .data[[value]], share)), size = 2.6) +
-    scale_fill_gradient2(low = "#4B6587", mid = "white", high = "#C95A3A", limits = c(-2.2, 2.2)) +
-    labs(title = title, x = "Receiver quartile", y = "Sender quartile") +
-    theme_paper(9)
-}
-figure_s24 <- quartile_panel("predicted", "Model-predicted") | quartile_panel("observed", "Observed")
-
+## ---- s7-figure-s23-si ----
+# Supporting Information layout (plotting code in figures/S7_figures.R)
+figure_s23 <- plot_figure_s23(dyads, beta_main)
 figure_s23
 
+## ---- s7-figure-s24 ----
+# Figure S24: Cooperation GAP by sender and receiver rank quartile
+# Quick look: observed Cooperation GAP in each quartile cell
+ggplot(quartile_cells, aes(receiver_q, sender_q, fill = observed)) +
+  geom_tile() +
+  geom_text(aes(label = round(observed, 2)))
+
+## ---- s7-figure-s24-si ----
+# Supporting Information layout (plotting code in figures/S7_figures.R)
+figure_s24 <- plot_figure_s24(quartile_cells)
+figure_s24
 
 ## ---- s7-save ----
 save_table(regression_table(fe_all, terms = "rank_gap"),    "S7_table_s17_all")
@@ -261,6 +268,6 @@ save_table(regression_table(fe_high_to_low, terms = "rank_gap"), "S7_table_s22_h
 save_table(table_s23, "S7_table_s23_direction_contrast")
 save_table(table_s24, "S7_table_s24_magnitudes")
 save_table(quartile_cells, "S7_quartile_cells")
-save_si_figure(figure_s22, "S7_figure_s22_gap_histogram", 7, 3.5)
-save_si_figure(figure_s23, "S7_figure_s23_predicted", 6, 4)
-save_si_figure(figure_s24, "S7_figure_s24_quartiles", 9, 4)
+save_si_figure(figure_s22, "S7_figure_s22_gap_histogram", 8, 3.6)
+save_si_figure(figure_s23, "S7_figure_s23_predicted", 7.5, 4.2)
+save_si_figure(figure_s24, "S7_figure_s24_quartiles", 9, 4.6)

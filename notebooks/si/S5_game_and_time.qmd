@@ -15,6 +15,7 @@ code-links:
 #| include: false
 here::i_am("notebooks/si/S5_game_and_time.qmd")
 knitr::read_chunk(here::here("code", "si", "S5_game_and_time.R"))
+knitr::read_chunk(here::here("code", "si", "figures", "S5_figures.R"))
 ```
 
 This notebook describes the game data and how giving changed during the
@@ -48,9 +49,24 @@ takes about half a minute.)
 ```
 
 ```{r s5-figure-s9}
+#| fig-width: 7
+#| fig-height: 3
+```
+
+::: {.callout-note collapse="true" appearance="simple"}
+## Supporting Information layout
+
+Plotting code from `code/si/figures/S5_figures.R`. This is the version
+saved to `output/figures/si/`.
+
+```{r plot-figure-s9}
+```
+
+```{r s5-figure-s9-si}
 #| fig-width: 9
 #| fig-height: 7
 ```
+:::
 
 ## Figure S10 and Table S13. Giving over the session
 
@@ -65,9 +81,24 @@ takes about half a minute.)
 ```
 
 ```{r s5-figure-s10}
+#| fig-width: 7
+#| fig-height: 3.5
+```
+
+::: {.callout-note collapse="true" appearance="simple"}
+## Supporting Information layout
+
+Plotting code from `code/si/figures/S5_figures.R`. This is the version
+saved to `output/figures/si/`.
+
+```{r plot-figure-s10}
+```
+
+```{r s5-figure-s10-si}
 #| fig-width: 9
 #| fig-height: 6
 ```
+:::
 
 ### Table S13. Classroom coverage by round
 
@@ -87,9 +118,24 @@ takes about half a minute.)
 ```
 
 ```{r s5-figure-s11}
+#| fig-width: 7
+#| fig-height: 3.5
+```
+
+::: {.callout-note collapse="true" appearance="simple"}
+## Supporting Information layout
+
+Plotting code from `code/si/figures/S5_figures.R`. This is the version
+saved to `output/figures/si/`.
+
+```{r plot-figure-s11}
+```
+
+```{r s5-figure-s11-si}
 #| fig-width: 9
 #| fig-height: 6.5
 ```
+:::
 
 ### Table S14. Giving trends by friendship group
 
@@ -119,25 +165,85 @@ change toward the others.
 ```
 
 ```{r s5-figure-s12}
-#| fig-width: 9
+#| fig-width: 7
+#| fig-height: 3.5
+```
+
+::: {.callout-note collapse="true" appearance="simple"}
+## Supporting Information layout
+
+Plotting code from `code/si/figures/S5_figures.R`. This is the version
+saved to `output/figures/si/`.
+
+```{r plot-s12-panel-a}
+```
+
+```{r plot-s12-panel-b}
+```
+
+```{r plot-s12-panel-c}
+```
+
+```{r plot-figure-s12}
+```
+
+```{r s5-figure-s12-si}
+#| fig-width: 11
 #| fig-height: 3.8
 ```
+:::
 
 ## Figure S13. Classroom size
 
 ```{r s5-class-size}
-#| fig-width: 9
-#| fig-height: 3.6
 ```
+
+```{r s5-figure-s13}
+#| fig-width: 7
+#| fig-height: 3.5
+```
+
+::: {.callout-note collapse="true" appearance="simple"}
+## Supporting Information layout
+
+Plotting code from `code/si/figures/S5_figures.R`. This is the version
+saved to `output/figures/si/`.
+
+```{r plot-figure-s13}
+```
+
+```{r s5-figure-s13-si}
+#| fig-width: 9
+#| fig-height: 4
+```
+:::
 
 ## Figure S14. Time between decisions
 
 Only the 29 classrooms where the tablets recorded the time of each decision.
 
 ```{r s5-pacing}
-#| fig-width: 6
+```
+
+```{r s5-figure-s14}
+#| fig-width: 7
 #| fig-height: 3.5
 ```
+
+::: {.callout-note collapse="true" appearance="simple"}
+## Supporting Information layout
+
+Plotting code from `code/si/figures/S5_figures.R`. This is the version
+saved to `output/figures/si/`.
+
+```{r plot-figure-s14}
+```
+
+```{r s5-figure-s14-si}
+#| fig-width: 8
+#| fig-height: 5.5
+```
+:::
 
 ```{r s5-save}
 ```

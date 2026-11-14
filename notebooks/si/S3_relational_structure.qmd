@@ -15,6 +15,7 @@ code-links:
 #| include: false
 here::i_am("notebooks/si/S3_relational_structure.qmd")
 knitr::read_chunk(here::here("code", "si", "S3_relational_structure.R"))
+knitr::read_chunk(here::here("code", "si", "figures", "S3_figures.R"))
 ```
 
 Each classroom is a small closed group in which we observe several
@@ -54,10 +55,28 @@ subtitle gives the share of ties between children of the same sex.
 
 ### Figure S2. All layers of classroom 20
 
-```{r s3-figure-s2}
+Each panel is one network of the same classroom, with every child in the
+same position.
+
+```{r s3-figure-s2-minimal}
 #| fig-width: 9
 #| fig-height: 13
 ```
+
+::: {.callout-note collapse="true" appearance="simple"}
+## Supporting Information layout
+
+The same layers drawn as tilted planes stacked from top to bottom and
+grouped by kind. This is the version saved to `output/figures/si/`.
+
+```{r plot-figure-s2}
+```
+
+```{r s3-figure-s2}
+#| fig-width: 6.5
+#| fig-height: 10
+```
+:::
 
 ### Figures S3–S5. Small, intermediate and large classrooms
 
@@ -65,6 +84,21 @@ subtitle gives the share of ties between children of the same sex.
 #| fig-width: 9
 #| fig-height: 3.2
 ```
+
+::: {.callout-note collapse="true" appearance="simple"}
+## Supporting Information layout
+
+Plotting code from `code/si/figures/S3_figures.R`. This is the version
+saved to `output/figures/si/`.
+
+```{r plot-focal-layers}
+```
+
+```{r s3-figures-s3-s5-si}
+#| fig-width: 9
+#| fig-height: 3.6
+```
+:::
 
 ```{r}
 #| fig-width: 9

@@ -14,6 +14,7 @@
 ## ---- s3-setup ----
 source(here::here("code", "00_helpers.R"))
 source(here("code", "00_style.R"))
+source(here("code", "si", "figures", "S3_figures.R"))   # plotting functions of this section
 library(igraph)
 library(ggraph)
 library(patchwork)
@@ -144,31 +145,41 @@ draw_sociogram <- function(this_class, layer, nodes, title = layer) {
 }
 
 
-## ---- s3-figure-s2 ----
-# Figure S2: every layer of class 20
+## ---- s3-figure-s2-minimal ----
+# Figure S2, minimal version: every layer of class 20 as a grid of sociograms
+# (same positions in every panel)
 nodes_20 <- class_layout(20, seed = 20)
 layers <- c("tokens_sent", "tokens_received", names(question_names))
 layer_titles <- c("Tokens sent (out-strength)", "Tokens received (in-strength)", question_names)
 
-figure_s2 <- map2(layers, layer_titles, ~ draw_sociogram(20, .x, nodes_20, .y)) %>%
+figure_s2_minimal <- map2(layers, layer_titles, ~ draw_sociogram(20, .x, nodes_20, .y)) %>%
   wrap_plots(ncol = 3)
 
+figure_s2_minimal
+
+
+## ---- s3-figure-s2 ----
+# Figure S2 as in the SI: the same layers drawn as tilted planes stacked from
+# top to bottom and grouped by kind: the game (tokens), friendship, positive
+# and negative nominations. Each child keeps the same position in every plane.
+figure_s2 <- plot_figure_s2(dyads, nodes_20)
 figure_s2
 
 
 ## ---- s3-figures-s3-s5 ----
-# Figures S3-S5: the three focal questions for three classroom sizes
-focal <- c(nom_q3 = "Best friends (Q3)", nom_q4 = "Most popular (Q4)", nom_q5 = "Not popular (Q5)")
+# Figures S3-S5: the three focal questions for three classroom sizes.
+# Gray arrows are nominations; a reciprocated pair is drawn once, curved,
+# with a head at each end. Node size = nominations received in that network.
+# Quick look: the three focal networks of the small classroom
+nodes_16 <- class_layout(16, seed = 16)
+map(c("nom_q3", "nom_q4", "nom_q5"), ~ draw_sociogram(16, .x, nodes_16)) %>%
+  wrap_plots(nrow = 1)
 
-three_layers <- function(this_class) {
-  nodes <- class_layout(this_class, seed = this_class)
-  map2(names(focal), focal, ~ draw_sociogram(this_class, .x, nodes, .y)) %>%
-    wrap_plots(nrow = 1)
-}
-
-figure_s3 <- three_layers(16)   # small, 9 children
-figure_s4 <- three_layers(40)   # intermediate, 18 children (all girls)
-figure_s5 <- three_layers(1)    # large, 33 children
+## ---- s3-figures-s3-s5-si ----
+# Supporting Information layout (plotting code in figures/S3_figures.R)
+figure_s3 <- plot_focal_layers(dyads, class_layout(16, seed = 16), 16)   # small, 9 children
+figure_s4 <- plot_focal_layers(dyads, class_layout(40, seed = 40), 40)   # intermediate, 18 children (all girls)
+figure_s5 <- plot_focal_layers(dyads, class_layout(1, seed = 1), 1)      # large, 33 children
 
 figure_s3
 
@@ -180,7 +191,7 @@ save_si_figure <- function(plot, name, width, height) {
   ggsave(here("output", "figures", "si", paste0(name, ".pdf")), plot, width = width, height = height)
   ggsave(here("output", "figures", "si", paste0(name, ".png")), plot, width = width, height = height, dpi = 300)
 }
-save_si_figure(figure_s2, "S3_figure_s2_class20_layers", 9, 13)
-save_si_figure(figure_s3, "S3_figure_s3_class16", 9, 3.2)
-save_si_figure(figure_s4, "S3_figure_s4_class40", 9, 3.2)
-save_si_figure(figure_s5, "S3_figure_s5_class1", 9, 3.2)
+save_si_figure(figure_s2, "S3_figure_s2_class20_layers", 6.5, 10)
+save_si_figure(figure_s3, "S3_figure_s3_class16", 9, 3.6)
+save_si_figure(figure_s4, "S3_figure_s4_class40", 9, 3.6)
+save_si_figure(figure_s5, "S3_figure_s5_class1", 9, 3.6)

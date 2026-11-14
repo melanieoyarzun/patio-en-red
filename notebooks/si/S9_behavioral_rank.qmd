@@ -15,6 +15,7 @@ code-links:
 #| include: false
 here::i_am("notebooks/si/S9_behavioral_rank.qmd")
 knitr::read_chunk(here::here("code", "si", "S9_behavioral_rank.R"))
+knitr::read_chunk(here::here("code", "si", "figures", "S9_figures.R"))
 ```
 
 Instead of asking children who is popular, we can read rank off the game:
@@ -107,21 +108,45 @@ knitr::kable(table_s55[["Higher-to-lower"]])
 
 ```{r s9-figure-s29}
 #| fig-width: 9
-#| fig-height: 6
+#| fig-height: 3
 ```
+
+::: {.callout-note collapse="true" appearance="simple"}
+## Supporting Information layout
+
+Plotting code from `code/si/figures/S9_figures.R`. This is the version
+saved to `output/figures/si/`.
+
+```{r plot-figure-s29}
+```
+
+```{r s9-figure-s29-si}
+#| fig-width: 9
+#| fig-height: 5.5
+```
+:::
 
 ## Figure S30
 
 ```{r s9-figure-s30}
 #| fig-width: 9
-#| fig-height: 4.5
+#| fig-height: 5
 ```
 
-```{r}
-#| fig-width: 9
-#| fig-height: 4.5
-figure_s30
+::: {.callout-note collapse="true" appearance="simple"}
+## Supporting Information layout
+
+Plotting code from `code/si/figures/S9_figures.R`. This is the version
+saved to `output/figures/si/`.
+
+```{r plot-figure-s30}
 ```
+
+```{r s9-figure-s30-si}
+#| fig-width: 10
+#| fig-height: 6
+```
+:::
 
 ```{r s9-save}
 ```

@@ -19,6 +19,7 @@
 ## ---- s8-setup ----
 source(here::here("code", "00_helpers.R"))
 source(here("code", "00_style.R"))
+source(here("code", "si", "figures", "S8_figures.R"))   # plotting functions of this section
 library(igraph)
 library(patchwork)
 dir.create(here("output", "figures", "si"), recursive = TRUE, showWarnings = FALSE)
@@ -199,17 +200,17 @@ filtered_bins <- dyads %>%
             mean_sent = mean(sent, na.rm = TRUE), mean_received = mean(received, na.rm = TRUE),
             mean_coop_gap = mean(coop_gap), ci = 1.96 * sd(coop_gap) / sqrt(n), .groups = "drop")
 
-figure_s25 <- ggplot(filtered_bins, aes(gap, mean_coop_gap, color = friendship)) +
-  geom_hline(yintercept = 0, linetype = "dashed") + geom_vline(xintercept = 0, linetype = "dashed") +
-  geom_line() + geom_point() +
-  geom_errorbar(aes(ymin = mean_coop_gap - ci, ymax = mean_coop_gap + ci), width = 0.03) +
-  facet_wrap(~ friendship) +
-  scale_color_manual(values = c("Non-friends" = color_non_friends, Mutual = color_mutual,
-                                "Sender declares" = color_asymmetric)) +
-  labs(x = "Social Rank GAP", y = "Filtered Cooperation GAP") +
-  theme_paper(9) + theme(strip.background = element_blank())
-figure_s25
+# Quick look: filtered Cooperation GAP by bin and friendship type
+ggplot(filtered_bins, aes(gap, mean_coop_gap)) +
+  geom_hline(yintercept = 0) +
+  geom_line() +
+  geom_point() +
+  facet_wrap(~ friendship)
 
+## ---- s8-figure-s25-si ----
+# Supporting Information layout (plotting code in figures/S8_figures.R)
+figure_s25 <- plot_figure_s25()
+figure_s25
 
 ## ---- s8-threshold-function ----
 # 8.2 Re-filter at other retention rates. "global": one cutoff for all
@@ -322,6 +323,21 @@ format_asymmetric_thresholds <- function(nomination_direction) {
     rename("Target" = retention, "Decisions" = n, "Senders with 2+ decisions" = senders_2plus)
 }
 
+## ---- s8-figure-asymmetric-thresholds ----
+# Quick look: coefficients by retention share, direction and specification
+asymmetric_thresholds %>%
+  filter(!is.na(estimate), retention >= 0.4, spec %in% levels(spec)[1:3]) %>%
+  ggplot(aes(retention, estimate, color = direction)) +
+  geom_hline(yintercept = 0) +
+  geom_line() +
+  geom_point() +
+  facet_wrap(~ spec) +
+  scale_x_reverse()
+
+## ---- s8-figure-asymmetric-thresholds-si ----
+# Supporting Information layout (plotting code in figures/S8_figures.R)
+figure_asymmetric_thresholds <- plot_figure_asymmetric_thresholds(asymmetric_thresholds)
+figure_asymmetric_thresholds
 
 ## ---- s8-nomination-cap ----
 # 8.3 Rebuild Social Rank with modified popularity nominations and re-run
@@ -380,12 +396,16 @@ table_s36 <- bind_rows(
 
 table_s36
 
-figure_s26 <- ggplot(table_s36, aes(estimate, fct_rev(fct_inorder(construction)))) +
-  geom_vline(xintercept = 0, linetype = "dashed") +
-  geom_errorbarh(aes(xmin = estimate - 1.96 * se, xmax = estimate + 1.96 * se), height = 0.2) +
-  geom_point(size = 2) +
-  labs(x = "Social Rank GAP coefficient", y = NULL) + theme_paper(10)
 
+## ---- s8-figure-s26 ----
+# Quick look: coefficient and 95% CI under each construction
+ggplot(table_s36, aes(estimate, construction)) +
+  geom_pointrange(aes(xmin = estimate - 1.96 * se, xmax = estimate + 1.96 * se))
+
+## ---- s8-figure-s26-si ----
+# Supporting Information layout (plotting code in figures/S8_figures.R)
+figure_s26 <- plot_figure_s26(table_s36)
+figure_s26
 
 ## ---- s8-class-size ----
 # 8.4 Does the slope differ by classroom size? Size terciles and a continuous
@@ -413,21 +433,15 @@ lfe::waldtest(size_interaction, grep("rank_gap:size_group", names(coef(size_inte
 term_estimate(preferred_model(dyads, rhs = "rank_gap * class_size"), "rank_gap:class_size")
 
 
-## ---- s8-class-size-figure ----
-quartile_cuts <- quantile(c(dyads$sender_rank, dyads$receiver_rank), c(0.25, 0.5, 0.75))
-figure_s27 <- dyads %>%
-  mutate(sender_q   = findInterval(sender_rank, quartile_cuts, left.open = TRUE) + 1,
-         receiver_q = findInterval(receiver_rank, quartile_cuts, left.open = TRUE) + 1) %>%
-  group_by(size_group, sender_q, receiver_q) %>%
-  summarise(observed = mean(coop_gap), .groups = "drop") %>%
-  ggplot(aes(factor(receiver_q), factor(sender_q), fill = observed)) +
-  geom_tile() + geom_text(aes(label = sprintf("%.2f", observed)), size = 2.6) +
-  scale_fill_gradient2(low = "#4B6587", mid = "white", high = "#C95A3A") +
-  facet_wrap(~ size_group) +
-  labs(x = "Receiver quartile", y = "Sender quartile", fill = "Coop GAP") +
-  theme_paper(9) + theme(legend.position = "right", strip.background = element_blank())
-figure_s27
+## ---- s8-figure-s27 ----
+# Quick look: slope and 95% CI in each classroom-size group
+ggplot(size_slopes, aes(estimate, size_group)) +
+  geom_pointrange(aes(xmin = estimate - 1.96 * se, xmax = estimate + 1.96 * se))
 
+## ---- s8-figure-s27-si ----
+# Supporting Information layout (plotting code in figures/S8_figures.R)
+figure_s27 <- plot_figure_s27(dyads, size_slopes)
+figure_s27
 
 ## ---- s8-temporal ----
 # 8.5 Does the slope change over the session?
@@ -574,10 +588,10 @@ subgroup_table <- function(grouping, friendship_sample, outcome_name) {
 # 8.8 The preferred model with the rank gap from each alternative
 # construction of Social Rank (built in S4)
 alternative_ranks <- read_csv(here("data", "generated", "alternative_ranks.csv"), show_col_types = FALSE)
-alternative_labels <- c(social_rank = "Social Rank (primary)",
-                        rank_net_nominations = "Net popularity nominations",
-                        rank_pn_centrality   = "Signed in-PN centrality",
-                        rank_pr_minus_neg_in = "Positive PageRank minus negative indegree",
+alternative_labels <- c(social_rank          = "Pop. Social Rank\n(Affine transform)",
+                        rank_pn_centrality   = "Signed PN centrality",
+                        rank_net_nominations = "Net nominations",
+                        rank_pr_minus_neg_in = "Pos. PageRank -\nneg. indegree",
                         rank_two_layer       = "Two-layer PageRank",
                         rank_positive_only   = "Positive-only PageRank")
 
@@ -586,29 +600,41 @@ gap_with <- function(measure) {
   r[as.character(dyads$sender_id)] - r[as.character(dyads$receiver_id)]
 }
 
-rank_robustness <- expand_grid(measure = names(alternative_labels),
-                               sample = c("All dyads", "Non-friends", "Mutual friends")) %>%
+# Five samples as in the SI figure, all with the preferred specification.
+# One-sided friendships are seen from the receiver ("alter declares") or from
+# the sender ("ego declares").
+robustness_samples <- c("A. All dyads", "B. Non-friends", "C. Mutual friends",
+                        "D. Alter declares", "E. Ego declares")
+
+rank_robustness <- expand_grid(measure = names(alternative_labels), sample = robustness_samples) %>%
   mutate(result = map2(measure, sample, function(m, s) {
     d <- dyads %>% mutate(rank_gap = gap_with(m))
-    d <- switch(s, "All dyads" = d, "Non-friends" = filter(d, friendship == "Non-friends"),
-                "Mutual friends" = filter(d, friendship == "Mutual"))
+    d <- switch(s,
+                "A. All dyads"      = d,
+                "B. Non-friends"    = filter(d, friendship == "Non-friends"),
+                "C. Mutual friends" = filter(d, friendship == "Mutual"),
+                "D. Alter declares" = filter(d, friendship == "Receiver declares"),
+                "E. Ego declares"   = filter(d, friendship == "Sender declares"))
     term_estimate(preferred_model(d))
   })) %>%
   unnest(result) %>%
-  mutate(measure = factor(alternative_labels[measure], levels = rev(alternative_labels)))
+  mutate(primary = measure == "social_rank",
+         measure = factor(alternative_labels[measure], levels = rev(alternative_labels)))
 
 rank_robustness %>% select(measure, sample, estimate) %>%
   pivot_wider(names_from = sample, values_from = estimate)
 
-figure_s28 <- ggplot(rank_robustness, aes(estimate, measure)) +
-  geom_vline(xintercept = 0, linetype = "dashed") +
-  geom_errorbarh(aes(xmin = estimate - 1.96 * se, xmax = estimate + 1.96 * se), height = 0.2) +
-  geom_point(size = 1.8) +
-  facet_wrap(~ sample) +
-  labs(x = "Social Rank GAP coefficient", y = NULL) +
-  theme_paper(9) + theme(strip.background = element_blank())
-figure_s28
 
+## ---- s8-figure-s28 ----
+# Quick look: coefficient by rank construction and sample
+ggplot(rank_robustness, aes(estimate, measure)) +
+  geom_point() +
+  facet_wrap(~ sample, nrow = 1, scales = "free_x")
+
+## ---- s8-figure-s28-si ----
+# Supporting Information layout (plotting code in figures/S8_figures.R)
+figure_s28 <- plot_figure_s28(rank_robustness)
+figure_s28
 
 ## ---- s8-affiliation-ranks ----
 # 8.9 Rank from affiliation networks instead of popularity: PageRank of
@@ -688,7 +714,8 @@ pwalk(subgroup_tables, function(by, sample, outcome, table) {
 })
 save_table(rank_robustness, "S8_rank_constructions")
 save_table(table_s52, "S8_table_s52_affiliation_ranks")
-save_si_figure(figure_s25, "S8_figure_s25_filtered", 9, 3.2)
-save_si_figure(figure_s26, "S8_figure_s26_nomination_cap", 6, 3)
-save_si_figure(figure_s27, "S8_figure_s27_class_size", 9, 3.2)
-save_si_figure(figure_s28, "S8_figure_s28_rank_constructions", 9, 3.5)
+save_si_figure(figure_s25, "S8_figure_s25_filtered", 6.5, 9)
+save_si_figure(figure_asymmetric_thresholds, "S8_figure_asymmetric_thresholds", 9, 6)
+save_si_figure(figure_s26, "S8_figure_s26_nomination_cap", 7, 3.4)
+save_si_figure(figure_s27, "S8_figure_s27_class_size", 10, 4)
+save_si_figure(figure_s28, "S8_figure_s28_rank_constructions", 11, 3.4)

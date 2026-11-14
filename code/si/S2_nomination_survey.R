@@ -12,6 +12,7 @@
 ## ---- s2-setup ----
 source(here::here("code", "00_helpers.R"))
 source(here("code", "00_style.R"))
+source(here("code", "si", "figures", "S2_figures.R"))   # plotting functions of this section
 dir.create(here("output", "figures", "si"), recursive = TRUE, showWarnings = FALSE)
 
 dyads <- read_csv(here("data", "generated", "analysis_dyads.csv"), show_col_types = FALSE)
@@ -42,17 +43,17 @@ table_s3
 
 
 ## ---- s2-figure-s1 ----
-figure_s1 <- ggplot(out_nominations, aes(x = nominations)) +
-  geom_bar(fill = "grey55", width = 0.8) +
-  geom_vline(xintercept = 5.5, linetype = "dashed") +
-  facet_wrap(~ question) +
-  scale_x_continuous(breaks = 0:5) +
-  labs(x = "Nominations sent", y = "Students") +
-  theme_paper(base_size = 10) +
-  theme(strip.background = element_blank(), strip.text = element_text(face = "bold"))
+# Bars: share of children who named 0, 1, ..., 5 classmates. The bar at the
+# limit of five is highlighted in orange; the dotted line is the median.
+# Quick look: how many classmates each child named, per question
+ggplot(out_nominations, aes(nominations)) +
+  geom_bar() +
+  facet_wrap(~ question)
 
+## ---- s2-figure-s1-si ----
+# Supporting Information layout (plotting code in figures/S2_figures.R)
+figure_s1 <- plot_figure_s1(out_nominations, question_labels)
 figure_s1
-
 
 ## ---- s2-consistency ----
 # Table S4: the same classmate named as "most popular" (Q4) and as

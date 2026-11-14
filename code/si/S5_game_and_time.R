@@ -16,6 +16,7 @@
 ## ---- s5-setup ----
 source(here::here("code", "00_helpers.R"))
 source(here("code", "00_style.R"))
+source(here("code", "si", "figures", "S5_figures.R"))   # plotting functions of this section
 library(patchwork)
 dir.create(here("output", "figures", "si"), recursive = TRUE, showWarnings = FALSE)
 
@@ -121,49 +122,16 @@ c(zero_tokens = mean(dyads$tokens_sent == 0), ten_tokens = mean(dyads$tokens_sen
 
 
 ## ---- s5-figure-s9 ----
-panel_a <- ggplot(dyads, aes(tokens_sent)) +
-  geom_bar(fill = "grey55") +
-  scale_x_continuous(breaks = 0:10) +
-  labs(title = "A. Tokens sent", x = "Tokens sent", y = "Decisions") + theme_paper(9)
+# Figure S9: (A) tokens sent, (B) the two allocations of each pair,
+# (C) the Cooperation GAP, with zero gaps in orange, (D) what zero gaps are made of
+# Quick look: tokens sent and the Cooperation GAP
+(ggplot(dyads, aes(tokens_sent)) + geom_bar()) |
+  (ggplot(dyads, aes(coop_gap)) + geom_bar())
 
-pair_cells <- pairs %>%
-  count(high = pmax(tokens_sent, tokens_received), low = pmin(tokens_sent, tokens_received)) %>%
-  mutate(percent = 100 * n / sum(n))
-
-panel_b <- ggplot(pair_cells, aes(high, low, fill = percent)) +
-  geom_tile(color = "white") +
-  geom_text(aes(label = round(percent, 1)), size = 1.8) +
-  scale_fill_gradient(low = "#FFF4D6", high = "#C95A3A") +
-  scale_x_continuous(breaks = 0:10) + scale_y_continuous(breaks = 0:10) +
-  coord_fixed() +
-  labs(title = "B. The two allocations of each pair", x = "Higher allocation", y = "Lower allocation") +
-  theme_paper(9)
-
-panel_c <- dyads %>%
-  mutate(kind = case_when(coop_gap == 0 & tokens_sent == 0 ~ "0-0 exchange",
-                          coop_gap == 0                    ~ "equal positive",
-                          TRUE                             ~ "unequal")) %>%
-  ggplot(aes(coop_gap, fill = kind)) +
-  geom_bar() +
-  scale_fill_manual(values = c("0-0 exchange" = "#E7B56A", "equal positive" = "#C95A3A", unequal = "grey60")) +
-  labs(title = "C. Cooperation GAP", x = "Received - sent", y = "Decisions", fill = NULL) +
-  theme_paper(9) + theme(legend.position = c(0.2, 0.8))
-
-panel_d <- pairs %>%
-  filter(coop_gap == 0) %>%
-  mutate(friend_group = if_else(friendship %in% c("Sender declares", "Receiver declares"),
-                                "Asymmetric ties", as.character(friend_group))) %>%
-  ggplot(aes(tokens_sent, fill = friend_group)) +
-  geom_bar() +
-  scale_fill_manual(values = c("Non-friends" = color_non_friends, "Asymmetric ties" = color_asymmetric,
-                               "Mutual friends" = color_mutual)) +
-  scale_x_continuous(breaks = 0:10) +
-  labs(title = "D. Balanced pairs by allocation and friendship", x = "Tokens each sent", y = "Pairs", fill = NULL) +
-  theme_paper(9) + theme(legend.position = c(0.3, 0.8))
-
-figure_s9 <- (panel_a | panel_b) / (panel_c | panel_d)
+## ---- s5-figure-s9-si ----
+# Supporting Information layout (plotting code in figures/S5_figures.R)
+figure_s9 <- plot_figure_s9(dyads, pairs)
 figure_s9
-
 
 ## ---- s5-round-means ----
 # Means with 95% confidence intervals, and the number of classrooms behind
@@ -187,23 +155,15 @@ by_fifth
 
 
 ## ---- s5-figure-s10 ----
-time_panel <- function(data, x, title, xlab, ribbon = TRUE) {
-  p <- ggplot(data, aes({{ x }}, mean))
-  if (ribbon) p <- p + geom_ribbon(aes(ymin = low, ymax = high), fill = "grey85")
-  p + geom_line(color = "grey30") +
-    geom_point(aes(size = classrooms), color = "grey20") +
-    scale_size_continuous(range = c(0.4, 2.2)) +
-    labs(title = title, x = xlab, y = "Mean tokens sent") +
-    theme_paper(9)
-}
+# Quick look: mean tokens sent by classroom round
+ggplot(by_round, aes(round, mean)) +
+  geom_line() +
+  geom_point()
 
-figure_s10 <- (time_panel(by_round, round, "A. Classroom round", "Round") |
-               time_panel(filter(by_round, round <= 7), round, "B. Rounds 1-7", "Round")) /
-              (time_panel(by_order, decision_order, "C. Personal decision order", "Decision", ribbon = FALSE) |
-               time_panel(by_fifth, fifth, "D. Fifths of personal progress", "Fifth") +
-                 geom_errorbar(aes(ymin = low, ymax = high), width = 0.1))
+## ---- s5-figure-s10-si ----
+# Supporting Information layout (plotting code in figures/S5_figures.R)
+figure_s10 <- plot_figure_s10(by_round, by_order, by_fifth)
 figure_s10
-
 
 ## ---- s5-coverage ----
 # Table S13: how many classrooms have at least one decision in each round
@@ -230,28 +190,14 @@ by_fifth_f %>% filter(fifth %in% c(1, 5))
 
 
 ## ---- s5-figure-s11 ----
-friend_colors <- c("Non-friends" = color_non_friends, "Asymmetric ties" = color_asymmetric,
-                   "Mutual friends" = color_mutual)
+# Quick look: mean tokens sent by round and friendship group
+ggplot(by_round_f, aes(round, mean, color = friend_group)) +
+  geom_line()
 
-group_panel <- function(data, x, title, xlab) {
-  ggplot(data, aes({{ x }}, mean, color = friend_group)) +
-    geom_hline(yintercept = mean(dyads$tokens_sent), linetype = "dashed", color = "#7C8FA6") +
-    geom_line() +
-    geom_point(aes(size = classrooms)) +
-    scale_color_manual(values = friend_colors) +
-    scale_size_continuous(range = c(0.3, 2), guide = "none") +
-    labs(title = title, x = xlab, y = "Mean tokens sent", color = NULL) +
-    theme_paper(9)
-}
-
-figure_s11 <- (group_panel(by_round_f, round, "A. Classroom round", "Round") |
-               group_panel(filter(by_round_f, round <= 7), round, "B. Rounds 1-7", "Round")) /
-              (group_panel(by_order_f, decision_order, "C. Personal decision order", "Decision") |
-               group_panel(by_fifth_f, fifth, "D. Fifths of personal progress", "Fifth") +
-                 geom_errorbar(aes(ymin = low, ymax = high), width = 0.1) +
-                 theme(legend.position = "bottom"))
+## ---- s5-figure-s11-si ----
+# Supporting Information layout (plotting code in figures/S5_figures.R)
+figure_s11 <- plot_figure_s11(by_round_f, by_order_f, by_fifth_f, by_round, by_order, by_fifth)
 figure_s11
-
 
 ## ---- s5-friendship-slopes ----
 # Table S14: does giving change at the same rate in the three groups?
@@ -384,30 +330,46 @@ table_s15 %>% mutate(across(where(is.double), ~ round(.x, 3)))
 
 
 ## ---- s5-figure-s12 ----
-# Figure S12: (A) the decomposition; (B) within-child means toward
-# nominated (A) and other (N) receivers in the first and final fifths
-figure_s12_a <- decomposition %>%
-  select(friend_group, `Within categories` = within, `Category shares` = composition) %>%
-  pivot_longer(-friend_group, names_to = "component") %>%
-  ggplot(aes(component, value, fill = friend_group)) +
-  geom_col() +
-  geom_hline(yintercept = 0) +
-  scale_fill_manual(values = friend_colors) +
-  labs(title = "A. Change in mean giving, first to final fifth", x = NULL, y = "Tokens", fill = NULL) +
-  theme_paper(9) + theme(legend.position = "bottom")
+# Figure S12: (A) aggregate change and its two components; (B) mean giving
+# of the same children toward the classmates they named and the others, in the
+# first and final fifths; (C) the within-child changes with classroom-bootstrap CIs
+# within-child means (first and final fifth) toward nominated (A) and other (N) classmates
+child_means <- child_cells %>%
+  filter(sender_id %in% complete_children) %>%
+  group_by(receiver_type, period) %>%
+  summarise(mean = mean(mean_tokens), se = sd(mean_tokens) / sqrt(n()), .groups = "drop") %>%
+  mutate(receiver_type = if_else(receiver_type == "A", "Sender-nominated", "Not sender-nominated"),
+         period = if_else(period == "E", "First 20%", "Final 20%"),
+         period = factor(period, levels = c("First 20%", "Final 20%")))
 
-figure_s12_b <- child_level %>%
-  summarise(`Nominated (A)` = mean(change_A), `Other (N)` = mean(change_N), Difference = mean(D)) %>%
-  pivot_longer(everything()) %>%
-  mutate(name = fct_inorder(name)) %>%
-  ggplot(aes(name, value)) +
-  geom_col(fill = c("#00A388", "grey60", "#C95A3A"), width = 0.6) +
-  labs(title = "B. Within-child change (216 children)", x = NULL, y = "Tokens") +
-  theme_paper(9)
+# classroom bootstrap of the three child-level means
+set.seed(999)
+change_draws <- map_dfr(1:999, function(b) {
+  sampled <- tibble(class_id = sample(classrooms, replace = TRUE)) %>%
+    left_join(child_level, by = "class_id", relationship = "many-to-many")
+  tibble(reference = mean(sampled$change_N), additional = mean(sampled$D), total = mean(sampled$change_A))
+})
 
-figure_s12 <- figure_s12_a | figure_s12_b
+change_components <- tibble(
+  term = factor(c("Reference\n(not sender-\nnominated)", "Additional\nchange toward\nnominated",
+                  "Total change\ntoward\nnominated"),
+                levels = rev(c("Reference\n(not sender-\nnominated)", "Additional\nchange toward\nnominated",
+                               "Total change\ntoward\nnominated"))),
+  estimate = c(mean(child_level$change_N), mean(child_level$D), mean(child_level$change_A)),
+  low  = map_dbl(change_draws, quantile, 0.025),
+  high = map_dbl(change_draws, quantile, 0.975),
+  highlight = c(FALSE, TRUE, FALSE))
+
+# Quick look: giving toward named and other classmates, first and final fifth
+ggplot(child_means, aes(period, mean, color = receiver_type, group = receiver_type)) +
+  geom_line() +
+  geom_point()
+
+## ---- s5-figure-s12-si ----
+# Supporting Information layout (plotting code in figures/S5_figures.R)
+figure_s12 <- plot_figure_s12(decomposition, child_means, change_components, child_level,
+                              n_children = n_distinct(dyads$sender_id))
 figure_s12
-
 
 ## ---- s5-class-size ----
 # Figure S13: by classroom size group, and classroom-specific slopes
@@ -422,21 +384,17 @@ class_slopes <- dyads %>%
 
 cor.test(class_slopes$slope, class_slopes$class_size)
 
-figure_s13 <- (ggplot(size_groups, aes(fifth, mean, color = size_group)) +
-                 geom_ribbon(aes(ymin = low, ymax = high, fill = size_group), alpha = 0.15, color = NA) +
-                 geom_line() + geom_point() +
-                 labs(title = "A. By classroom size", x = "Fifth of personal progress",
-                      y = "Mean tokens sent", color = NULL, fill = NULL) +
-                 theme_paper(9) + theme(legend.position = "bottom")) |
-              (ggplot(class_slopes, aes(class_size, slope)) +
-                 geom_hline(yintercept = 0, linetype = "dashed") +
-                 geom_point(color = "grey30") +
-                 geom_smooth(method = "lm", color = "#C95A3A") +
-                 labs(title = "B. Classroom-specific change", x = "Classroom size",
-                      y = "First-to-last change (tokens)") +
-                 theme_paper(9))
-figure_s13
 
+## ---- s5-figure-s13 ----
+# Quick look: classroom-specific trends against classroom size
+ggplot(class_slopes, aes(class_size, slope)) +
+  geom_point() +
+  geom_smooth(method = "lm")
+
+## ---- s5-figure-s13-si ----
+# Supporting Information layout (plotting code in figures/S5_figures.R)
+figure_s13 <- plot_figure_s13(size_groups, class_slopes)
+figure_s13
 
 ## ---- s5-pacing ----
 # Figure S14: seconds between two consecutive decisions of the same child,
@@ -459,14 +417,17 @@ pacing <- intervals %>%
 
 pacing
 
-figure_s14 <- ggplot(pacing, aes(decile, median)) +
-  geom_ribbon(aes(ymin = q25, ymax = q75), fill = "grey85") +
-  geom_line() + geom_point() +
-  scale_x_continuous(breaks = 1:10) +
-  labs(x = "Decile of the child's decision sequence", y = "Seconds since previous decision") +
-  theme_paper(10)
-figure_s14
 
+## ---- s5-figure-s14 ----
+# Quick look: median interval (and interquartile range) by decile of the session
+ggplot(pacing, aes(decile, median)) +
+  geom_ribbon(aes(ymin = q25, ymax = q75), alpha = 0.2) +
+  geom_line()
+
+## ---- s5-figure-s14-si ----
+# Supporting Information layout (plotting code in figures/S5_figures.R)
+figure_s14 <- plot_figure_s14(intervals)
+figure_s14
 
 ## ---- s5-save ----
 save_table(table_s11_a, "S5_table_s11a_schedule")
@@ -480,6 +441,6 @@ save_table(pacing, "S5_pacing")
 save_si_figure(figure_s9,  "S5_figure_s9_game",           9, 7)
 save_si_figure(figure_s10, "S5_figure_s10_time",          9, 6)
 save_si_figure(figure_s11, "S5_figure_s11_time_friendship", 9, 6.5)
-save_si_figure(figure_s12, "S5_figure_s12_decomposition", 9, 3.8)
-save_si_figure(figure_s13, "S5_figure_s13_class_size",    9, 3.6)
-save_si_figure(figure_s14, "S5_figure_s14_pacing",        6, 3.5)
+save_si_figure(figure_s12, "S5_figure_s12_decomposition", 11, 3.8)
+save_si_figure(figure_s13, "S5_figure_s13_class_size",    9, 4)
+save_si_figure(figure_s14, "S5_figure_s14_pacing",        8, 5.5)

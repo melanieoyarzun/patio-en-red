@@ -14,6 +14,9 @@ project:
 
 format:
   ipynb:
+    filters:
+      - path: _tools/unwrap_callouts.lua
+        at: pre-quarto
     df-print: kable
     # keep each HTML table as it is (one output per table)
     html-table-processing: none
