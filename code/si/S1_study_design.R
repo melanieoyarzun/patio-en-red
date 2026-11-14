@@ -38,11 +38,6 @@ table_s1 <- students %>%
             attendance         = mean(attendance_2017, na.rm = TRUE)) %>%
   left_join(tokens_by_class, by = "class_id")
 
-table_s1 %>%
-  mutate(across(c(age_mean, age_sd, cooperation), ~ round(.x, 2)),
-         across(c(female_pct, guardian_secondary, gpa, attendance), ~ round(.x, 1)))
-
-
 ## ---- s1-sample-totals ----
 # Totals quoted in the SI and the main text
 students %>%
