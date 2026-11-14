@@ -12,6 +12,7 @@
 #
 #   Input : data/generated/analysis_dyads.csv
 #   Output: output/figures/figure3_{I,II,III}_{A,B,C}.(pdf|png)
+#           output/figures/figure3_assembled.(pdf|png)
 #           output/tables/figure3_heatmap_cells.csv
 #           output/tables/figure3_binned_means.csv
 # =============================================================================
@@ -212,19 +213,41 @@ plot_coop_gap <- function(this_group, color, y_limits = c(-6, 6), main = "Observ
 
 ## ---- all-panels ----
 rows <- tribble(
-  ~row,  ~heatmap_group,   ~rank_group,       ~color,            ~y_min,
-  "I",   "Non-friends",    "Non-friends",     color_non_friends, -6,
-  "II",  "Mutual friends", "Mutual",          color_mutual,      -6,
-  "III", "Asymmetric",     "Sender declares", color_asymmetric,  -8.5
+  ~row,  ~label,                       ~heatmap_group,   ~rank_group,       ~color,            ~y_min,
+  "I",   "Non friends",                "Non-friends",    "Non-friends",     color_non_friends, -6,
+  "II",  "Mutual friends",             "Mutual friends", "Mutual",          color_mutual,      -6,
+  "III", "Sender declared friendship", "Asymmetric",     "Sender declares", color_asymmetric,  -8.5
 )
 
-figure3_panels <- pmap(rows, function(row, heatmap_group, rank_group, color, y_min) {
+figure3_panels <- pmap(select(rows, heatmap_group, rank_group, color, y_min),
+                      function(heatmap_group, rank_group, color, y_min) {
   list(A = plot_heatmap(heatmap_group),
        B = plot_tokens(rank_group, color),
        C = plot_coop_gap(rank_group, color, y_limits = c(y_min, 6)))
 }) %>% set_names(rows$row)
 
-figure3 <- patchwork::wrap_plots(flatten(figure3_panels), ncol = 3)
+## ---- fig3-row-assembly ----
+figure3_headers <- pmap(select(rows, roman = row, label, color), friendship_row_header) %>%
+  set_names(rows$row)
+
+assemble_figure3_row <- function(heading, panels) {
+  # The row heading supplies the friendship label in the composite.
+  panels$A <- panels$A + labs(title = NULL)
+  tagged <- imap(panels, function(panel, letter) {
+    panel + labs(tag = letter) +
+      theme(plot.tag = element_text(face = "bold", size = 10, hjust = 0, vjust = 1),
+            plot.tag.position = c(0, 1))
+  })
+  plots <- patchwork::wrap_plots(tagged, nrow = 1, widths = c(1.15, 1, 1))
+  patchwork::wrap_plots(patchwork::wrap_elements(full = heading), plots,
+                        ncol = 1, heights = c(0.095, 1))
+}
+
+figure3_rows <- map2(figure3_headers, figure3_panels, assemble_figure3_row)
+
+## ---- fig3-assemble ----
+figure3 <- patchwork::wrap_plots(figure3_rows, ncol = 1)
+figure3
 
 
 ## ---- fig3-save ----

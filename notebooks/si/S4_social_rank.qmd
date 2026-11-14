@@ -138,7 +138,9 @@ The public data support the guardian education comparison.
 
 ## Figure S8. Social Rank and student characteristics
 
-Panels A–O show within-classroom z-scores against Social Rank, with binned means and a linear fit. Panels P, Q, and S show Social Rank by sex, guardian education, and grade repetition. The public data omit religion (panel R) and use broader guardian-education categories. The scatter panels recompute correlations from the public data, so some values differ from those displayed in the SI.
+Panels A–O show within-classroom z-scores against Social Rank, with binned means and a linear fit. Panels P, Q, and S show Social Rank by sex, guardian education, and grade repetition. The scatter panels recompute correlations from the public data, so some values differ from those displayed in the SI.
+
+To reduce the risk of identifying participants, the public dataset omits religion (panel R) and uses broader categories for parent or guardian education (panel Q). Researchers who need these variables at the level of detail used in the SI can contact [Melanie Oyarzún](mailto:melanie.oyarzun@gmail.com) to discuss access.
 
 The same scatter panel is drawn for 15 characteristics and the same box-plot
 panel for three, so the script defines one function for each:

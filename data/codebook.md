@@ -2,6 +2,8 @@
 
 All identifiers are study codes created for this release. The files contain no names or links to administrative records. Class codes follow the order of the SI tables, so `class_id = 16` is "Class ID 16" in Figure 2.
 
+To reduce the risk of identifying participants, the public dataset omits religion and groups parent or guardian education into broader categories. Researchers who need these variables at the level of detail used in the Supporting Information can contact [Melanie Oyarzún](mailto:melanie.oyarzun@gmail.com) to discuss access.
+
 ### RAW Data
 
 ### `students.csv`

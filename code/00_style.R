@@ -106,6 +106,18 @@ header_bar <- function(label, color) {
     theme_void()
 }
 
+# Full-width row heading for Figure 3 and its filtered-token counterpart.
+friendship_row_header <- function(roman, label, color) {
+  ggplot() +
+    annotate("rect", xmin = 0, xmax = 1, ymin = 0, ymax = 1, fill = color) +
+    annotate("text", x = 0.015, y = 0.5, label = roman, hjust = 0,
+             color = "white", fontface = "bold", size = 3.4) +
+    annotate("text", x = 0.53, y = 0.5, label = label,
+             color = "white", fontface = "bold", size = 4.3) +
+    coord_cartesian(xlim = c(0, 1), ylim = c(0, 1), expand = FALSE) +
+    theme_void()
+}
+
 # "p < 2.2e-16" or "p = 0.0012", as printed by cor.test()
 format_p <- function(p) {
   if (p < 2.2e-16) "p < 2.2e-16" else paste("p =", format(signif(p, 2)))

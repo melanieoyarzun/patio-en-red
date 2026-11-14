@@ -94,18 +94,89 @@ table_s30 %>%
 
 The SI figure used a historical central-band filter. The 42 bin summaries from that run are included in `data/raw/figure_s25_bins.csv`. The regression tables use the global retention cutoff described above.
 
-```{r s8-figure-s25-rows}
+```{r s8-figure-s25-data}
 ```
 
-One row on its own (non-friends):
+#### Individual panels
+
+Panel A shows mean filtered tokens sent and received. Panel B compares the observed and filtered Cooperation GAP. Each function is used once per friendship group.
+
+```{r s8-figure-s25-panel-style}
+```
+
+```{r s8-figure-s25-tokens}
+```
+
+```{r s8-figure-s25-gap}
+```
+
+```{r s8-figure-s25-panels}
+```
+
+##### Row I. Non-friends
+
+```{r}
+#| fig-width: 3.5
+#| fig-height: 2.9
+s25_panels[["I"]]$A
+```
+
+```{r}
+#| fig-width: 3.5
+#| fig-height: 2.9
+s25_panels[["I"]]$B
+```
+
+##### Row II. Mutual friends
+
+```{r}
+#| fig-width: 3.5
+#| fig-height: 2.9
+s25_panels[["II"]]$A
+```
+
+```{r}
+#| fig-width: 3.5
+#| fig-height: 2.9
+s25_panels[["II"]]$B
+```
+
+##### Row III. Sender-declared friendships
+
+```{r}
+#| fig-width: 3.5
+#| fig-height: 2.9
+s25_panels[["III"]]$A
+```
+
+```{r}
+#| fig-width: 3.5
+#| fig-height: 2.9
+s25_panels[["III"]]$B
+```
+
+#### From panels to rows
+
+The colored headings and Roman numerals identify the friendship category in each row. Here is the heading for non-friends on its own, followed by the complete first row.
+
+```{r s8-figure-s25-row-assembly}
+```
+
+```{r}
+#| fig-width: 6.5
+#| fig-height: 0.35
+s25_headers[["I"]]
+```
 
 ```{r}
 #| fig-width: 6.5
 #| fig-height: 3
-s25_row("I", "Non friends", "Non-friends", color_non_friends, -6)
+s25_assembled_rows[["I"]]
 ```
 
-The three rows, as in the SI:
+#### Assembled Figure S25
+
+Stack the three labeled rows to build the complete figure.
 
 ```{r s8-figure-s25}
 #| fig-width: 6.5

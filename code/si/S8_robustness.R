@@ -181,7 +181,7 @@ table_s30 <- imap_dfr(contrast_fe, function(effects, label) {
 })
 
 
-## ---- s8-figure-s25-rows ----
+## ---- s8-figure-s25-data ----
 # These bin summaries come from the historical central-band filter used for
 # the SI figure. The regression tables above use the global retention cutoff.
 s25_bins <- read_csv(here("data", "raw", "figure_s25_bins.csv"), show_col_types = FALSE)
@@ -193,6 +193,7 @@ s25_rows <- tribble(
   "III",  "Sender declared friendship", "Sender declares", color_asymmetric, -8.5
 )
 
+## ---- s8-figure-s25-panel-style ----
 s25_panel_theme <- theme_paper(base_size = 10) +
   theme(panel.border = element_rect(color = "grey70", linewidth = 0.45),
         axis.line = element_line(color = color_text, linewidth = 0.4),
@@ -203,6 +204,7 @@ s25_rank_labels <- tibble(
   label = c("Receiver higher rank", "Sender higher rank")
 )
 
+## ---- s8-figure-s25-tokens ----
 s25_token_panel <- function(filtered, color, mutual) {
   first_bin <- slice_min(filtered, gap, n = 1, with_ties = FALSE)
   ggplot(filtered, aes(gap)) +
@@ -230,6 +232,7 @@ s25_token_panel <- function(filtered, color, mutual) {
     s25_panel_theme
 }
 
+## ---- s8-figure-s25-gap ----
 s25_gap_panel <- function(filtered, observed, color, y_min) {
   observed_color <- scales::alpha(color, 0.4)
   ggplot(filtered, aes(gap, mean_coop_gap)) +
@@ -255,25 +258,24 @@ s25_gap_panel <- function(filtered, observed, color, y_min) {
     s25_panel_theme
 }
 
-s25_row <- function(roman, label, group, color, y_min) {
+## ---- s8-figure-s25-panels ----
+s25_panels <- pmap(select(s25_rows, group, color, y_min), function(group, color, y_min) {
   filtered <- s25_bins %>% filter(.data$group == .env$group, version == "Filtered")
   observed <- s25_bins %>% filter(.data$group == .env$group, version == "Observed")
-  heading <- ggplot() +
-    annotate("rect", xmin = 0, xmax = 1, ymin = 0, ymax = 1, fill = color) +
-    annotate("text", x = 0.015, y = 0.5, label = roman, hjust = 0,
-             color = "white", fontface = "bold", size = 3.4) +
-    annotate("text", x = 0.53, y = 0.5, label = label,
-             color = "white", fontface = "bold", size = 4.3) +
-    coord_cartesian(xlim = c(0, 1), ylim = c(0, 1), expand = FALSE) +
-    theme_void()
-  heading /
-    (s25_token_panel(filtered, color, group == "Mutual") | s25_gap_panel(filtered, observed, color, y_min)) +
-    plot_layout(heights = c(0.095, 1))
-}
+  list(A = s25_token_panel(filtered, color, group == "Mutual"),
+       B = s25_gap_panel(filtered, observed, color, y_min))
+}) %>% set_names(s25_rows$roman)
+
+## ---- s8-figure-s25-row-assembly ----
+s25_headers <- pmap(select(s25_rows, roman, label, color), friendship_row_header) %>%
+  set_names(s25_rows$roman)
+
+s25_assembled_rows <- map2(s25_headers, s25_panels, function(heading, panels) {
+  heading / (panels$A | panels$B) + plot_layout(heights = c(0.095, 1))
+})
 
 ## ---- s8-figure-s25 ----
-figure_s25 <- pmap(s25_rows, s25_row) %>%
-  wrap_plots(ncol = 1)
+figure_s25 <- wrap_plots(s25_assembled_rows, ncol = 1)
 figure_s25
 
 ## ---- s8-threshold-function ----

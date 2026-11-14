@@ -474,12 +474,32 @@ figure3_panels[["III"]]$B
 figure3_panels[["III"]]$C
 ```
 
-## Assembled Figure 3 {#all-nine-panels}
+## From panels to rows
+
+Each row gets a colored heading and a Roman numeral. The assembly adds letters A, B, and C above the three panels. The headings can also be drawn on their own.
+
+```{r fig3-row-assembly}
+```
+
+```{r}
+#| fig-width: 9
+#| fig-height: 0.4
+figure3_headers[["I"]]
+```
 
 ```{r}
 #| fig-width: 11
+#| fig-height: 3.4
+figure3_rows[["I"]]
+```
+
+## Assembled Figure 3 {#all-nine-panels}
+
+Stack the three labeled rows to build the complete figure.
+
+```{r fig3-assemble}
+#| fig-width: 11
 #| fig-height: 10
-figure3
 ```
 
 ```{r fig3-save}
