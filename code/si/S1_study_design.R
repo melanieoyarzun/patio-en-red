@@ -49,6 +49,7 @@ students %>%
             age_sd     = sd(age, na.rm = TRUE),
             female_pct = 100 * mean(female))
 
+## ---- s1-classroom-composition ----
 # Classroom composition by sex: mixed, all girls, all boys
 table_s1 %>%
   count(composition = case_when(female_pct == 100 ~ "all girls",

@@ -35,10 +35,18 @@ errors and are left out of the age summaries, as stated in the SI.
 knitr::kable(table_s1, digits = c(0, 0, 2, 2, 1, 1, 1, 0, 1, 2))
 ```
 
-Totals for the whole sample, and the sex composition of the classrooms
-(32 mixed, 10 all-girls, 3 all-boys):
+### Overall sample characteristics
+
+The table summarizes the number of children, classrooms, and schools, as well as age and the percentage of girls in the sample.
 
 ```{r s1-sample-totals}
+```
+
+### Classroom composition by sex
+
+The table counts mixed classrooms, classrooms with only girls, and classrooms with only boys.
+
+```{r s1-classroom-composition}
 ```
 
 ## Table S2. Completeness
