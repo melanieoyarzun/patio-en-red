@@ -316,9 +316,11 @@ Only the 29 classrooms where the tablets recorded the time of each decision.
 ```{r s5-figure-s14-data}
 ```
 
-A basic version first, written here only to show how the figure is built:
+:::: {.content-visible when-format="html"}
+::: {.callout-note collapse="true" appearance="simple" icon="false" title="Show a minimal example"}
 
 ```{r}
+#| code-fold: false
 #| fig-width: 8
 #| fig-height: 5.5
 ggplot(pacing_by_group, aes(decile, median)) +
@@ -326,6 +328,9 @@ ggplot(pacing_by_group, aes(decile, median)) +
   geom_line() +
   facet_wrap(~ panel)
 ```
+
+:::
+::::
 
 The figure as in the SI, with its colors, labels and legends (code from the script):
 

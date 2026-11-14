@@ -175,13 +175,20 @@ much closer: 83% of the decisions have a gap between $-0.5$ and $0.5$.
 ```{r rank-gap}
 ```
 
+:::: {.content-visible when-format="html"}
+::: {.callout-note collapse="true" appearance="simple" icon="false" title="Show the rank-gap histogram"}
+
 ```{r}
+#| code-fold: false
 #| fig-height: 3
 ggplot(dyads, aes(rank_gap)) +
   geom_histogram(binwidth = 0.05, fill = "grey60", color = "white") +
   labs(x = "Social Rank GAP", y = "Decisions") +
   theme_minimal()
 ```
+
+:::
+::::
 
 # Step 6. Student covariates
 

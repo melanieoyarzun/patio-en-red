@@ -45,9 +45,11 @@ with the rank the child could expect in that classroom and round.
 ```{r s6-figure-s15-data}
 ```
 
-A basic version first, written here only to show how the figure is built:
+:::: {.content-visible when-format="html"}
+::: {.callout-note collapse="true" appearance="simple" icon="false" title="Show a minimal example"}
 
 ```{r}
+#| code-fold: false
 #| fig-width: 7
 #| fig-height: 2.8
 ggplot(figure_s15_data, aes(estimate, term)) +
@@ -55,6 +57,9 @@ ggplot(figure_s15_data, aes(estimate, term)) +
   geom_pointrange(aes(xmin = estimate - 1.96 * se, xmax = estimate + 1.96 * se)) +
   facet_wrap(~ outcome)
 ```
+
+:::
+::::
 
 The figure as in the SI, with its colors, labels and legends (code from the script):
 
@@ -68,9 +73,11 @@ The figure as in the SI, with its colors, labels and legends (code from the scri
 ```{r s6-figure-s16-data}
 ```
 
-A basic version first, written here only to show how the figure is built:
+:::: {.content-visible when-format="html"}
+::: {.callout-note collapse="true" appearance="simple" icon="false" title="Show a minimal example"}
 
 ```{r}
+#| code-fold: false
 #| fig-width: 8
 #| fig-height: 6
 ggplot(round_balance, aes(round_id, estimate)) +
@@ -78,6 +85,9 @@ ggplot(round_balance, aes(round_id, estimate)) +
   geom_point() +
   facet_grid(outcome ~ covariate, scales = "free_y")
 ```
+
+:::
+::::
 
 The figure as in the SI, with its colors, labels and legends (code from the script):
 
@@ -91,15 +101,20 @@ The figure as in the SI, with its colors, labels and legends (code from the scri
 ```{r s6-figure-s17-data}
 ```
 
-A basic version first, written here only to show how the figure is built:
+:::: {.content-visible when-format="html"}
+::: {.callout-note collapse="true" appearance="simple" icon="false" title="Show a minimal example"}
 
 ```{r}
+#| code-fold: false
 #| fig-width: 10
 #| fig-height: 3.2
 ggplot(density_data, aes(gap_demeaned, fill = group)) +
   geom_density(alpha = 0.4) +
   facet_wrap(~ covariate)
 ```
+
+:::
+::::
 
 The figure as in the SI, with its colors, labels and legends (code from the script):
 
@@ -110,14 +125,19 @@ The figure as in the SI, with its colors, labels and legends (code from the scri
 
 ## Figure S18. Rank gaps by round
 
-A basic version first, written here only to show how the figure is built:
+:::: {.content-visible when-format="html"}
+::: {.callout-note collapse="true" appearance="simple" icon="false" title="Show a minimal example"}
 
 ```{r}
+#| code-fold: false
 #| fig-width: 8
 #| fig-height: 3.5
 ggplot(dyads, aes(factor(round), rank_gap)) +
   geom_boxplot()
 ```
+
+:::
+::::
 
 The figure as in the SI, with its colors, labels and legends (code from the script):
 
@@ -134,15 +154,20 @@ SI.
 ```{r s6-figure-s19-data}
 ```
 
-A basic version first, written here only to show how the figure is built:
+:::: {.content-visible when-format="html"}
+::: {.callout-note collapse="true" appearance="simple" icon="false" title="Show a minimal example"}
 
 ```{r}
+#| code-fold: false
 #| fig-width: 8
 #| fig-height: 10
 ggplot(densities, aes(x, y)) +
   geom_area() +
   facet_wrap(~ round_label)
 ```
+
+:::
+::::
 
 The figure as in the SI, with its colors, labels and legends (code from the script):
 
@@ -153,9 +178,11 @@ The figure as in the SI, with its colors, labels and legends (code from the scri
 
 ## Figure S20. By classroom
 
-A basic version first, written here only to show how the figure is built:
+:::: {.content-visible when-format="html"}
+::: {.callout-note collapse="true" appearance="simple" icon="false" title="Show a minimal example"}
 
 ```{r}
+#| code-fold: false
 #| fig-width: 10
 #| fig-height: 6
 dyads %>%
@@ -165,6 +192,9 @@ dyads %>%
   geom_boxplot() +
   facet_wrap(~ name, ncol = 1, scales = "free_y")
 ```
+
+:::
+::::
 
 The figure as in the SI, with its colors, labels and legends (code from the script):
 
@@ -178,10 +208,13 @@ The figure as in the SI, with its colors, labels and legends (code from the scri
 ```{r s6-support}
 ```
 
-A basic version first, written here only to show what the figure compares:
-the distribution of the Social Rank GAP among non-friends and mutual friends.
+:::: {.content-visible when-format="html"}
+::: {.callout-note collapse="true" appearance="simple" icon="false" title="Show a minimal example"}
+
+Distribution of the Social Rank GAP among non-friends and mutual friends.
 
 ```{r}
+#| code-fold: false
 #| fig-width: 7
 #| fig-height: 3.5
 dyads %>%
@@ -191,6 +224,9 @@ dyads %>%
   geom_boxplot(width = 0.12, outlier.shape = NA) +
   geom_vline(xintercept = c(-0.5, -0.25, 0.25, 0.5), linetype = "dashed")
 ```
+
+:::
+::::
 
 The figure as in the SI (code from the script): a "raincloud" for each group
 (decisions as dots, a box plot and half a density), with the support

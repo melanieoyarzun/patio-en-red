@@ -38,9 +38,11 @@ How many classmates each child named, and how many hit the limit of five
 ```{r s2-figure-s1-data}
 ```
 
-A basic version first, written here only to show how the figure is built:
+:::: {.content-visible when-format="html"}
+::: {.callout-note collapse="true" appearance="simple" icon="false" title="Show a minimal example"}
 
 ```{r}
+#| code-fold: false
 #| fig-width: 8
 #| fig-height: 3
 ggplot(bars, aes(nominations, n)) +
@@ -48,6 +50,9 @@ ggplot(bars, aes(nominations, n)) +
   geom_vline(data = medians, aes(xintercept = median), linetype = "dotted") +
   facet_wrap(~ panel)
 ```
+
+:::
+::::
 
 The figure as in the SI, with its colors, labels and legends (code from the script):
 

@@ -117,14 +117,19 @@ The observed mean Cooperation GAP is shown alongside the value predicted by the 
 ```{r s7-figure-s22-data}
 ```
 
-A basic version first, written here only to show how the figure is built:
+:::: {.content-visible when-format="html"}
+::: {.callout-note collapse="true" appearance="simple" icon="false" title="Show a minimal example"}
 
 ```{r}
+#| code-fold: false
 #| fig-width: 8
 #| fig-height: 3.6
 ggplot(dyads, aes(rank_gap)) +
   geom_histogram(binwidth = 0.033)
 ```
+
+:::
+::::
 
 The figure as in the SI, with its colors, labels and legends (code from the script):
 
@@ -136,15 +141,20 @@ The figure as in the SI, with its colors, labels and legends (code from the scri
 ```{r s7-figure-s23-data}
 ```
 
-A basic version first, written here only to show how the figure is built:
+:::: {.content-visible when-format="html"}
+::: {.callout-note collapse="true" appearance="simple" icon="false" title="Show a minimal example"}
 
 ```{r}
+#| code-fold: false
 #| fig-width: 7.5
 #| fig-height: 4.2
 ggplot(binned, aes(gap, mean)) +
   geom_pointrange(aes(ymin = mean - 1.96 * se, ymax = mean + 1.96 * se)) +
   geom_abline(slope = beta_main, intercept = 0)
 ```
+
+:::
+::::
 
 The figure as in the SI, with its colors, labels and legends (code from the script):
 

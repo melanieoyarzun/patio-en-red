@@ -59,15 +59,20 @@ primary Social Rank.
 ```{r s4-figure-s6-data}
 ```
 
-A basic version first, written here only to show how the figure is built:
+:::: {.content-visible when-format="html"}
+::: {.callout-note collapse="true" appearance="simple" icon="false" title="Show a minimal example"}
 
 ```{r}
+#| code-fold: false
 #| fig-width: 6.5
 #| fig-height: 5.5
 ggplot(correlation_cells, aes(column, row, fill = rho)) +
   geom_tile() +
   geom_text(aes(label = round(rho, 2)))
 ```
+
+:::
+::::
 
 The figure as in the SI, with its colors, labels and legends (code from the script):
 

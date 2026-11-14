@@ -106,9 +106,13 @@ knitr::kable(table_s55[["Higher-to-lower"]])
 ```{r s9-figure-s29-data}
 ```
 
-A basic version first, written here only to show how the figure is built: the filtered Cooperation GAP along the behavioral rank gap.
+:::: {.content-visible when-format="html"}
+::: {.callout-note collapse="true" appearance="simple" icon="false" title="Show a minimal example"}
+
+Filtered Cooperation GAP along the Behavioral Social Rank GAP.
 
 ```{r}
+#| code-fold: false
 #| fig-width: 9
 #| fig-height: 3.2
 ggplot(bsr_bins, aes(gap, Filtered)) +
@@ -117,6 +121,9 @@ ggplot(bsr_bins, aes(gap, Filtered)) +
   geom_point() +
   facet_wrap(~ friendship)
 ```
+
+:::
+::::
 
 The figure as in the SI (code from the script): one column per friendship
 type, written as a function.
@@ -144,9 +151,13 @@ The three columns, as in the SI:
 ```{r s9-figure-s30-data}
 ```
 
-A basic version first, written here only to show how the figure is built: Behavioral Social Rank against each characteristic.
+:::: {.content-visible when-format="html"}
+::: {.callout-note collapse="true" appearance="simple" icon="false" title="Show a minimal example"}
+
+Behavioral Social Rank against each student characteristic.
 
 ```{r}
+#| code-fold: false
 #| fig-width: 9
 #| fig-height: 5
 ggplot(bsr_correlates, aes(bsr, value)) +
@@ -154,6 +165,9 @@ ggplot(bsr_correlates, aes(bsr, value)) +
   geom_smooth(method = "lm") +
   facet_wrap(~ panel)
 ```
+
+:::
+::::
 
 The figure as in the SI (code from the script): panel A, and one panel per
 characteristic written as a function.
