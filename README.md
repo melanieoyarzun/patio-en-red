@@ -18,13 +18,6 @@ The [notebook index](notebooks/README.md) links to the main analyses and all nin
 
 [Clone and reproduce the analysis](#clone-and-reproduce) using the R scripts or notebooks.
 
-> [!NOTE]
-> **How the code stays in sync: R scripts → Quarto notebooks → Jupyter notebooks.**
->
-> The R scripts in `code/` are the source for the analysis code. The Quarto notebooks (`.qmd`) use `knitr::read_chunk()` to read labeled chunks from those scripts (`## ---- name ----`) and add explanations around them. Quarto renders the website and exports the Jupyter notebooks (`.ipynb`), which include the code and saved tables and figures.
->
-> Edit the analysis code in the R scripts and the explanations in the Quarto notebooks. Then [rebuild the website and Jupyter notebooks](#build-the-notebook-viewer-and-jupyter-files) so both reflect the changes.
-
 ## Replication at a glance
 
 1. **Start with student and dyad records.** The pseudonymized inputs include one row per child in `students.csv` and one row per directed game decision in `dyads.csv`. The dyad file records who sent tokens to whom and how the sender nominated the partner in the peer survey.
@@ -54,6 +47,13 @@ Significance marks follow the paper and the SI: † p < 0.1, \* p < 0.05, \*\* p
 The regressions use `lfe::felm()`. The [codebook](data/codebook.md) defines the input variables and generated measures.
 
 ## Main workflows
+
+> [!NOTE]
+> **How the code stays in sync: R scripts → Quarto notebooks → Jupyter notebooks.**
+>
+> The R scripts in `code/` are the source for the analysis code. The Quarto notebooks (`.qmd`) use `knitr::read_chunk()` to read labeled chunks from those scripts (`## ---- name ----`) and add explanations around them. Quarto renders the website and exports the Jupyter notebooks (`.ipynb`), which include the code and saved tables and figures.
+>
+> Edit the analysis code in the R scripts and the explanations in the Quarto notebooks. Then [rebuild the website and Jupyter notebooks](#build-the-notebook-viewer-and-jupyter-files) so both reflect the changes.
 
 ### Clone and reproduce
 
