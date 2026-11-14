@@ -398,31 +398,79 @@ The script builds each panel separately and saves it as a PDF and a PNG. When a 
 
 ### Row I. Non-friends
 
+#### A. Heatmap of token exchanges
+
 ```{r}
 #| fig-width: 3.8
 #| fig-height: 3.3
 figure3_panels[["I"]]$A
+```
+
+#### B. Tokens sent and received
+
+```{r}
+#| fig-width: 3.8
+#| fig-height: 3.3
 figure3_panels[["I"]]$B
+```
+
+#### C. Cooperation Gap
+
+```{r}
+#| fig-width: 3.8
+#| fig-height: 3.3
 figure3_panels[["I"]]$C
 ```
 
 ### Row II. Mutual friends
 
+#### A. Heatmap of token exchanges
+
 ```{r}
 #| fig-width: 3.8
 #| fig-height: 3.3
 figure3_panels[["II"]]$A
+```
+
+#### B. Tokens sent and received
+
+```{r}
+#| fig-width: 3.8
+#| fig-height: 3.3
 figure3_panels[["II"]]$B
+```
+
+#### C. Cooperation Gap
+
+```{r}
+#| fig-width: 3.8
+#| fig-height: 3.3
 figure3_panels[["II"]]$C
 ```
 
 ### Row III. One-sided friendships
 
+#### A. Heatmap of token exchanges
+
 ```{r}
 #| fig-width: 3.8
 #| fig-height: 3.3
 figure3_panels[["III"]]$A
+```
+
+#### B. Tokens sent and received
+
+```{r}
+#| fig-width: 3.8
+#| fig-height: 3.3
 figure3_panels[["III"]]$B
+```
+
+#### C. Cooperation Gap
+
+```{r}
+#| fig-width: 3.8
+#| fig-height: 3.3
 figure3_panels[["III"]]$C
 ```
 
