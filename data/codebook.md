@@ -60,6 +60,17 @@ Nomination questions (each child named 2 to 5 classmates):
 
 These coordinates reproduce the drawing in Figure 2 and are used only for plotting.
 
+### `figure_s25_bins.csv`
+
+The file contains 42 aggregate rows from the historical run that generated `figure_s22_filtered_token_counterpart_figure2.pdf` in the SI. The original script used 1,001 sender-preserving simulations per classroom (seed 100) and kept transfers outside the simulated mean ± 0.67449 standard deviations. For each friendship category and series, the original script grouped children into seven equal-width bins of their median Social Rank GAP. The public script uses these archived summaries to reproduce the figure. The robustness regressions compute their global retention filter from the replication inputs.
+
+| Variable | Description |
+|---|---|
+| `group`, `version` | Friendship category and transfer series (observed or filtered) |
+| `gap` | Mean of the children's median Social Rank GAP within a bin |
+| `mean_sent`, `mean_received`, `mean_coop_gap` | Bin averages of child-level sent and received tokens and the difference between them |
+| `ci_sent`, `ci_received`, `ci_coop_gap` | Half-widths of the historical 95% intervals |
+
 ## Generated measures
 
 ### `analysis_students.csv`

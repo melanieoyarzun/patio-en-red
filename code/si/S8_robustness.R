@@ -19,7 +19,6 @@
 ## ---- s8-setup ----
 source(here::here("code", "00_helpers.R"))
 source(here("code", "00_style.R"))
-source(here("code", "si", "figures", "S8_figures.R"))   # plotting functions of this section
 library(igraph)
 library(patchwork)
 dir.create(here("output", "figures", "si"), recursive = TRUE, showWarnings = FALSE)
@@ -182,34 +181,99 @@ table_s30 <- imap_dfr(contrast_fe, function(effects, label) {
 })
 
 
+## ---- s8-figure-s25-rows ----
+# These bin summaries come from the historical central-band filter used for
+# the SI figure. The regression tables above use the global retention cutoff.
+s25_bins <- read_csv(here("data", "raw", "figure_s25_bins.csv"), show_col_types = FALSE)
+s25_filtered_mean <- 4.946900760089924
+s25_rows <- tribble(
+  ~roman, ~label,                       ~group,            ~color,            ~y_min,
+  "I",    "Non friends",                "Non-friends",     color_non_friends, -6,
+  "II",   "Mutual friends",             "Mutual",          color_mutual,      -6,
+  "III",  "Sender declared friendship", "Sender declares", color_asymmetric, -8.5
+)
+
+s25_panel_theme <- theme_paper(base_size = 10) +
+  theme(panel.border = element_rect(color = "grey70", linewidth = 0.45),
+        axis.line = element_line(color = color_text, linewidth = 0.4),
+        plot.title = element_text(face = "bold", size = 9),
+        plot.margin = margin(2, 4, 2, 3))
+s25_rank_labels <- tibble(
+  gap = c(-0.62, 0.62),
+  label = c("Receiver higher rank", "Sender higher rank")
+)
+
+s25_token_panel <- function(filtered, color, mutual) {
+  first_bin <- slice_min(filtered, gap, n = 1, with_ties = FALSE)
+  ggplot(filtered, aes(gap)) +
+    geom_vline(xintercept = 0, linetype = "dashed", color = color_text) +
+    geom_hline(yintercept = s25_filtered_mean, linetype = "dashed", color = color_text) +
+    geom_ribbon(aes(ymin = mean_received, ymax = mean_sent), fill = "#F0E5A8", alpha = 0.55) +
+    geom_line(aes(y = mean_sent), color = color, linewidth = 1.15) +
+    geom_line(aes(y = mean_received), color = color, linewidth = 1.15) +
+    geom_point(aes(y = mean_sent), color = color, shape = 18, size = 3.3) +
+    geom_point(aes(y = mean_received), color = color, shape = 15, size = 2.9) +
+    geom_errorbar(aes(ymin = mean_sent - ci_sent, ymax = mean_sent + ci_sent),
+                  color = color, width = 0.045, linewidth = 0.5) +
+    geom_errorbar(aes(ymin = mean_received - ci_received, ymax = mean_received + ci_received),
+                  color = color, width = 0.045, linewidth = 0.5) +
+    annotate("text", x = first_bin$gap,
+             y = pmin(first_bin$mean_sent + first_bin$ci_sent, 10.35) - 0.1 * mutual,
+             label = "Sent", color = color, fontface = "bold", size = 2.45, vjust = -0.9) +
+    annotate("text", x = first_bin$gap, y = pmax(first_bin$mean_received - first_bin$ci_received, 1.35),
+             label = "Received", color = color, fontface = "bold", size = 2.45, vjust = 1.25) +
+    geom_text(data = s25_rank_labels, aes(y = 0.15, label = label), fontface = "bold", size = 2.2) +
+    scale_x_continuous(breaks = seq(-1, 1, 0.5)) +
+    scale_y_continuous(breaks = c(0, 5, 10)) +
+    coord_cartesian(xlim = c(-1.1, 1.1), ylim = c(-0.35, 11), expand = FALSE) +
+    labs(title = "A", x = "Social Ranking GAP", y = "Tokens") +
+    s25_panel_theme
+}
+
+s25_gap_panel <- function(filtered, observed, color, y_min) {
+  observed_color <- scales::alpha(color, 0.4)
+  ggplot(filtered, aes(gap, mean_coop_gap)) +
+    geom_vline(xintercept = 0, linetype = "dashed", color = color_text) +
+    geom_hline(yintercept = 0, linetype = "dashed", color = color_text) +
+    geom_line(data = observed, color = observed_color, linewidth = 0.8) +
+    geom_errorbar(data = observed, aes(ymin = mean_coop_gap - ci_coop_gap,
+                                       ymax = mean_coop_gap + ci_coop_gap),
+                  color = observed_color, width = 0.045, linewidth = 0.35) +
+    geom_point(data = observed, color = observed_color, size = 3.05) +
+    geom_line(color = color, linewidth = 1.2) +
+    geom_point(color = color, size = 3.5) +
+    geom_errorbar(aes(ymin = mean_coop_gap - ci_coop_gap, ymax = mean_coop_gap + ci_coop_gap),
+                  color = color, width = 0.045, linewidth = 0.5) +
+    geom_text(data = s25_rank_labels, aes(gap, y_min + 0.15, label = label),
+              inherit.aes = FALSE, fontface = "bold", size = 2.2) +
+    annotate("text", x = c(0.48, 0.57), y = y_min + 1.45, label = c("Filtered", "Observed"),
+             color = c(color, observed_color), hjust = c(1, 0), fontface = "bold", size = 2.45) +
+    scale_x_continuous(breaks = seq(-1, 1, 0.5)) +
+    scale_y_continuous(breaks = seq(-7.5, 5, 2.5)) +
+    coord_cartesian(xlim = c(-1.1, 1.1), ylim = c(y_min - 0.35, 6.65), expand = FALSE) +
+    labs(title = "B", x = "Social Ranking GAP", y = "Cooperation GAP\n[Received - Sent]") +
+    s25_panel_theme
+}
+
+s25_row <- function(roman, label, group, color, y_min) {
+  filtered <- s25_bins %>% filter(.data$group == .env$group, version == "Filtered")
+  observed <- s25_bins %>% filter(.data$group == .env$group, version == "Observed")
+  heading <- ggplot() +
+    annotate("rect", xmin = 0, xmax = 1, ymin = 0, ymax = 1, fill = color) +
+    annotate("text", x = 0.015, y = 0.5, label = roman, hjust = 0,
+             color = "white", fontface = "bold", size = 3.4) +
+    annotate("text", x = 0.53, y = 0.5, label = label,
+             color = "white", fontface = "bold", size = 4.3) +
+    coord_cartesian(xlim = c(0, 1), ylim = c(0, 1), expand = FALSE) +
+    theme_void()
+  heading /
+    (s25_token_panel(filtered, color, group == "Mutual") | s25_gap_panel(filtered, observed, color, y_min)) +
+    plot_layout(heights = c(0.095, 1))
+}
+
 ## ---- s8-figure-s25 ----
-# Figure S25: Figure 3 panels B and C with filtered tokens. Same binning as
-# in 05_figure3_cooperation.R: per-child averages, 7 equal-width bins.
-filtered_bins <- dyads %>%
-  filter(friendship %in% c("Non-friends", "Mutual", "Sender declares")) %>%
-  group_by(friendship, sender_id) %>%
-  summarise(gap = median(rank_gap),
-            sent = mean(tokens_sent_filtered, na.rm = TRUE),
-            received = mean(tokens_received_filtered, na.rm = TRUE),
-            coop_gap = mean(coop_gap_filtered, na.rm = TRUE), .groups = "drop") %>%
-  group_by(friendship) %>%
-  mutate(bin = cut_interval(gap, 7)) %>%
-  filter(!is.na(coop_gap)) %>%
-  group_by(friendship, bin) %>%
-  summarise(gap = mean(gap), n = n(),
-            mean_sent = mean(sent, na.rm = TRUE), mean_received = mean(received, na.rm = TRUE),
-            mean_coop_gap = mean(coop_gap), ci = 1.96 * sd(coop_gap) / sqrt(n), .groups = "drop")
-
-# Quick look: filtered Cooperation GAP by bin and friendship type
-ggplot(filtered_bins, aes(gap, mean_coop_gap)) +
-  geom_hline(yintercept = 0) +
-  geom_line() +
-  geom_point() +
-  facet_wrap(~ friendship)
-
-## ---- s8-figure-s25-si ----
-# Supporting Information layout (plotting code in figures/S8_figures.R)
-figure_s25 <- plot_figure_s25()
+figure_s25 <- pmap(s25_rows, s25_row) %>%
+  wrap_plots(ncol = 1)
 figure_s25
 
 ## ---- s8-threshold-function ----
@@ -323,20 +387,50 @@ format_asymmetric_thresholds <- function(nomination_direction) {
     rename("Target" = retention, "Decisions" = n, "Senders with 2+ decisions" = senders_2plus)
 }
 
-## ---- s8-figure-asymmetric-thresholds ----
-# Quick look: coefficients by retention share, direction and specification
-asymmetric_thresholds %>%
-  filter(!is.na(estimate), retention >= 0.4, spec %in% levels(spec)[1:3]) %>%
-  ggplot(aes(retention, estimate, color = direction)) +
-  geom_hline(yintercept = 0) +
-  geom_line() +
-  geom_point() +
-  facet_wrap(~ spec) +
-  scale_x_reverse()
+## ---- s8-figure-asymmetric-panels ----
+# Asymmetric friendships by direction across the retention grid: (A) Social
+# Rank GAP coefficient with 95% CI, three specifications; (B) data left.
+# The figure shows the range where the samples still support estimation.
+# Low-to-high in orange; retention shares on a reversed axis (100% =
+# observed data). Each panel is built on its own and the two are stacked.
+figure_range <- asymmetric_thresholds %>% filter(retention >= 0.4)
+dodge <- position_dodge(width = 4)
+direction_colors <- c("Low to high" = color_highlight, "High to low" = color_slate)
+retention_labels <- function(x) if_else(x == 100, "100%\n(observed)", paste0(x, "%"))
 
-## ---- s8-figure-asymmetric-thresholds-si ----
-# Supporting Information layout (plotting code in figures/S8_figures.R)
-figure_asymmetric_thresholds <- plot_figure_asymmetric_thresholds(asymmetric_thresholds)
+coef_panel <- figure_range %>%
+  filter(!is.na(estimate), spec %in% levels(spec)[1:3]) %>%
+  ggplot(aes(100 * retention, estimate, color = direction)) +
+  annotate("rect", xmin = 45, xmax = 55, ymin = -Inf, ymax = Inf, fill = "grey92") +   # the 50% filter
+  geom_hline(yintercept = 0, linewidth = 0.3, color = "grey50") +
+  geom_line(position = dodge, linewidth = 0.4, alpha = 0.6) +
+  geom_errorbar(aes(ymin = estimate - 1.96 * se, ymax = estimate + 1.96 * se),
+                width = 0, position = dodge, linewidth = 0.5) +
+  geom_point(position = dodge, size = 1.8) +
+  facet_wrap(~ spec, nrow = 1) +
+  scale_x_reverse(breaks = c(100, 70, 60, 50, 40), labels = retention_labels) +
+  scale_color_manual(values = direction_colors, name = NULL) +
+  labs(title = "A. Social Rank GAP coefficient (95% CI)", x = NULL, y = "Coefficient") +
+  theme_si() +
+  theme(legend.position = "top", legend.justification = "left")
+
+support_panel <- figure_range %>%
+  distinct(retention, direction, n, senders_2plus) %>%
+  pivot_longer(c(n, senders_2plus), names_to = "measure", values_to = "count") %>%
+  mutate(measure = recode(measure, n = "Decisions retained",
+                          senders_2plus = "Senders with 2+ retained decisions")) %>%
+  ggplot(aes(100 * retention, count, color = direction)) +
+  geom_line(linewidth = 0.5) +
+  geom_point(size = 1.6) +
+  facet_wrap(~ measure, nrow = 1, scales = "free_y") +
+  scale_x_reverse(breaks = c(100, 70, 60, 50, 40), labels = retention_labels) +
+  scale_y_continuous(limits = c(0, NA)) +
+  scale_color_manual(values = direction_colors, guide = "none") +
+  labs(title = "B. Data left for estimation", x = "Share of transfers retained by the filter", y = NULL) +
+  theme_si()
+
+## ---- s8-figure-asymmetric-thresholds ----
+figure_asymmetric_thresholds <- coef_panel / support_panel + plot_layout(heights = c(1.2, 1))
 figure_asymmetric_thresholds
 
 ## ---- s8-nomination-cap ----
@@ -398,7 +492,27 @@ table_s36
 
 
 ## ---- s8-figure-s26 ----
-figure_s26 <- plot_figure_s26(table_s36)
+# Figure S26: Social Rank GAP coefficient under each nomination-cap
+# construction
+figure_s26 <- table_s36 %>%
+  mutate(label = c("Baseline\n(all nominations)", "Fixed cap (k=3)", "Fixed cap (k=4)",
+                   "Exclude cap-reachers (\u22655)"),
+         label = fct_rev(fct_inorder(label)),
+         baseline = row_number() == 1) %>%
+  ggplot(aes(estimate, label, color = baseline)) +
+  geom_vline(xintercept = 0, linetype = "dashed", color = "grey50") +
+  geom_errorbarh(aes(xmin = estimate - 1.96 * se, xmax = estimate + 1.96 * se), height = 0.15) +
+  geom_point(aes(size = baseline)) +
+  # The baseline in orange and larger, bold baseline label
+  scale_color_manual(values = c(`FALSE` = "grey25", `TRUE` = color_highlight)) +
+  scale_size_manual(values = c(`FALSE` = 2, `TRUE` = 3)) +
+  scale_x_continuous(limits = c(-0.2, 3.5), breaks = seq(0, 3.5, 0.5)) +
+  labs(title = "Nomination-cap sensitivity", x = "Social Rank GAP coefficient (received - sent)", y = NULL) +
+  theme_si(10) +
+  theme(plot.title = element_text(hjust = 0.5), plot.title.position = "panel",
+        axis.text.y = element_text(face = c("plain", "plain", "plain", "bold"), size = 10),
+        panel.grid.major.x = element_line(color = "grey92", linewidth = 0.3),
+        panel.grid.major.y = element_blank())
 figure_s26
 
 ## ---- s8-class-size ----
@@ -427,14 +541,45 @@ lfe::waldtest(size_interaction, grep("rank_gap:size_group", names(coef(size_inte
 term_estimate(preferred_model(dyads, rhs = "rank_gap * class_size"), "rank_gap:class_size")
 
 
-## ---- s8-figure-s27 ----
-# Quick look: slope and 95% CI in each classroom-size group
-ggplot(size_slopes, aes(estimate, size_group)) +
-  geom_pointrange(aes(xmin = estimate - 1.96 * se, xmax = estimate + 1.96 * se))
+## ---- s8-figure-s27-panels ----
+# Figure S27: observed Cooperation GAP by sender and receiver rank quartile,
+# in small, medium and large classrooms. The three heatmaps share one
+# drawing, written as a function.
+quartile_cuts <- quantile(c(dyads$sender_rank, dyads$receiver_rank), c(0.25, 0.5, 0.75))
+size_titles <- size_slopes %>%
+  left_join(dyads %>% distinct(class_id, size_group) %>% count(size_group, name = "classes"), by = "size_group") %>%
+  mutate(title = c("A. Small (n \u2264 15)", "B. Medium (16\u201321)", "C. Large (n > 21)"))
 
-## ---- s8-figure-s27-si ----
-# Supporting Information layout (plotting code in figures/S8_figures.R)
-figure_s27 <- plot_figure_s27(dyads, size_slopes)
+cells <- dyads %>%
+  mutate(sender_q   = findInterval(sender_rank, quartile_cuts, left.open = TRUE) + 1,
+         receiver_q = findInterval(receiver_rank, quartile_cuts, left.open = TRUE) + 1) %>%
+  group_by(size_group, sender_q, receiver_q) %>%
+  summarise(observed = mean(coop_gap), .groups = "drop")
+
+# one heatmap per size group, with the slope and number of classes below the title
+size_panel <- function(i) {
+  info <- size_titles[i, ]
+  cells %>% filter(size_group == info$size_group) %>%
+    ggplot(aes(factor(receiver_q, labels = quartile_labels), factor(sender_q, labels = quartile_labels),
+               fill = observed)) +
+    geom_tile(color = "white", linewidth = 0.6) +
+    geom_text(aes(label = sprintf("%+.2f", observed), color = abs(observed) > 1.1),
+              fontface = "bold", size = 3.4) +
+    scale_fill_coop_gap() +
+    scale_color_manual(values = c(`FALSE` = "grey15", `TRUE` = "white"), guide = "none") +
+    scale_x_discrete(expand = c(0, 0)) + scale_y_discrete(expand = c(0, 0)) +
+    coord_fixed() +
+    labs(title = info$title,
+         subtitle = bquote(hat(beta) == .(sprintf("%.2f", info$estimate)) %.% .(info$classes) ~ "classes"),
+         x = "Receiver's rank quartile", y = if (i == 1) "Sender's rank quartile" else NULL) +
+    theme_heatmap(9) +
+    guides(fill = guide_colorbar(title.position = "right",
+                                 title.theme = element_text(angle = 90, size = 8)))
+}
+
+## ---- s8-figure-s27 ----
+figure_s27 <- wrap_plots(map(seq_len(nrow(size_titles)), size_panel), nrow = 1, guides = "collect") +
+  figure_title("Observed Cooperation GAP by rank quartile, across classroom sizes", size = 12)
 figure_s27
 
 ## ---- s8-temporal ----
@@ -620,7 +765,21 @@ rank_robustness %>% select(measure, sample, estimate) %>%
 
 
 ## ---- s8-figure-s28 ----
-figure_s28 <- plot_figure_s28(rank_robustness)
+# Figure S28: Social Rank GAP coefficient for each rank construction and sample
+figure_s28 <- ggplot(rank_robustness, aes(estimate, measure, color = primary)) +
+  geom_vline(xintercept = 0, linetype = "dashed", color = "grey50") +
+  geom_errorbarh(aes(xmin = estimate - 1.96 * se, xmax = estimate + 1.96 * se), height = 0.2) +
+  geom_point(size = 1.8) +
+  facet_wrap(~ sample, nrow = 1, scales = "free_x") +
+  # The primary Social Rank in orange, with a bold label
+  scale_color_manual(values = c(`FALSE` = "grey35", `TRUE` = color_highlight)) +
+  labs(title = "Social Rank GAP robustness across popularity-network constructions",
+       x = "Coefficient", y = NULL) +
+  theme_si(8) +
+  theme(plot.title = element_text(hjust = 0.5), plot.title.position = "panel",
+        axis.text.y = element_text(color = rev(c(color_highlight, rep(color_text, 5))),
+                                   face = rev(c("bold", rep("plain", 5)))),
+        panel.grid.major.x = element_line(color = "grey92", linewidth = 0.3))
 figure_s28
 
 ## ---- s8-affiliation-ranks ----

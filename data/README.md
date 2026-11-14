@@ -11,6 +11,7 @@ Read the [codebook](codebook.md) that describes the fields in the replication in
 | [`raw/students.csv`](raw/students.csv) | Pseudonymized student records (859 rows) |
 | [`raw/dyads.csv`](raw/dyads.csv) | Pseudonymized directed decisions and peer nominations (17,804 rows) |
 | [`raw/figure2_layout.csv`](raw/figure2_layout.csv) | Coordinates for the classroom illustration in Figure 2 |
+| [`raw/figure_s25_bins.csv`](raw/figure_s25_bins.csv) | Aggregate plotting data from the historical filter used in the SI counterpart of Figure 3 |
 
 The archival dataset is available on [Zenodo](https://doi.org/10.5281/zenodo.24210703).
 

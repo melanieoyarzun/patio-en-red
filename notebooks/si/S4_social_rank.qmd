@@ -15,7 +15,6 @@ code-links:
 #| include: false
 here::i_am("notebooks/si/S4_social_rank.qmd")
 knitr::read_chunk(here::here("code", "si", "S4_social_rank.R"))
-knitr::read_chunk(here::here("code", "si", "figures", "S4_figures.R"))
 ```
 
 Social Rank is PageRank on the signed popularity network, with weights
@@ -57,25 +56,25 @@ primary Social Rank.
 ```{r s4-construction-correlations}
 ```
 
+```{r s4-figure-s6-data}
+```
+
+A basic version first, written here only to show how the figure is built:
+
+```{r}
+#| fig-width: 6.5
+#| fig-height: 5.5
+ggplot(correlation_cells, aes(column, row, fill = rho)) +
+  geom_tile() +
+  geom_text(aes(label = round(rho, 2)))
+```
+
+The figure as in the SI, with its colors, labels and legends (code from the script):
+
 ```{r s4-figure-s6}
-#| fig-width: 7
-#| fig-height: 3.5
-```
-
-::: {.callout-note collapse="true" appearance="simple"}
-## Supporting Information layout
-
-Plotting code from `code/si/figures/S4_figures.R`. This is the version
-saved to `output/figures/si/`.
-
-```{r plot-figure-s6}
-```
-
-```{r s4-figure-s6-si}
 #| fig-width: 6.5
 #| fig-height: 5.5
 ```
-:::
 
 ## Figure S7. Weight given to non-nominations
 
@@ -85,25 +84,41 @@ Explicit negative = 0 and explicit positive = 2 are kept; the weight of
 ```{r s4-reference-weight}
 ```
 
+The script builds the three panels one by one and then puts them together.
+
+```{r s4-figure-s7-panels}
+```
+
+Panel A follows each child of one 18-child classroom as $w$ changes:
+
+```{r}
+#| fig-width: 4
+#| fig-height: 3.4
+panel_a
+```
+
+Panel B measures how much of the primary order survives in that classroom:
+
+```{r}
+#| fig-width: 4
+#| fig-height: 3.4
+panel_b
+```
+
+Panel C repeats the Spearman correlation for every classroom:
+
+```{r}
+#| fig-width: 4
+#| fig-height: 3.4
+panel_c
+```
+
+The three panels together, as in the SI:
+
 ```{r s4-figure-s7}
-#| fig-width: 7
-#| fig-height: 3.5
-```
-
-::: {.callout-note collapse="true" appearance="simple"}
-## Supporting Information layout
-
-Plotting code from `code/si/figures/S4_figures.R`. This is the version
-saved to `output/figures/si/`.
-
-```{r plot-figure-s7}
-```
-
-```{r s4-figure-s7-si}
 #| fig-width: 10
 #| fig-height: 3.4
 ```
-:::
 
 ## Table S9. Social Rank and student characteristics
 
@@ -123,30 +138,34 @@ The public data support the guardian education comparison.
 
 ## Figure S8. Social Rank and student characteristics
 
-Panels A-O: within-classroom z-scores against Social Rank, with binned
-means and a linear fit. Panels P, Q and S: Social Rank by sex, guardian
-education and grade repetition. (The SI figure also shows religion, which
-is not part of the public data.)
+Panels A–O show within-classroom z-scores against Social Rank, with binned means and a linear fit. Panels P, Q, and S show Social Rank by sex, guardian education, and grade repetition. The public data omit religion (panel R) and use broader guardian-education categories. The scatter panels recompute correlations from the public data, so some values differ from those displayed in the SI.
+
+The same scatter panel is drawn for 15 characteristics and the same box-plot
+panel for three, so the script defines one function for each:
+
+```{r s4-figure-s8-panels}
+```
+
+One scatter panel and one box-plot panel on their own:
+
+```{r}
+#| fig-width: 3
+#| fig-height: 3
+scatter_panel("nom_q3", "Peer nominations (Z-score)")
+```
+
+```{r}
+#| fig-width: 3
+#| fig-height: 3
+box_panel(categorical, "sex", "P. Sex", c(color_male, color_female), "Sex")
+```
+
+The panels that can be reproduced from the public data:
 
 ```{r s4-figure-s8}
-#| fig-width: 7
-#| fig-height: 5
-```
-
-::: {.callout-note collapse="true" appearance="simple"}
-## Supporting Information layout
-
-Plotting code from `code/si/figures/S4_figures.R`. This is the version
-saved to `output/figures/si/`.
-
-```{r plot-figure-s8}
-```
-
-```{r s4-figure-s8-si}
 #| fig-width: 9
 #| fig-height: 10.5
 ```
-:::
 
 ## Table S10. Distribution of the Social Rank GAP
 

@@ -15,7 +15,6 @@ code-links:
 #| include: false
 here::i_am("notebooks/si/S7_main_regressions.qmd")
 knitr::read_chunk(here::here("code", "si", "S7_main_regressions.R"))
-knitr::read_chunk(here::here("code", "si", "figures", "S7_figures.R"))
 ```
 
 The model of Table 1, now shown across five sets of fixed effects, from
@@ -115,36 +114,59 @@ The observed mean Cooperation GAP is shown alongside the value predicted by the 
 ```{r s7-quartiles-extremes}
 ```
 
-```{r plot-figure-s22}
+```{r s7-figure-s22-data}
 ```
+
+A basic version first, written here only to show how the figure is built:
+
+```{r}
+#| fig-width: 8
+#| fig-height: 3.6
+ggplot(dyads, aes(rank_gap)) +
+  geom_histogram(binwidth = 0.033)
+```
+
+The figure as in the SI, with its colors, labels and legends (code from the script):
 
 ```{r s7-figure-s22}
 #| fig-width: 8
 #| fig-height: 3.6
 ```
 
+```{r s7-figure-s23-data}
+```
+
+A basic version first, written here only to show how the figure is built:
+
+```{r}
+#| fig-width: 7.5
+#| fig-height: 4.2
+ggplot(binned, aes(gap, mean)) +
+  geom_pointrange(aes(ymin = mean - 1.96 * se, ymax = mean + 1.96 * se)) +
+  geom_abline(slope = beta_main, intercept = 0)
+```
+
+The figure as in the SI, with its colors, labels and legends (code from the script):
+
 ```{r s7-figure-s23}
-#| fig-width: 7
-#| fig-height: 3.5
-```
-
-::: {.callout-note collapse="true" appearance="simple"}
-## Supporting Information layout
-
-Plotting code from `code/si/figures/S7_figures.R`. This is the version
-saved to `output/figures/si/`.
-
-```{r plot-figure-s23}
-```
-
-```{r s7-figure-s23-si}
 #| fig-width: 7.5
 #| fig-height: 4.2
 ```
-:::
 
-```{r plot-figure-s24}
+The two heatmaps share one drawing, a function defined in the script:
+
+```{r s7-figure-s24-panels}
 ```
+
+One heatmap on its own (observed):
+
+```{r}
+#| fig-width: 5
+#| fig-height: 4.6
+quartile_panel("observed", "B. Observed", legend = TRUE)
+```
+
+Both heatmaps, as in the SI:
 
 ```{r s7-figure-s24}
 #| fig-width: 9

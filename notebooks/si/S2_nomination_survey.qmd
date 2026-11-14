@@ -15,7 +15,6 @@ code-links:
 #| include: false
 here::i_am("notebooks/si/S2_nomination_survey.qmd")
 knitr::read_chunk(here::here("code", "si", "S2_nomination_survey.R"))
-knitr::read_chunk(here::here("code", "si", "figures", "S2_figures.R"))
 ```
 
 After the game, each child answered nine questions of the form *"select
@@ -36,25 +35,26 @@ How many classmates each child named, and how many hit the limit of five
 
 ## Figure S1. Distribution of nominations sent
 
+```{r s2-figure-s1-data}
+```
+
+A basic version first, written here only to show how the figure is built:
+
+```{r}
+#| fig-width: 8
+#| fig-height: 3
+ggplot(bars, aes(nominations, n)) +
+  geom_col() +
+  geom_vline(data = medians, aes(xintercept = median), linetype = "dotted") +
+  facet_wrap(~ panel)
+```
+
+The figure as in the SI, with its colors, labels and legends (code from the script):
+
 ```{r s2-figure-s1}
-#| fig-width: 7
-#| fig-height: 3.5
-```
-
-::: {.callout-note collapse="true" appearance="simple"}
-## Supporting Information layout
-
-Plotting code from `code/si/figures/S2_figures.R`. This is the version
-saved to `output/figures/si/`.
-
-```{r plot-figure-s1}
-```
-
-```{r s2-figure-s1-si}
 #| fig-width: 8
 #| fig-height: 3
 ```
-:::
 
 ## Table S4. Consistency of the two popularity questions
 

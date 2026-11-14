@@ -15,7 +15,6 @@ code-links:
 #| include: false
 here::i_am("notebooks/si/S5_game_and_time.qmd")
 knitr::read_chunk(here::here("code", "si", "S5_game_and_time.R"))
-knitr::read_chunk(here::here("code", "si", "figures", "S5_figures.R"))
 ```
 
 This notebook describes the game data and how giving changed during the
@@ -48,25 +47,49 @@ takes about half a minute.)
 ```{r s5-game-descriptives}
 ```
 
+The script builds the four panels one by one and then puts them together.
+
+```{r s5-figure-s9-panels}
+```
+
+Panel A: tokens sent in each decision.
+
+```{r}
+#| fig-width: 4.5
+#| fig-height: 3.5
+panel_a
+```
+
+Panel B: the two allocations of each pair, the larger one on the horizontal axis.
+
+```{r}
+#| fig-width: 4.5
+#| fig-height: 3.5
+panel_b
+```
+
+Panel C: the Cooperation GAP; zero gaps in orange (dark: both gave something, light: both gave zero).
+
+```{r}
+#| fig-width: 4.5
+#| fig-height: 3.5
+panel_c
+```
+
+Panel D: the zero gaps by the number of tokens both children sent, and by friendship type.
+
+```{r}
+#| fig-width: 4.5
+#| fig-height: 3.5
+panel_d
+```
+
+The four panels together, as in the SI:
+
 ```{r s5-figure-s9}
-#| fig-width: 7
-#| fig-height: 3
-```
-
-::: {.callout-note collapse="true" appearance="simple"}
-## Supporting Information layout
-
-Plotting code from `code/si/figures/S5_figures.R`. This is the version
-saved to `output/figures/si/`.
-
-```{r plot-figure-s9}
-```
-
-```{r s5-figure-s9-si}
 #| fig-width: 9
 #| fig-height: 7
 ```
-:::
 
 ## Figure S10 and Table S13. Giving over the session
 
@@ -80,25 +103,50 @@ saved to `output/figures/si/`.
 ```{r s5-means-by-fifth}
 ```
 
+Panels A to C use the same drawing, a function defined in the script; each
+panel is then built on its own:
+
+```{r s5-figure-s10-panels}
+```
+
+Panel A: every classroom round.
+
+```{r}
+#| fig-width: 4.5
+#| fig-height: 3
+s10_a
+```
+
+Panel B: rounds 1 to 7, which every classroom played.
+
+```{r}
+#| fig-width: 4.5
+#| fig-height: 3
+s10_b
+```
+
+Panel C: each child's own decision order.
+
+```{r}
+#| fig-width: 4.5
+#| fig-height: 3
+s10_c
+```
+
+Panel D: fifths of each child's own sequence.
+
+```{r}
+#| fig-width: 4.5
+#| fig-height: 3
+s10_d
+```
+
+The four panels together, as in the SI:
+
 ```{r s5-figure-s10}
-#| fig-width: 7
-#| fig-height: 3.5
-```
-
-::: {.callout-note collapse="true" appearance="simple"}
-## Supporting Information layout
-
-Plotting code from `code/si/figures/S5_figures.R`. This is the version
-saved to `output/figures/si/`.
-
-```{r plot-figure-s10}
-```
-
-```{r s5-figure-s10-si}
 #| fig-width: 9
 #| fig-height: 6
 ```
-:::
 
 ### Table S13. Classroom coverage by round
 
@@ -117,25 +165,49 @@ saved to `output/figures/si/`.
 ```{r s5-friendship-by-fifth}
 ```
 
+The same four views by friendship type, again built panel by panel:
+
+```{r s5-figure-s11-panels}
+```
+
+Panel A, with the legend.
+
+```{r}
+#| fig-width: 4.5
+#| fig-height: 3.2
+s11_a
+```
+
+Panel B.
+
+```{r}
+#| fig-width: 4.5
+#| fig-height: 3.2
+s11_b
+```
+
+Panel C.
+
+```{r}
+#| fig-width: 4.5
+#| fig-height: 3.2
+s11_c
+```
+
+Panel D.
+
+```{r}
+#| fig-width: 4.5
+#| fig-height: 3.2
+s11_d
+```
+
+The four panels together, as in the SI:
+
 ```{r s5-figure-s11}
-#| fig-width: 7
-#| fig-height: 3.5
-```
-
-::: {.callout-note collapse="true" appearance="simple"}
-## Supporting Information layout
-
-Plotting code from `code/si/figures/S5_figures.R`. This is the version
-saved to `output/figures/si/`.
-
-```{r plot-figure-s11}
-```
-
-```{r s5-figure-s11-si}
 #| fig-width: 9
 #| fig-height: 6.5
 ```
-:::
 
 ### Table S14. Giving trends by friendship group
 
@@ -164,42 +236,70 @@ change toward the others.
 ```{r s5-within-child-models}
 ```
 
+```{r s5-figure-s12-data}
+```
+
+The three panels, one by one:
+
+```{r s5-figure-s12-panels}
+```
+
+Panel A: the overall change and its two components.
+
+```{r}
+#| fig-width: 4
+#| fig-height: 3.8
+figure_s12_a
+```
+
+Panel B: the same children, toward named and other classmates; the dashed line is the counterfactual.
+
+```{r}
+#| fig-width: 4
+#| fig-height: 3.8
+figure_s12_b
+```
+
+Panel C: the within-child changes with classroom-bootstrap 95% CIs.
+
+```{r}
+#| fig-width: 4
+#| fig-height: 3.8
+figure_s12_c
+```
+
+The three panels together, as in the SI:
+
 ```{r s5-figure-s12}
-#| fig-width: 7
-#| fig-height: 3.5
-```
-
-::: {.callout-note collapse="true" appearance="simple"}
-## Supporting Information layout
-
-Plotting code from `code/si/figures/S5_figures.R`. This is the version
-saved to `output/figures/si/`.
-
-```{r plot-s12-panel-a}
-```
-
-```{r plot-s12-panel-b}
-```
-
-```{r plot-s12-panel-c}
-```
-
-```{r plot-figure-s12}
-```
-
-```{r s5-figure-s12-si}
 #| fig-width: 11
 #| fig-height: 3.8
 ```
-:::
 
 ## Figure S13. Classroom size
 
 ```{r s5-class-size}
 ```
 
-```{r plot-figure-s13}
+```{r s5-figure-s13-panels}
 ```
+
+Panel A: giving over the session by classroom size.
+
+```{r}
+#| fig-width: 4.5
+#| fig-height: 4
+s13_a
+```
+
+Panel B: the trend of each classroom against its size.
+
+```{r}
+#| fig-width: 4.5
+#| fig-height: 4
+s13_b
+```
+
+The two panels together, as in the SI:
 
 ```{r s5-figure-s13}
 #| fig-width: 9
@@ -213,8 +313,21 @@ Only the 29 classrooms where the tablets recorded the time of each decision.
 ```{r s5-pacing}
 ```
 
-```{r plot-figure-s14}
+```{r s5-figure-s14-data}
 ```
+
+A basic version first, written here only to show how the figure is built:
+
+```{r}
+#| fig-width: 8
+#| fig-height: 5.5
+ggplot(pacing_by_group, aes(decile, median)) +
+  geom_ribbon(aes(ymin = q25, ymax = q75), alpha = 0.2) +
+  geom_line() +
+  facet_wrap(~ panel)
+```
+
+The figure as in the SI, with its colors, labels and legends (code from the script):
 
 ```{r s5-figure-s14}
 #| fig-width: 8

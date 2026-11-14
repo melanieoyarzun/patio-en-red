@@ -15,7 +15,6 @@ code-links:
 #| include: false
 here::i_am("notebooks/si/S3_relational_structure.qmd")
 knitr::read_chunk(here::here("code", "si", "S3_relational_structure.R"))
-knitr::read_chunk(here::here("code", "si", "figures", "S3_figures.R"))
 ```
 
 Each classroom is a small closed group in which we observe several
@@ -47,63 +46,99 @@ knitr::kable(table_s5)
 
 ## Sociograms
 
-The same layout is used for every layer of a classroom, so each child keeps
-her position. Node size is nominations received (or tokens), and the
-subtitle gives the share of ties between children of the same sex.
+The same layout is used for every network of a classroom, so each child
+keeps her position:
 
-```{r s3-sociogram-function}
+```{r s3-layout}
 ```
 
 ### Figure S2. All layers of classroom 20
 
-Each panel is one network of the same classroom, with every child in the
-same position.
+To see what the figure shows, a basic version first, written here only for
+explanation: one plain sociogram per network of the same classroom, with
+every child in the same position. Node size is nominations received (or
+tokens), and the subtitle gives the share of ties between children of the
+same sex.
 
-```{r s3-figure-s2-minimal}
+```{r}
 #| fig-width: 9
 #| fig-height: 13
+draw_sociogram <- function(this_class, layer, nodes, title = layer) {
+  class_dyads <- dyads %>% filter(class_id == this_class) %>%
+    mutate(from = as.character(sender_id), to = as.character(receiver_id))
+
+  if (layer %in% c("tokens_sent", "tokens_received")) {
+    links <- class_dyads %>% filter(tokens_sent > 0) %>% mutate(width = tokens_sent)
+    size  <- class_dyads %>%
+      group_by(name = if (layer == "tokens_sent") from else to) %>%
+      summarise(size = sum(tokens_sent))
+  } else {
+    links <- class_dyads %>% filter(.data[[layer]] == 1) %>% mutate(width = 1)
+    size  <- class_dyads %>% group_by(name = to) %>% summarise(size = sum(.data[[layer]]))
+  }
+
+  # share of ties between two children of the same sex
+  sex_of <- setNames(nodes$sex, nodes$name)
+  same_sex <- 100 * mean(sex_of[links$from] == sex_of[links$to])
+
+  nodes <- nodes %>% left_join(size, by = "name")
+  network <- graph_from_data_frame(links %>% select(from, to, width), vertices = nodes)
+
+  ggraph(network, layout = "manual", x = V(network)$x, y = V(network)$y) +
+    geom_edge_link(aes(width = width), color = "grey45", alpha = 0.6,
+                   arrow = arrow(length = unit(1.5, "mm"), type = "closed"),
+                   end_cap = circle(2.5, "mm")) +
+    geom_node_point(aes(size = size, fill = sex), shape = 21, color = "grey20") +
+    scale_edge_width(range = c(0.2, 1)) +
+    scale_fill_manual(values = c(Female = color_female, Male = color_male)) +
+    scale_size_continuous(range = c(1.5, 7)) +
+    labs(title = title, subtitle = sprintf("%.0f%% same-sex ties", same_sex)) +
+    theme_void(base_size = 8) +
+    theme(legend.position = "none", plot.title = element_text(face = "bold"))
+}
+
+nodes_20 <- class_layout(20, seed = 20)
+layers <- c("tokens_sent", "tokens_received", names(question_names))
+layer_titles <- c("Tokens sent (out-strength)", "Tokens received (in-strength)", question_names)
+
+map2(layers, layer_titles, ~ draw_sociogram(20, .x, nodes_20, .y)) %>%
+  wrap_plots(ncol = 3)
 ```
 
-::: {.callout-note collapse="true" appearance="simple"}
-## Supporting Information layout
-
-The same layers drawn as tilted planes stacked from top to bottom and
-grouped by kind. This is the version saved to `output/figures/si/`.
-
-```{r plot-figure-s2}
-```
+The figure as in the SI (code from the script): the same layers drawn as
+flat planes stacked from top to bottom and grouped by kind.
 
 ```{r s3-figure-s2}
 #| fig-width: 6.5
 #| fig-height: 10
 ```
-:::
 
 ### Figures S3–S5. Small, intermediate and large classrooms
 
+The three focal networks are drawn with the same function, defined here:
+
+```{r s3-focal-function}
+```
+
+One network on its own (best friends in the small classroom):
+
+```{r}
+#| fig-width: 3.5
+#| fig-height: 3.5
+draw_focal_layer(dyads, 16, "nom_q3", class_layout(16, seed = 16),
+                 "Best friends (Q3)", max_size = 6)
+```
+
+The three networks of each classroom, as in the SI:
+
 ```{r s3-figures-s3-s5}
-#| fig-width: 9
-#| fig-height: 3.2
-```
-
-::: {.callout-note collapse="true" appearance="simple"}
-## Supporting Information layout
-
-Plotting code from `code/si/figures/S3_figures.R`. This is the version
-saved to `output/figures/si/`.
-
-```{r plot-focal-layers}
-```
-
-```{r s3-figures-s3-s5-si}
 #| fig-width: 9
 #| fig-height: 3.6
 ```
-:::
 
 ```{r}
 #| fig-width: 9
-#| fig-height: 3.2
+#| fig-height: 3.6
 figure_s4
 figure_s5
 ```

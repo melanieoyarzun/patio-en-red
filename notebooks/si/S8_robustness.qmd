@@ -15,7 +15,6 @@ code-links:
 #| include: false
 here::i_am("notebooks/si/S8_robustness.qmd")
 knitr::read_chunk(here::here("code", "si", "S8_robustness.R"))
-knitr::read_chunk(here::here("code", "si", "figures", "S8_figures.R"))
 ```
 
 Code: `code/si/S8_robustness.R`. Each block repeats the main model under one
@@ -91,25 +90,27 @@ table_s30 %>%
   knitr::kable()
 ```
 
+### Filtered-token counterpart of Figure 3
+
+The SI figure used a historical central-band filter. The 42 bin summaries from that run are included in `data/raw/figure_s25_bins.csv`. The regression tables use the global retention cutoff described above.
+
+```{r s8-figure-s25-rows}
+```
+
+One row on its own (non-friends):
+
+```{r}
+#| fig-width: 6.5
+#| fig-height: 3
+s25_row("I", "Non friends", "Non-friends", color_non_friends, -6)
+```
+
+The three rows, as in the SI:
+
 ```{r s8-figure-s25}
-#| fig-width: 9
-#| fig-height: 3.2
-```
-
-::: {.callout-note collapse="true" appearance="simple"}
-## Supporting Information layout
-
-Plotting code from `code/si/figures/S8_figures.R`. This is the version
-saved to `output/figures/si/`.
-
-```{r plot-figure-s25}
-```
-
-```{r s8-figure-s25-si}
 #| fig-width: 6.5
 #| fig-height: 7.6
 ```
-:::
 
 ## 8.2 Filtering threshold and cutoff (Tables S31–S35)
 
@@ -142,33 +143,47 @@ knitr::kable(format_asymmetric_thresholds("Low to high"))
 knitr::kable(format_asymmetric_thresholds("High to low"))
 ```
 
-```{r s8-figure-asymmetric-thresholds}
+```{r s8-figure-asymmetric-panels}
+```
+
+Panel A: the coefficients.
+
+```{r}
 #| fig-width: 9
-#| fig-height: 3.5
+#| fig-height: 3.3
+coef_panel
 ```
 
-::: {.callout-note collapse="true" appearance="simple"}
-## Expanded figure
+Panel B: the data left at each retention share.
 
-Plotting code from `code/si/figures/S8_figures.R`. This is the version
-saved to `output/figures/si/`.
-
-```{r plot-figure-asymmetric-thresholds}
+```{r}
+#| fig-width: 9
+#| fig-height: 2.8
+support_panel
 ```
 
-```{r s8-figure-asymmetric-thresholds-si}
+Both panels together:
+
+```{r s8-figure-asymmetric-thresholds}
 #| fig-width: 9
 #| fig-height: 6
 ```
-:::
 
 ## 8.3 Nomination limit (Table S36, Figure S26)
 
 ```{r s8-nomination-cap}
 ```
 
-```{r plot-figure-s26}
+A basic version first, written here only to show how the figure is built:
+
+```{r}
+#| fig-width: 7
+#| fig-height: 3.4
+ggplot(table_s36, aes(estimate, construction)) +
+  geom_pointrange(aes(xmin = estimate - 1.96 * se, xmax = estimate + 1.96 * se))
 ```
+
+The figure as in the SI, with its colors, labels and legends (code from the script):
 
 ```{r s8-figure-s26}
 #| fig-width: 7
@@ -198,25 +213,23 @@ saved to `output/figures/si/`.
 ```
 
 
+```{r s8-figure-s27-panels}
+```
+
+One heatmap on its own (small classrooms):
+
+```{r}
+#| fig-width: 4
+#| fig-height: 4
+size_panel(1)
+```
+
+The three heatmaps, as in the SI:
+
 ```{r s8-figure-s27}
-#| fig-width: 7
-#| fig-height: 2.5
-```
-
-::: {.callout-note collapse="true" appearance="simple"}
-## Supporting Information layout
-
-Plotting code from `code/si/figures/S8_figures.R`. This is the version
-saved to `output/figures/si/`.
-
-```{r plot-figure-s27}
-```
-
-```{r s8-figure-s27-si}
 #| fig-width: 10
 #| fig-height: 4
 ```
-:::
 
 ## 8.5 Temporal robustness (Table S37)
 
@@ -323,8 +336,17 @@ knitr::kable(subgroup_table("grade", "Non-friends", "coop_gap_filtered"))
 ```{r s8-alternative-ranks}
 ```
 
-```{r plot-figure-s28}
+A basic version first, written here only to show how the figure is built:
+
+```{r}
+#| fig-width: 11
+#| fig-height: 3.4
+ggplot(rank_robustness, aes(estimate, measure)) +
+  geom_pointrange(aes(xmin = estimate - 1.96 * se, xmax = estimate + 1.96 * se)) +
+  facet_wrap(~ sample, nrow = 1, scales = "free_x")
 ```
+
+The figure as in the SI, with its colors, labels and legends (code from the script):
 
 ```{r s8-figure-s28}
 #| fig-width: 11

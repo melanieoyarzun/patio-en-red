@@ -15,13 +15,10 @@ code-links:
 #| include: false
 here::i_am("notebooks/si/S9_behavioral_rank.qmd")
 knitr::read_chunk(here::here("code", "si", "S9_behavioral_rank.R"))
-knitr::read_chunk(here::here("code", "si", "figures", "S9_figures.R"))
 ```
 
 Instead of asking children who is popular, we can read rank off the game:
 PageRank on the network of tokens sent. Code: `code/si/S9_behavioral_rank.R`.
-
-For the regression tables, † denotes p < 0.10, * p < 0.05, ** p < 0.01, and *** p < 0.001.
 
 ```{r s9-setup}
 ```
@@ -106,47 +103,84 @@ knitr::kable(table_s55[["Higher-to-lower"]])
 
 ## Figure S29
 
+```{r s9-figure-s29-data}
+```
+
+A basic version first, written here only to show how the figure is built: the filtered Cooperation GAP along the behavioral rank gap.
+
+```{r}
+#| fig-width: 9
+#| fig-height: 3.2
+ggplot(bsr_bins, aes(gap, Filtered)) +
+  geom_hline(yintercept = 0) +
+  geom_line() +
+  geom_point() +
+  facet_wrap(~ friendship)
+```
+
+The figure as in the SI (code from the script): one column per friendship
+type, written as a function.
+
+```{r s9-figure-s29-panels}
+```
+
+One column on its own (non-friends):
+
+```{r}
+#| fig-width: 3.5
+#| fig-height: 6
+s29_column("Non-friends", "Non Friends", color_non_friends)
+```
+
+The three columns, as in the SI:
+
 ```{r s9-figure-s29}
-#| fig-width: 9
-#| fig-height: 3
+#| fig-width: 10
+#| fig-height: 7
 ```
-
-::: {.callout-note collapse="true" appearance="simple"}
-## Supporting Information layout
-
-Plotting code from `code/si/figures/S9_figures.R`. This is the version
-saved to `output/figures/si/`.
-
-```{r plot-figure-s29}
-```
-
-```{r s9-figure-s29-si}
-#| fig-width: 9
-#| fig-height: 5.5
-```
-:::
 
 ## Figure S30
 
-```{r s9-figure-s30}
+```{r s9-figure-s30-data}
+```
+
+A basic version first, written here only to show how the figure is built: Behavioral Social Rank against each characteristic.
+
+```{r}
 #| fig-width: 9
 #| fig-height: 5
+ggplot(bsr_correlates, aes(bsr, value)) +
+  geom_point(alpha = 0.2) +
+  geom_smooth(method = "lm") +
+  facet_wrap(~ panel)
 ```
 
-::: {.callout-note collapse="true" appearance="simple"}
-## Supporting Information layout
+The figure as in the SI (code from the script): panel A, and one panel per
+characteristic written as a function.
 
-Plotting code from `code/si/figures/S9_figures.R`. This is the version
-saved to `output/figures/si/`.
-
-```{r plot-figure-s30}
+```{r s9-figure-s30-panels}
 ```
 
-```{r s9-figure-s30-si}
+Panel A and one characteristic on their own:
+
+```{r}
+#| fig-width: 3.5
+#| fig-height: 3.5
+panel_a
+```
+
+```{r}
+#| fig-width: 3.5
+#| fig-height: 3.5
+correlate_panel(s30_titles[1], "Z-score")
+```
+
+All panels, as in the SI:
+
+```{r s9-figure-s30}
 #| fig-width: 10
 #| fig-height: 6
 ```
-:::
 
 ```{r s9-save}
 ```
