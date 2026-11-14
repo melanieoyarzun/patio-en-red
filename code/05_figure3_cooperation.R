@@ -8,7 +8,7 @@
 #   B. mean tokens sent and received along the Social Rank GAP
 #   C. Cooperation GAP along the Social Rank GAP (observed and null-model filtered)
 #
-# Each panel is saved on its own (9 files). The paper assembles them.
+# The same nine panel objects are exported individually and assembled.
 #
 #   Input : data/generated/analysis_dyads.csv
 #   Output: output/figures/figure3_{I,II,III}_{A,B,C}.(pdf|png)
@@ -93,9 +93,6 @@ plot_heatmap <- function(this_group) {
     theme(panel.border = element_blank(), legend.position = "right")
 }
 
-plot_heatmap("Non-friends")
-
-
 ## ---- binned-data ----
 # Panels B and C follow the logic of the original analysis:
 #   1. for each child (sender), average over her partners in a given
@@ -171,13 +168,11 @@ plot_tokens <- function(this_group, color) {
     annotate("text", x = c(-0.55, 0.55), y = 0.4, size = 2.3, fontface = "bold",
              label = c("Receiver higher rank", "Sender higher rank")) +
     scale_x_continuous(limits = c(-1.1, 1.1), breaks = seq(-1, 1, 0.5)) +
-    scale_y_continuous(limits = c(0, 11), breaks = c(0, 5, 10)) +
+    scale_y_continuous(breaks = c(0, 5, 10)) +
+    coord_cartesian(ylim = c(0, 11), clip = "on") +
     labs(x = "Social Rank GAP", y = "Tokens") +
     theme_paper(base_size = 9)
 }
-
-plot_tokens("Non-friends", color_non_friends)
-
 
 ## ---- panel-c-plot ----
 plot_coop_gap <- function(this_group, color, y_limits = c(-6, 6)) {
@@ -197,13 +192,11 @@ plot_coop_gap <- function(this_group, color, y_limits = c(-6, 6)) {
              fontface = "bold", color = color, alpha = c(1, 0.4),
              label = c("Observed data", "Null-model filtered")) +
     scale_x_continuous(limits = c(-1.1, 1.1), breaks = seq(-1, 1, 0.5)) +
-    scale_y_continuous(limits = y_limits, breaks = seq(-7.5, 5, 2.5)) +
+    scale_y_continuous(breaks = seq(-7.5, 5, 2.5)) +
+    coord_cartesian(ylim = y_limits, clip = "on") +
     labs(x = "Social Rank GAP", y = "Cooperation GAP\n[Received - Sent]") +
     theme_paper(base_size = 9)
 }
-
-plot_coop_gap("Non-friends", color_non_friends)
-
 
 ## ---- all-panels ----
 rows <- tribble(
@@ -213,17 +206,23 @@ rows <- tribble(
   "III", "Asymmetric",     "Sender declares", color_asymmetric,  -8.5
 )
 
-for (k in seq_len(nrow(rows))) {
-  r <- rows[k, ]
-  save_figure(plot_heatmap(r$heatmap_group),
-              paste0("figure3_", r$row, "_A_heatmap"), width = 3.6, height = 3.2)
-  save_figure(plot_tokens(r$rank_group, r$color),
-              paste0("figure3_", r$row, "_B_tokens"), width = 3.2, height = 3)
-  save_figure(plot_coop_gap(r$rank_group, r$color, y_limits = c(r$y_min, 6)),
-              paste0("figure3_", r$row, "_C_coop_gap"), width = 3.2, height = 3)
-}
+figure3_panels <- pmap(rows, function(row, heatmap_group, rank_group, color, y_min) {
+  list(A = plot_heatmap(heatmap_group),
+       B = plot_tokens(rank_group, color),
+       C = plot_coop_gap(rank_group, color, y_limits = c(y_min, 6)))
+}) %>% set_names(rows$row)
+
+figure3 <- patchwork::wrap_plots(flatten(figure3_panels), ncol = 3)
 
 
 ## ---- fig3-save ----
+for (row in names(figure3_panels)) {
+  panels <- figure3_panels[[row]]
+  save_figure(panels$A, paste0("figure3_", row, "_A_heatmap"), width = 3.6, height = 3.2)
+  save_figure(panels$B, paste0("figure3_", row, "_B_tokens"), width = 3.2, height = 3)
+  save_figure(panels$C, paste0("figure3_", row, "_C_coop_gap"), width = 3.2, height = 3)
+}
+save_figure(figure3, "figure3_assembled", width = 11, height = 10)
+
 write_csv(heatmap_cells, here("output", "tables", "figure3_heatmap_cells.csv"))
 write_csv(binned,        here("output", "tables", "figure3_binned_means.csv"))

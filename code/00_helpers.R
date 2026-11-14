@@ -35,6 +35,10 @@ stars <- function(p) {
   case_when(p < 0.001 ~ "***", p < 0.01 ~ "**", p < 0.05 ~ "*", TRUE ~ "")
 }
 
+si_stars <- function(p) {
+  if_else(!is.na(p) & p >= 0.05 & p < 0.1, "†", stars(p))
+}
+
 # The SI regression tables report the same model with five sets of fixed
 # effects, from none to the preferred one:
 #   (1) no fixed effects, ordinary standard errors
@@ -56,7 +60,7 @@ fe_progression <- function(data, outcome = "coop_gap", formula_rhs = "rank_gap")
   }
 
   # a model that cannot be estimated (too few observations for its fixed
-  # effects) is returned as NULL and shown as an empty column
+  # effects) is returned as NULL and marked as not estimable
   fit <- function(formula) quiet_felm(formula, data)
 
   list(
@@ -71,7 +75,14 @@ fe_progression <- function(data, outcome = "coop_gap", formula_rhs = "rank_gap")
 # One row per coefficient (estimate and SE), plus N, R2 and adjusted R2,
 # in the layout of the SI tables. Works for any list of felm models.
 regression_table <- function(models, terms = NULL, digits = 3) {
-  models <- compact(models)   # drop models that could not be estimated
+  specifications <- names(models)
+  fitted <- compact(models)
+  models <- keep(fitted, ~ .x$N > .x$p)
+  if (length(models) == 0L) {
+    table <- tibble(row = c(terms, "Observations", "R2", "Adj. R2"))
+    for (name in specifications) table[[name]] <- "n.e."
+    return(table)
+  }
   coef_rows <- map_dfr(names(models), function(name) {
     ct <- quiet_summary(models[[name]])$coefficients
     se_col <- if ("Cluster s.e." %in% colnames(ct)) "Cluster s.e." else "Std. Error"
@@ -92,8 +103,9 @@ regression_table <- function(models, terms = NULL, digits = 3) {
   })
 
   coefficients <- coef_rows %>%
-    mutate(cell_estimate = paste0(sprintf(paste0("%.", digits, "f"), estimate), stars(p_value)),
-           cell_se       = paste0("(", sprintf(paste0("%.", digits, "f"), se), ")")) %>%
+    mutate(valid = is.finite(estimate) & is.finite(se) & is.finite(p_value),
+           cell_estimate = if_else(valid, paste0(sprintf(paste0("%.", digits, "f"), estimate), si_stars(p_value)), "n.e."),
+           cell_se = if_else(valid, paste0("(", sprintf(paste0("%.", digits, "f"), se), ")"), "")) %>%
     select(model, term, cell_estimate, cell_se) %>%
     pivot_longer(c(cell_estimate, cell_se), names_to = "what", values_to = "value") %>%
     mutate(row = if_else(what == "cell_estimate", term, "")) %>%
@@ -107,8 +119,16 @@ regression_table <- function(models, terms = NULL, digits = 3) {
     pivot_longer(-model, names_to = "row") %>%
     pivot_wider(names_from = model, values_from = value)
 
-  bind_rows(coefficients, fits) %>%
+  table <- bind_rows(coefficients, fits) %>%
     mutate(across(everything(), ~ replace_na(.x, "")))
+
+  for (name in setdiff(specifications, names(models))) {
+    table[[name]] <- if_else(table$row == "", "", "n.e.")
+    if (!is.null(fitted[[name]])) {
+      table[[name]][table$row == "Observations"] <- format(fitted[[name]]$N, big.mark = ",")
+    }
+  }
+  table[, c("row", specifications)]
 }
 
 # Numbers (estimate, SE, p, N, R2) of one term in every model, for checks

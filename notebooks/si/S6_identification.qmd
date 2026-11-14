@@ -23,6 +23,8 @@ of the partners they met, that rank differences are spread over the whole
 session, and that every classroom and friendship group has enough variation
 in rank gaps. Code: `code/si/S6_identification.R`.
 
+For the regression tables, † denotes p < 0.10, * p < 0.05, ** p < 0.01, and *** p < 0.001.
+
 ```{r s6-setup}
 ```
 

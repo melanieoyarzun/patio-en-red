@@ -22,6 +22,8 @@ change: filtered tokens, another filtering threshold, another treatment of
 the nomination limit, subsamples by classroom size, sex or grade, temporal
 controls, a lagged placebo, and other ways of measuring rank.
 
+For the regression tables, † denotes p < 0.10, * p < 0.05, ** p < 0.01, and *** p < 0.001.
+
 ```{r s8-setup}
 ```
 
@@ -71,7 +73,21 @@ Specifications (4) and (5) are not estimable for this filtered sample. The fixed
 
 #### Table S30. Direct contrast between directions
 
+The contrast is the higher-to-lower slope minus the lower-to-higher slope. The models use 370 directed decisions from 44 classrooms. The table reports classroom-clustered standard errors, 95% confidence intervals, and restricted wild-cluster bootstrap p-values (999 draws). The two specifications without fixed effects coincide and are shown in one row.
+
 ```{r s8-filtered-contrast}
+```
+
+```{r}
+format_slope <- function(b, se) if_else(is.na(b), "n.e.", sprintf("%.3f (%.3f)", b, se))
+table_s30 %>%
+  transmute(FE = fixed_effects, Model = pooled_model,
+            `Lower to higher` = format_slope(lower_to_higher, lower_to_higher_se),
+            `Higher to lower` = format_slope(higher_to_lower, higher_to_lower_se),
+            Contrast = format_slope(contrast, contrast_se),
+            `95% CI` = if_else(estimable, sprintf("[%.3f, %.3f]", ci_low, ci_high), "n.e."),
+            `Cluster p` = round(cluster_p, 3), `Wild p` = round(wild_p, 3)) %>%
+  knitr::kable()
 ```
 
 ```{r s8-figure-s25}
@@ -91,7 +107,26 @@ keeps her own top share. n.e. (NA) marks models that cannot be estimated
 ```{r s8-thresholds}
 ```
 
-## 8.3 Nomination limit (Table S35, Figure S26)
+### Table S35. Sensitivity to the global filter by nomination direction
+
+Each row repeats the asymmetric-friendship analysis with a different share of transfers retained. A decision enters the filtered sample when both directions of the exchange survive. The sender count shows how many children still contribute at least two decisions. Standard errors are in parentheses. n.e. marks specifications with fewer than 10 residual degrees of freedom or without finite estimates. † p < 0.10, * p < 0.05, ** p < 0.01, *** p < 0.001.
+
+```{r s8-asymmetric-thresholds}
+```
+
+#### Panel A. Lower-to-higher nominations
+
+```{r}
+knitr::kable(format_asymmetric_thresholds("Low to high"))
+```
+
+#### Panel B. Higher-to-lower nominations
+
+```{r}
+knitr::kable(format_asymmetric_thresholds("High to low"))
+```
+
+## 8.3 Nomination limit (Table S36, Figure S26)
 
 ```{r s8-nomination-cap}
 ```
@@ -129,28 +164,104 @@ figure_s26
 #| fig-height: 3.2
 ```
 
-## 8.5 Temporal robustness (Table S36)
+## 8.5 Temporal robustness (Table S37)
 
 ```{r s8-temporal}
 ```
 
-## 8.6 Lagged placebo (Tables S37–S38)
+## 8.6 Lagged placebo (Tables S38–S39)
 
-### Table S37. Previous decision's rank gap in the full sample
+### Table S38. Previous decision's rank gap in the full sample
 
 ```{r s8-placebo}
 ```
 
-### Table S38. Placebo estimates by sample and token filter
+### Table S39. Placebo estimates by sample and token filter
 
 ```{r s8-placebo-by-group}
 ```
 
-## 8.7 Sex and grade level (Tables S39–S50)
+## 8.7 Sex and grade level (Tables S40–S51)
 
-The code builds all twelve subgroup tables. The preview below shows the sex specifications for all dyads using observed tokens. Run the script to export the full set.
+The models compare the observed and filtered Cooperation GAP within each sample. The sex tables vary the controls and interactions for sender and receiver sex. The grade tables compare a pooled model with grade indicators and separate models for grades 3, 4, and 5.
 
 ```{r s8-sex-grade}
+```
+
+### By sex
+
+#### Table S40. All dyads, observed tokens
+
+```{r}
+knitr::kable(subgroup_table("sex", "All dyads", "coop_gap"))
+```
+
+#### Table S41. All dyads, filtered tokens
+
+```{r}
+knitr::kable(subgroup_table("sex", "All dyads", "coop_gap_filtered"))
+```
+
+#### Table S42. Mutual friends, observed tokens
+
+```{r}
+knitr::kable(subgroup_table("sex", "Mutual friends", "coop_gap"))
+```
+
+#### Table S43. Mutual friends, filtered tokens
+
+```{r}
+knitr::kable(subgroup_table("sex", "Mutual friends", "coop_gap_filtered"))
+```
+
+#### Table S44. Non-friends, observed tokens
+
+```{r}
+knitr::kable(subgroup_table("sex", "Non-friends", "coop_gap"))
+```
+
+#### Table S45. Non-friends, filtered tokens
+
+```{r}
+knitr::kable(subgroup_table("sex", "Non-friends", "coop_gap_filtered"))
+```
+
+### By grade
+
+#### Table S46. All dyads, observed tokens
+
+```{r}
+knitr::kable(subgroup_table("grade", "All dyads", "coop_gap"))
+```
+
+#### Table S47. All dyads, filtered tokens
+
+```{r}
+knitr::kable(subgroup_table("grade", "All dyads", "coop_gap_filtered"))
+```
+
+#### Table S48. Mutual friends, observed tokens
+
+```{r}
+knitr::kable(subgroup_table("grade", "Mutual friends", "coop_gap"))
+```
+
+#### Table S49. Mutual friends, filtered tokens
+
+```{r}
+knitr::kable(subgroup_table("grade", "Mutual friends", "coop_gap_filtered"))
+```
+
+#### Table S50. Non-friends, observed tokens
+
+```{r}
+knitr::kable(subgroup_table("grade", "Non-friends", "coop_gap"))
+```
+
+#### Table S51. Non-friends, filtered tokens
+
+```{r}
+knitr::kable(subgroup_table("grade", "Non-friends", "coop_gap_filtered"))
 ```
 
 ## 8.8 Alternative Social Rank constructions (Figure S28)
@@ -160,9 +271,9 @@ The code builds all twelve subgroup tables. The preview below shows the sex spec
 #| fig-height: 3.5
 ```
 
-## 8.9 Rank from affiliation networks (Table S51)
+## 8.9 Rank from affiliation networks (Table S52)
 
-### Table S51. Regression estimates using affiliation-based ranks
+### Table S52. Regression estimates using affiliation-based ranks
 
 ```{r s8-affiliation-ranks}
 ```

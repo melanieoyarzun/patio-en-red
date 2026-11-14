@@ -2,14 +2,14 @@
 # S8_robustness.R   SI Section 8: Global robustness and sensitivity analyses
 #
 #   8.1  Null-model filtered tokens: Tables S25-S30, Figure S25
-#   8.2  Filtering threshold and cutoff definition: Tables S31-S34
-#   8.3  Nomination limit: Table S35, Figure S26
+#   8.2  Filtering threshold and cutoff definition: Tables S31-S35
+#   8.3  Nomination limit: Table S36, Figure S26
 #   8.4  Classroom size: Figure S27
-#   8.5  Temporal robustness: Table S36
-#   8.6  Lagged Social Rank GAP placebo: Tables S37-S38
-#   8.7  Sex and grade level: Tables S39-S50
+#   8.5  Temporal robustness: Table S37
+#   8.6  Lagged Social Rank GAP placebo: Tables S38-S39
+#   8.7  Sex and grade level: Tables S40-S51
 #   8.8  Alternative Social Rank constructions: Figure S28
-#   8.9  Rank measures from affiliation networks: Table S51
+#   8.9  Rank measures from affiliation networks: Table S52
 #
 #   Input : data/generated/analysis_dyads.csv, data/generated/analysis_students.csv,
 #           data/generated/alternative_ranks.csv (from S4)
@@ -50,9 +50,10 @@ preferred_model <- function(data, outcome = "coop_gap", rhs = "rank_gap",
 term_estimate <- function(model, term = "rank_gap") {
   if (is.null(model) || model$df < 10) return(tibble(estimate = NA_real_, se = NA_real_, p_value = NA_real_))
   ct <- quiet_summary(model)$coefficients
-  if (!term %in% rownames(ct) || !is.finite(ct[term, "Cluster s.e."]))
+  se_col <- if ("Cluster s.e." %in% colnames(ct)) "Cluster s.e." else "Std. Error"
+  if (!term %in% rownames(ct) || !is.finite(ct[term, se_col]))
     return(tibble(estimate = NA_real_, se = NA_real_, p_value = NA_real_))
-  tibble(estimate = ct[term, "Estimate"], se = ct[term, "Cluster s.e."], p_value = ct[term, "Pr(>|t|)"])
+  tibble(estimate = ct[term, "Estimate"], se = ct[term, se_col], p_value = ct[term, "Pr(>|t|)"])
 }
 
 
@@ -86,8 +87,6 @@ filtered_asymmetric <- filtered %>%
   mutate(high_to_low = as.integer(rank_gap >= 0))
 
 fe_filtered_lh <- fe_progression(filter(filtered_asymmetric, high_to_low == 0), outcome = "coop_gap_filtered")
-fe_filtered_contrast <- fe_progression(filtered_asymmetric, outcome = "coop_gap_filtered",
-                                       formula_rhs = "rank_gap * high_to_low")
 
 regression_table(fe_filtered_lh, terms = "rank_gap")
 
@@ -106,7 +105,80 @@ if (qr(fixed_effects_5)$rank == nrow(filtered_high_to_low)) fe_filtered_hl["(5)"
 regression_table(fe_filtered_hl, terms = "rank_gap")
 
 ## ---- s8-filtered-contrast ----
-regression_table(fe_filtered_contrast, terms = c("rank_gap", "rank_gap:high_to_low"))
+# Table S30: H-to-L minus L-to-H slope on the current filtered sample.
+contrast_data <- filtered_asymmetric %>%
+  mutate(across(c(sender_id, class_id, class_round, round),
+                ~ interaction(.x, high_to_low, drop = TRUE), .names = "{.col}_direction"),
+         across(c(sender_id, class_id, class_round, round), factor))
+
+contrast_fe <- list(
+  "None" = character(),
+  "Classroom" = "class_id",
+  "Sender + classroom" = c("sender_id", "class_id"),
+  "Sender + classroom + round" = c("sender_id", "class_id", "round"),
+  "Sender + classroom-by-round" = c("sender_id", "class_round")
+)
+
+contrast_models <- function(effects, separate) {
+  has_fe <- length(effects) > 0L
+  if (has_fe && separate) effects <- paste0(effects, "_direction")
+  fe <- if (has_fe) paste(effects, collapse = " + ") else "0"
+  base <- if (has_fe && separate) "rank_gap" else "rank_gap + high_to_low"
+  as_formula <- function(rhs) as.formula(paste("coop_gap_filtered ~", rhs, "|", fe, "| 0 | class_id"))
+  list(full = as_formula(paste(base, "+ rank_gap:high_to_low")), restricted = as_formula(base))
+}
+
+filtered_contrast_row <- function(effects, separate, draws = 999L) {
+  formulas <- contrast_models(effects, separate)
+  full <- quiet_felm(formulas$full, contrast_data)
+  terms <- c("rank_gap", "rank_gap:high_to_low")
+  if (is.null(full) || full$N <= full$p) return(tibble(estimable = FALSE))
+  b <- coef(full)[terms]
+  V <- vcov(full)[terms, terms, drop = FALSE]
+  if (any(!is.finite(b)) || any(!is.finite(V)) || V[2, 2] <= 0) return(tibble(estimable = FALSE))
+
+  difference <- unname(b[2])
+  se <- sqrt(V[2, 2])
+  t_obs <- difference / se
+  # Use the 45 classrooms in the experiment as the reference for cluster
+  # inference, as in the SI. Bootstrap weights use the 44 observed clusters.
+  df <- n_distinct(dyads$class_id) - 1L
+  classes <- unique(contrast_data$class_id)
+  restricted <- quiet_felm(formulas$restricted, contrast_data)
+  residual <- drop(residuals(restricted))
+  fitted <- contrast_data$coop_gap_filtered - residual
+
+  set.seed(123)
+  t_star <- map_dbl(seq_len(draws), function(draw) {
+    weights <- setNames(sample(c(-1, 1), length(classes), replace = TRUE), classes)
+    sample_data <- contrast_data %>%
+      mutate(coop_gap_filtered = fitted + residual * weights[as.character(class_id)])
+    fit <- quiet_felm(formulas$full, sample_data)
+    if (is.null(fit)) return(NA_real_)
+    unname(coef(fit)[terms[2]]) / sqrt(vcov(fit)[terms[2], terms[2]])
+  })
+  tibble(estimable = TRUE,
+         lower_to_higher = unname(b[1]), lower_to_higher_se = sqrt(V[1, 1]),
+         higher_to_lower = sum(b), higher_to_lower_se = sqrt(sum(V)),
+         contrast = difference, contrast_se = se,
+         ci_low = difference - qt(.975, df) * se, ci_high = difference + qt(.975, df) * se,
+         cluster_p = 2 * pt(-abs(t_obs), df),
+         wild_p = if (all(is.finite(t_star))) mean(abs(t_star) >= abs(t_obs)) else NA_real_)
+}
+
+table_s30 <- imap_dfr(contrast_fe, function(effects, label) {
+  # With no fixed effects, direction-specific intercepts and the standard
+  # interaction are the same model. Estimate it only once.
+  if (length(effects) == 0L) {
+    return(filtered_contrast_row(effects, FALSE) %>%
+             mutate(fixed_effects = label, pooled_model = "Direction-specific intercepts / standard interaction",
+                    .before = 1))
+  }
+  bind_rows(
+    filtered_contrast_row(effects, TRUE) %>% mutate(pooled_model = "Direction-specific FE", .before = 1),
+    filtered_contrast_row(effects, FALSE) %>% mutate(pooled_model = "Common FE interaction", .before = 1)
+  ) %>% mutate(fixed_effects = label, .before = 1)
+})
 
 
 ## ---- s8-figure-s25 ----
@@ -168,9 +240,10 @@ threshold_row <- function(retention, scope) {
                                 fixed_effects = "sender_id + class_id + round")
   pooled_fit <- preferred_model(filter(pairs, friendship %in% c("Non-friends", "Mutual")),
                                 "coop_gap_p", rhs = "rank_gap * mutual")
-  mutual_slope <- if (is.null(pooled_fit) || pooled_fit$df < 10) c(estimate = NA, se = NA) else {
+  mutual_slope <- if (is.null(pooled_fit) || pooled_fit$df < 10) c(estimate = NA, se = NA, p = NA) else {
     b <- coef(pooled_fit); V <- vcov(pooled_fit); w <- c(1, 0, 1)
-    c(estimate = sum(w * b), se = sqrt(drop(t(w) %*% V %*% w)))
+    est <- sum(w * b); se <- sqrt(drop(t(w) %*% V %*% w))
+    c(estimate = est, se = se, p = 2 * pt(-abs(est / se), pooled_fit$df))
   }
   tibble(scope = scope, target = retention,
          transfers_retained = mean(d$keep), interactions = sum(d$keep),
@@ -181,7 +254,9 @@ threshold_row <- function(retention, scope) {
          mutual = term_estimate(mutual_fit),
          pooled_b1 = term_estimate(pooled_fit, "rank_gap"),
          pooled_b3 = term_estimate(pooled_fit, "rank_gap:mutual"),
-         pooled_mutual_slope = mutual_slope[["estimate"]])
+         pooled_mutual_slope = mutual_slope[["estimate"]],
+         pooled_mutual_slope_se = mutual_slope[["se"]],
+         pooled_mutual_slope_p = mutual_slope[["p"]])
 }
 
 
@@ -198,6 +273,54 @@ threshold_sensitivity %>%
   select(scope, target, transfers_retained, interactions, dyad_n, mutual_n,
          all_estimate, non_friends_estimate, mutual_estimate, pooled_b3_estimate) %>%
   mutate(across(where(is.double), ~ round(.x, 2)))
+
+
+## ---- s8-asymmetric-thresholds ----
+# 8.2b The one-sided friendships (Sender declares) split by direction, along
+# the same global retention grid and all five fixed-effects specifications.
+# The sender count shows how much within-sender support remains.
+asymmetric_specs <- c("No FE" = "0", "Classroom FE" = "class_id",
+                      "Sender + classroom FE" = "sender_id + class_id",
+                      "Sender + classroom + round FE" = "sender_id + class_id + round",
+                      "Sender + classroom-by-round FE" = "sender_id + class_round")
+
+asymmetric_row <- function(retention) {
+  kept <- filter_at(retention, "global") %>%
+    filter(friendship == "Sender declares", !is.na(coop_gap_p)) %>%
+    mutate(direction = if_else(rank_gap < 0, "Low to high", "High to low"))
+  kept %>%
+    group_by(direction) %>%
+    group_modify(function(d, key) {
+      sender_counts <- count(d, sender_id)
+      imap_dfr(asymmetric_specs, function(fe, spec) {
+        # as in Table S29, column (1) uses conventional standard errors and
+        # the fixed-effects columns cluster by classroom
+        m <- if (fe == "0") quiet_felm(coop_gap_p ~ rank_gap | 0 | 0 | 0, d) else
+          preferred_model(d, outcome = "coop_gap_p", fixed_effects = fe)
+        est <- term_estimate(m)
+        tibble(spec = spec, n = nrow(d), senders = nrow(sender_counts),
+               senders_2plus = sum(sender_counts$n >= 2), est)
+      })
+    }) %>%
+    ungroup() %>%
+    mutate(retention = retention, .before = 1)
+}
+
+asymmetric_thresholds <- map_dfr(retention_rates, asymmetric_row) %>%
+  mutate(spec = factor(spec, levels = names(asymmetric_specs)),
+         direction = factor(direction, levels = c("Low to high", "High to low")))
+
+format_asymmetric_thresholds <- function(nomination_direction) {
+  asymmetric_thresholds %>%
+    filter(direction == nomination_direction) %>%
+    mutate(cell = if_else(is.na(estimate), "n.e.",
+                          sprintf("%.2f%s (%.2f)", estimate, si_stars(p_value), se))) %>%
+    select(retention, n, senders_2plus, spec, cell) %>%
+    pivot_wider(names_from = spec, values_from = cell) %>%
+    arrange(desc(retention)) %>%
+    mutate(retention = if_else(retention == 1, "100% (observed)", scales::percent(retention))) %>%
+    rename("Target" = retention, "Decisions" = n, "Senders with 2+ decisions" = senders_2plus)
+}
 
 
 ## ---- s8-nomination-cap ----
@@ -244,7 +367,7 @@ out_counts <- dyads %>% group_by(sender_id) %>% summarise(q4 = sum(nom_q4), q5 =
 reached_q4 <- out_counts$sender_id[out_counts$q4 >= 5]
 reached_q5 <- out_counts$sender_id[out_counts$q5 >= 5]
 
-table_s35 <- bind_rows(
+table_s36 <- bind_rows(
   main_with_gap(dyads$rank_gap) %>% mutate(construction = "Baseline (all nominations)"),
   cap_draws %>% filter(k == 3) %>% summarise(across(c(estimate, se, p_value), median)) %>%
     mutate(construction = "Fixed cap k = 3 (median of 25 draws)"),
@@ -255,9 +378,9 @@ table_s35 <- bind_rows(
     mutate(construction = "Exclude cap-reachers (>= 5)")
 ) %>% relocate(construction)
 
-table_s35
+table_s36
 
-figure_s26 <- ggplot(table_s35, aes(estimate, fct_rev(fct_inorder(construction)))) +
+figure_s26 <- ggplot(table_s36, aes(estimate, fct_rev(fct_inorder(construction)))) +
   geom_vline(xintercept = 0, linetype = "dashed") +
   geom_errorbarh(aes(xmin = estimate - 1.96 * se, xmax = estimate + 1.96 * se), height = 0.2) +
   geom_point(size = 2) +
@@ -338,12 +461,12 @@ temporal_models <- list(
   "(8) pooled x progress"       = preferred_model(non_mutual, rhs = "rank_gap * mutual * progress_c")
 )
 
-table_s36 <- imap_dfr(temporal_models, function(fit, name) {
+table_s37 <- imap_dfr(temporal_models, function(fit, name) {
   summary(fit)$coefficients %>% as_tibble(rownames = "term") %>%
     filter(str_detect(term, "rank_gap")) %>%
     transmute(model = name, term, estimate = Estimate, se = `Cluster s.e.`, p_value = `Pr(>|t|)`, n = fit$N)
 })
-table_s36 %>% mutate(across(where(is.double), ~ round(.x, 3)))
+table_s37 %>% mutate(across(where(is.double), ~ round(.x, 3)))
 
 # Paired classroom jackknife for the change in the rank-gap coefficient
 # between model (1) and model (3)
@@ -382,46 +505,51 @@ placebo_samples <- list(
   "Non-friends"            = list(filter(lagged, friendship == "Non-friends"), "coop_gap"),
   "Non-friends (filtered)" = list(filter(lagged, friendship == "Non-friends"), "coop_gap_filtered")
 )
-table_s38 <- imap_dfr(placebo_samples, function(s, name) {
+table_s39 <- imap_dfr(placebo_samples, function(s, name) {
   d <- s[[1]] %>% filter(!is.na(.data[[s[[2]]]]))
   fit <- preferred_model(d, outcome = s[[2]], rhs = "lagged_rank_gap")
   term_estimate(fit, "lagged_rank_gap") %>% mutate(sample = name, n = nrow(d), .before = 1)
 })
-table_s38
+table_s39
 
 
 ## ---- s8-sex-grade ----
-# 8.7 Does the slope differ by the children's sex or grade level?
-# Classroom + sender FE, SE by classroom (sender sex is constant within
-# sender, so only its interactions can be estimated).
+# The SI reports separate samples and the same model layouts for observed
+# and filtered transfers. Filter before fitting or forming subgroups.
 dyads <- dyads %>%
   left_join(students %>% select(sender_id = student_id, sender_female = female, grade), by = "sender_id") %>%
   left_join(students %>% select(receiver_id = student_id, receiver_female = female), by = "receiver_id")
 
 sex_models <- function(data, outcome) {
-  data <- data %>% filter(!is.na(.data[[outcome]]))
-  fe <- "class_id + sender_id"
+  data <- filter(data, !is.na(.data[[outcome]]))
+  class_sender <- "class_id + sender_id"
+  girls <- filter(data, sender_female == 1)
+  boys <- filter(data, sender_female == 0)
   list(
-    "(1) all"                 = preferred_model(data, outcome, "rank_gap", fe),
-    "(2) + receiver female"   = preferred_model(data, outcome, "rank_gap + receiver_female", fe),
-    "(3) sex interactions"    = preferred_model(data, outcome, "rank_gap * sender_female * receiver_female", fe),
-    "(4) girls"               = preferred_model(filter(data, sender_female == 1), outcome, "rank_gap", fe),
-    "(5) girls + receiver F"  = preferred_model(filter(data, sender_female == 1), outcome, "rank_gap + receiver_female", fe),
-    "(6) boys"                = preferred_model(filter(data, sender_female == 0), outcome, "rank_gap", fe),
-    "(7) boys + receiver F"   = preferred_model(filter(data, sender_female == 0), outcome, "rank_gap + receiver_female", fe)
+    "(1) All" = preferred_model(data, outcome, "rank_gap", "class_id"),
+    "(2) Sender sex" = preferred_model(data, outcome, "rank_gap + sender_female", "class_id"),
+    "(3) Receiver sex" = preferred_model(data, outcome, "rank_gap + receiver_female", class_sender),
+    "(4) Interactions" = preferred_model(data, outcome, "rank_gap * sender_female * receiver_female", "class_id"),
+    "(5) Girls" = preferred_model(girls, outcome, "rank_gap", class_sender),
+    "(6) Girls + receiver sex" = preferred_model(girls, outcome, "rank_gap + receiver_female", class_sender),
+    "(7) Boys" = preferred_model(boys, outcome, "rank_gap", class_sender),
+    "(8) Boys + receiver sex" = preferred_model(boys, outcome, "rank_gap + receiver_female", class_sender)
   )
 }
 
 grade_models <- function(data, outcome) {
-  data <- data %>% filter(!is.na(.data[[outcome]])) %>% mutate(grade = factor(grade))
-  fe <- "class_id + sender_id"
-  list(
-    "(1) all"               = preferred_model(data, outcome, "rank_gap", fe),
-    "(2) gap x grade"       = preferred_model(data, outcome, "rank_gap + rank_gap:grade", fe),
-    "(3) 3rd grade"         = preferred_model(filter(data, grade == 3), outcome, "rank_gap", fe),
-    "(4) 4th grade"         = preferred_model(filter(data, grade == 4), outcome, "rank_gap", fe),
-    "(5) 5th grade"         = preferred_model(filter(data, grade == 5), outcome, "rank_gap", fe)
-  )
+  data <- filter(data, !is.na(.data[[outcome]])) %>%
+    mutate(grade4 = as.integer(grade == 4), grade5 = as.integer(grade == 5))
+  pooled <- quiet_felm(as.formula(paste(outcome, "~ rank_gap + grade4 + grade5 | 0 | 0 | 0")), data)
+  by_grade <- map(3:5, function(level) {
+    sample <- filter(data, grade == level)
+    list(preferred_model(sample, outcome, "rank_gap", "class_id"),
+         preferred_model(sample, outcome, "rank_gap", "class_id + sender_id"))
+  })
+  c(list(pooled), flatten(by_grade)) %>%
+    set_names(c("(1) Pooled", "(2) Grade 3", "(3) Grade 3 + sender FE",
+                "(4) Grade 4", "(5) Grade 4 + sender FE",
+                "(6) Grade 5", "(7) Grade 5 + sender FE"))
 }
 
 subgroup_tables <- expand_grid(by = c("sex", "grade"),
@@ -432,11 +560,14 @@ subgroup_tables <- expand_grid(by = c("sex", "grade"),
                 "Mutual friends" = filter(dyads, friendship == "Mutual"),
                 "Non-friends" = filter(dyads, friendship == "Non-friends"))
     models <- if (by == "sex") sex_models(d, outcome) else grade_models(d, outcome)
-    regression_table(compact(models))
+    regression_table(models)
   }))
 
-# for example, sex, all dyads, observed tokens
-subgroup_tables$table[[1]]
+subgroup_table <- function(grouping, friendship_sample, outcome_name) {
+  subgroup_tables %>%
+    filter(by == grouping, sample == friendship_sample, outcome == outcome_name) %>%
+    pull(table) %>% pluck(1)
+}
 
 
 ## ---- s8-alternative-ranks ----
@@ -510,7 +641,7 @@ affiliation_labels <- c(social_rank = "Pop. Social Rank (primary)",
                         rank_hangout_minus = "Most-minus-least hang-out PageRank",
                         rank_best_friend = "Best-friend PageRank")
 
-table_s51 <- expand_grid(measure = names(affiliation_labels),
+table_s52 <- expand_grid(measure = names(affiliation_labels),
                          sample = c("All dyads", "Non-friends", "Mutual friends")) %>%
   mutate(result = map2(measure, sample, function(m, s) {
     r <- setNames(affiliation_ranks[[m]], affiliation_ranks$student_id)
@@ -522,8 +653,8 @@ table_s51 <- expand_grid(measure = names(affiliation_labels),
   unnest(result) %>%
   mutate(measure = affiliation_labels[measure])
 
-table_s51 %>%
-  mutate(cell = sprintf("%.3f%s (%.3f)", estimate, stars(p_value), se)) %>%
+table_s52 %>%
+  mutate(cell = sprintf("%.3f%s (%.3f)", estimate, si_stars(p_value), se)) %>%
   select(measure, sample, cell) %>%
   pivot_wider(names_from = sample, values_from = cell)
 
@@ -544,18 +675,19 @@ save_table(regression_table(fe_filtered_mutual, terms = "rank_gap"), "S8_table_s
 save_table(regression_table(fe_filtered_pooled, terms = c("rank_gap", "mutual", "rank_gap:mutual")), "S8_table_s28_filtered_pooled")
 save_table(regression_table(fe_filtered_lh, terms = "rank_gap"),     "S8_table_s29_filtered_low_to_high")
 save_table(regression_table(fe_filtered_hl, terms = "rank_gap"),     "S8_table_s29_filtered_high_to_low")
-save_table(regression_table(fe_filtered_contrast, terms = c("rank_gap", "rank_gap:high_to_low")), "S8_table_s30_filtered_contrast")
+save_table(table_s30, "S8_table_s30_filtered_contrast")
 save_table(threshold_sensitivity, "S8_tables_s31_s34_thresholds")
-save_table(table_s35, "S8_table_s35_nomination_cap")
+save_table(asymmetric_thresholds, "S8_table_s35_asymmetric_thresholds")
+save_table(table_s36, "S8_table_s36_nomination_cap")
 save_table(size_slopes, "S8_class_size_slopes")
-save_table(table_s36, "S8_table_s36_temporal")
-save_table(regression_table(fe_placebo, terms = "lagged_rank_gap"), "S8_table_s37_placebo")
-save_table(table_s38, "S8_table_s38_placebo_samples")
+save_table(table_s37, "S8_table_s37_temporal")
+save_table(regression_table(fe_placebo, terms = "lagged_rank_gap"), "S8_table_s38_placebo")
+save_table(table_s39, "S8_table_s39_placebo_samples")
 pwalk(subgroup_tables, function(by, sample, outcome, table) {
   save_table(table, paste("S8_subgroup", by, str_replace_all(tolower(sample), "[^a-z]+", "_"), outcome, sep = "_"))
 })
 save_table(rank_robustness, "S8_rank_constructions")
-save_table(table_s51, "S8_table_s51_affiliation_ranks")
+save_table(table_s52, "S8_table_s52_affiliation_ranks")
 save_si_figure(figure_s25, "S8_figure_s25_filtered", 9, 3.2)
 save_si_figure(figure_s26, "S8_figure_s26_nomination_cap", 6, 3)
 save_si_figure(figure_s27, "S8_figure_s27_class_size", 9, 3.2)

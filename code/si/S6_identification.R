@@ -69,7 +69,7 @@ table_s16 <- balance_models %>%
             se = `Cluster s.e.`, p_value = `Pr(>|t|)`, r2)
 
 table_s16 %>%
-  mutate(cell = paste0(sprintf("%.4f", estimate), stars(p_value), " (", sprintf("%.4f", se), ")")) %>%
+  mutate(cell = paste0(sprintf("%.4f", estimate), si_stars(p_value), " (", sprintf("%.4f", se), ")")) %>%
   select(panel, term, model, cell) %>%
   pivot_wider(names_from = model, values_from = cell, values_fill = "")
 

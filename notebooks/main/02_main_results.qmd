@@ -389,18 +389,49 @@ Cooperation GAP rises from negative to positive. Among mutual friends both
 curves are higher (more giving overall) and they nearly overlap, so the
 Cooperation GAP stays close to zero along the whole range.
 
-## All nine panels
+## Individual panels
+
+The script builds each panel separately and saves it as a PDF and a PNG. When a confidence interval extends beyond the plotting window, the part inside the frame remains visible.
 
 ```{r all-panels}
 ```
 
+### Row I. Non-friends
+
+```{r}
+#| fig-width: 3.8
+#| fig-height: 3.3
+figure3_panels[["I"]]$A
+figure3_panels[["I"]]$B
+figure3_panels[["I"]]$C
+```
+
+### Row II. Mutual friends
+
+```{r}
+#| fig-width: 3.8
+#| fig-height: 3.3
+figure3_panels[["II"]]$A
+figure3_panels[["II"]]$B
+figure3_panels[["II"]]$C
+```
+
+### Row III. One-sided friendships
+
+```{r}
+#| fig-width: 3.8
+#| fig-height: 3.3
+figure3_panels[["III"]]$A
+figure3_panels[["III"]]$B
+figure3_panels[["III"]]$C
+```
+
+## Assembled Figure 3 {#all-nine-panels}
+
 ```{r}
 #| fig-width: 11
 #| fig-height: 10
-library(patchwork)
-(plot_heatmap("Non-friends")    | plot_tokens("Non-friends", color_non_friends)    | plot_coop_gap("Non-friends", color_non_friends)) /
-(plot_heatmap("Mutual friends") | plot_tokens("Mutual", color_mutual)              | plot_coop_gap("Mutual", color_mutual)) /
-(plot_heatmap("Asymmetric")     | plot_tokens("Sender declares", color_asymmetric) | plot_coop_gap("Sender declares", color_asymmetric, c(-8.5, 6)))
+figure3
 ```
 
 ```{r fig3-save}

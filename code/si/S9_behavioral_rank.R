@@ -6,7 +6,7 @@
 #
 #   Figure S29  Figure 3 panels B-C with the BSR gap
 #   Figure S30  BSR and student characteristics
-#   Tables S52-S54  Cooperation GAP on the BSR gap (observed, filtered,
+#   Tables S53-S55  Cooperation GAP on the BSR gap (observed, filtered,
 #                   asymmetric friendships)
 #
 #   Input : data/generated/analysis_dyads.csv, data/generated/analysis_students.csv
@@ -71,7 +71,7 @@ tibble(
 
 
 ## ---- s9-regressions ----
-# Tables S52-S53: three specifications (no FE; classroom FE; classroom +
+# Tables S53-S54: three specifications (no FE; classroom FE; classroom +
 # sender FE) for all dyads, mutual friends and non-friends
 bsr_models <- function(data, outcome) {
   data <- data %>% filter(!is.na(.data[[outcome]])) %>%
@@ -86,17 +86,17 @@ samples <- list("All dyads" = dyads,
                 "Mutual friends" = filter(dyads, friendship == "Mutual"),
                 "Non-friends" = filter(dyads, friendship == "Non-friends"))
 
-table_s52 <- map(samples, ~ regression_table(bsr_models(.x, "coop_gap"), terms = "bsr_gap"))
-table_s53 <- map(samples, ~ regression_table(bsr_models(.x, "coop_gap_filtered"), terms = "bsr_gap"))
+table_s53 <- map(samples, ~ regression_table(bsr_models(.x, "coop_gap"), terms = "bsr_gap"))
+table_s54 <- map(samples, ~ regression_table(bsr_models(.x, "coop_gap_filtered"), terms = "bsr_gap"))
 
 ## ---- s9-asymmetric ----
-# Table S54: one-sided friendships (filtered tokens), split by who has the
+# Table S55: one-sided friendships (filtered tokens), split by who has the
 # higher behavioral rank
 asymmetric <- dyads %>%
   filter(friendship == "Sender declares", !is.na(coop_gap_filtered)) %>%
   mutate(direction = if_else(bsr_gap < 0, "Lower-to-higher", "Higher-to-lower"))
 
-table_s54 <- asymmetric %>%
+table_s55 <- asymmetric %>%
   split(.$direction) %>%
   map(~ regression_table(bsr_models(.x, "coop_gap_filtered"), terms = "bsr_gap"))
 ## ---- s9-figure-s29 ----
@@ -168,9 +168,9 @@ figure_s30 <- ggplot(bsr_correlates, aes(bsr, value)) +
 
 
 ## ---- s9-save ----
-iwalk(table_s52, ~ save_table(.x, paste0("S9_table_s52_observed_", str_replace_all(tolower(.y), "[^a-z]+", "_"))))
-iwalk(table_s53, ~ save_table(.x, paste0("S9_table_s53_filtered_", str_replace_all(tolower(.y), "[^a-z]+", "_"))))
-iwalk(table_s54, ~ save_table(.x, paste0("S9_table_s54_asymmetric_", str_replace_all(tolower(.y), "[^a-z]+", "_"))))
+iwalk(table_s53, ~ save_table(.x, paste0("S9_table_s53_observed_", str_replace_all(tolower(.y), "[^a-z]+", "_"))))
+iwalk(table_s54, ~ save_table(.x, paste0("S9_table_s54_filtered_", str_replace_all(tolower(.y), "[^a-z]+", "_"))))
+iwalk(table_s55, ~ save_table(.x, paste0("S9_table_s55_asymmetric_", str_replace_all(tolower(.y), "[^a-z]+", "_"))))
 write_csv(students %>% select(student_id, class_id, bsr_pagerank, bsr), here("data", "generated", "behavioral_rank.csv"))
 save_si_figure(figure_s29, "S9_figure_s29_bsr_cooperation", 9, 6)
 save_si_figure(figure_s30, "S9_figure_s30_bsr_correlates", 9, 4.5)

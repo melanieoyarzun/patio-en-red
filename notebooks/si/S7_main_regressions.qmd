@@ -23,6 +23,8 @@ table is the corresponding column of Table 1.
 Code: `code/si/S7_main_regressions.R` and the helper `fe_progression()` in
 `code/00_helpers.R`. (The wild-cluster bootstrap takes about a minute.)
 
+For the regression tables, † denotes p < 0.10, * p < 0.05, ** p < 0.01, and *** p < 0.001.
+
 ```{r s7-setup}
 ```
 
