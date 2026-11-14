@@ -37,7 +37,7 @@ The [notebook index](notebooks/README.md) links to the main analyses and all nin
 
 ### Data and measures
 
-The two study CSVs contain pseudonymized records. The first script builds `analysis_students.csv` and `analysis_dyads.csv`. S4 writes `alternative_ranks.csv` for S8, and S9 writes `behavioral_rank.csv`. All four files are generated locally.
+The two study CSVs contain pseudonymized records. The first script builds `analysis_students.csv` and `analysis_dyads.csv`. S4 writes `alternative_ranks.csv` for S8, and S9 writes `behavioral_rank.csv`. This test copy includes all four [generated files](data/generated/), which the scripts rebuild when run.
 
 - **Cooperation GAP** is the number of tokens received from the partner minus the number sent.
 - **Friendship type** is mutual friendship, one-sided friendship (sender declares or receiver declares), or non-friendship, based on best-friend nominations.

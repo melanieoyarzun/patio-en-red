@@ -10,14 +10,14 @@ The [codebook](codebook.md) defines the fields in the replication inputs and the
 | [`raw/dyads.csv`](raw/dyads.csv) | Pseudonymized directed decisions and peer nominations (17,804 rows) |
 | [`raw/figure2_layout.csv`](raw/figure2_layout.csv) | Coordinates for the classroom illustration in Figure 2 |
 
-The archival dataset is planned for OSF. This page will link to its record when the identifier is available.
+The archival dataset is available on [Zenodo](https://doi.org/10.5281/zenodo.24210703).
 
 ## Generated files
 
 | File in `data/generated/` | Script |
 |---|---|
-| `analysis_students.csv` and `analysis_dyads.csv` | [`code/01_build_measures.R`](../code/01_build_measures.R) |
-| `alternative_ranks.csv` | [`code/si/S4_social_rank.R`](../code/si/S4_social_rank.R) |
-| `behavioral_rank.csv` | [`code/si/S9_behavioral_rank.R`](../code/si/S9_behavioral_rank.R) |
+| [`analysis_students.csv`](generated/analysis_students.csv) and [`analysis_dyads.csv`](generated/analysis_dyads.csv) | [`code/01_build_measures.R`](../code/01_build_measures.R) |
+| [`alternative_ranks.csv`](generated/alternative_ranks.csv) | [`code/si/S4_social_rank.R`](../code/si/S4_social_rank.R) |
+| [`behavioral_rank.csv`](generated/behavioral_rank.csv) | [`code/si/S9_behavioral_rank.R`](../code/si/S9_behavioral_rank.R) |
 
 Run `Rscript code/run_all.R main` for the main results or `Rscript code/run_all.R` for the main results and Supporting Information. See the [setup instructions](../README.md#clone-and-reproduce).

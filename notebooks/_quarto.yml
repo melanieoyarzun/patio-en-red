@@ -29,6 +29,9 @@ website:
     style: docked
     search: true
     tools:
+      - icon: house
+        href: https://melanieoyarzun.github.io/patio-en-red/
+        aria-label: Replication website home
       - icon: github
         href: https://github.com/melanieoyarzun/patio-en-red
         aria-label: GitHub repository

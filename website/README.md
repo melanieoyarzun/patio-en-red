@@ -19,4 +19,4 @@ Open `website/_site/index.html` in your browser. To edit the landing page with l
 
 ## GitHub Pages
 
-The [Pages workflow](../.github/workflows/pages.yml) rebuilds the landing page and rendered analyses when the website, notebooks, scripts, or inputs change. It saves both in one HTML artifact. The deployment job runs on the default branch of the public repository once its Pages source is set to **GitHub Actions** in **Settings → Pages**.
+The [Pages workflow](../.github/workflows/pages.yml) rebuilds the landing page and rendered analyses when the website, notebooks, scripts, or data change. It saves both in one HTML artifact. The deployment job runs on the default branch of the public repository once its Pages source is set to **GitHub Actions** in **Settings → Pages**.
