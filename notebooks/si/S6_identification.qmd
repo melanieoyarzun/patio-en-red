@@ -46,7 +46,7 @@ with the rank the child could expect in that classroom and round.
 ```
 
 :::: {.content-visible when-format="html"}
-::: {.callout-note collapse="true" appearance="simple" icon="false" title="Show a minimal example"}
+::: {.callout-note collapse="true" appearance="simple" icon="false" title="Minimal plotting code"}
 
 ```{r}
 #| code-fold: false
@@ -74,7 +74,7 @@ The figure as in the SI, with its colors, labels and legends (code from the scri
 ```
 
 :::: {.content-visible when-format="html"}
-::: {.callout-note collapse="true" appearance="simple" icon="false" title="Show a minimal example"}
+::: {.callout-note collapse="true" appearance="simple" icon="false" title="Minimal plotting code"}
 
 ```{r}
 #| code-fold: false
@@ -102,7 +102,7 @@ The figure as in the SI, with its colors, labels and legends (code from the scri
 ```
 
 :::: {.content-visible when-format="html"}
-::: {.callout-note collapse="true" appearance="simple" icon="false" title="Show a minimal example"}
+::: {.callout-note collapse="true" appearance="simple" icon="false" title="Minimal plotting code"}
 
 ```{r}
 #| code-fold: false
@@ -126,7 +126,7 @@ The figure as in the SI, with its colors, labels and legends (code from the scri
 ## Figure S18. Rank gaps by round
 
 :::: {.content-visible when-format="html"}
-::: {.callout-note collapse="true" appearance="simple" icon="false" title="Show a minimal example"}
+::: {.callout-note collapse="true" appearance="simple" icon="false" title="Minimal plotting code"}
 
 ```{r}
 #| code-fold: false
@@ -155,7 +155,7 @@ SI.
 ```
 
 :::: {.content-visible when-format="html"}
-::: {.callout-note collapse="true" appearance="simple" icon="false" title="Show a minimal example"}
+::: {.callout-note collapse="true" appearance="simple" icon="false" title="Minimal plotting code"}
 
 ```{r}
 #| code-fold: false
@@ -179,7 +179,7 @@ The figure as in the SI, with its colors, labels and legends (code from the scri
 ## Figure S20. By classroom
 
 :::: {.content-visible when-format="html"}
-::: {.callout-note collapse="true" appearance="simple" icon="false" title="Show a minimal example"}
+::: {.callout-note collapse="true" appearance="simple" icon="false" title="Minimal plotting code"}
 
 ```{r}
 #| code-fold: false
@@ -209,7 +209,7 @@ The figure as in the SI, with its colors, labels and legends (code from the scri
 ```
 
 :::: {.content-visible when-format="html"}
-::: {.callout-note collapse="true" appearance="simple" icon="false" title="Show a minimal example"}
+::: {.callout-note collapse="true" appearance="simple" icon="false" title="Minimal plotting code"}
 
 Distribution of the Social Rank GAP among non-friends and mutual friends.
 

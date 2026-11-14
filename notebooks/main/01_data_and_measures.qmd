@@ -176,7 +176,7 @@ much closer: 83% of the decisions have a gap between $-0.5$ and $0.5$.
 ```
 
 :::: {.content-visible when-format="html"}
-::: {.callout-note collapse="true" appearance="simple" icon="false" title="Show the rank-gap histogram"}
+::: {.callout-note collapse="true" appearance="simple" icon="false" title="Minimal plotting code"}
 
 ```{r}
 #| code-fold: false

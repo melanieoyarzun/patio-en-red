@@ -118,7 +118,7 @@ The observed mean Cooperation GAP is shown alongside the value predicted by the 
 ```
 
 :::: {.content-visible when-format="html"}
-::: {.callout-note collapse="true" appearance="simple" icon="false" title="Show a minimal example"}
+::: {.callout-note collapse="true" appearance="simple" icon="false" title="Minimal plotting code"}
 
 ```{r}
 #| code-fold: false
@@ -142,7 +142,7 @@ The figure as in the SI, with its colors, labels and legends (code from the scri
 ```
 
 :::: {.content-visible when-format="html"}
-::: {.callout-note collapse="true" appearance="simple" icon="false" title="Show a minimal example"}
+::: {.callout-note collapse="true" appearance="simple" icon="false" title="Minimal plotting code"}
 
 ```{r}
 #| code-fold: false

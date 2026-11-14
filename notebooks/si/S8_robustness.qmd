@@ -246,7 +246,7 @@ Both panels together:
 ```
 
 :::: {.content-visible when-format="html"}
-::: {.callout-note collapse="true" appearance="simple" icon="false" title="Show a minimal example"}
+::: {.callout-note collapse="true" appearance="simple" icon="false" title="Minimal plotting code"}
 
 ```{r}
 #| code-fold: false
@@ -413,7 +413,7 @@ knitr::kable(subgroup_table("grade", "Non-friends", "coop_gap_filtered"))
 ```
 
 :::: {.content-visible when-format="html"}
-::: {.callout-note collapse="true" appearance="simple" icon="false" title="Show a minimal example"}
+::: {.callout-note collapse="true" appearance="simple" icon="false" title="Minimal plotting code"}
 
 ```{r}
 #| code-fold: false

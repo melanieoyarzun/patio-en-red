@@ -107,7 +107,7 @@ knitr::kable(table_s55[["Higher-to-lower"]])
 ```
 
 :::: {.content-visible when-format="html"}
-::: {.callout-note collapse="true" appearance="simple" icon="false" title="Show a minimal example"}
+::: {.callout-note collapse="true" appearance="simple" icon="false" title="Minimal plotting code"}
 
 Filtered Cooperation GAP along the Behavioral Social Rank GAP.
 
@@ -152,7 +152,7 @@ The three columns, as in the SI:
 ```
 
 :::: {.content-visible when-format="html"}
-::: {.callout-note collapse="true" appearance="simple" icon="false" title="Show a minimal example"}
+::: {.callout-note collapse="true" appearance="simple" icon="false" title="Minimal plotting code"}
 
 Behavioral Social Rank against each student characteristic.
 
