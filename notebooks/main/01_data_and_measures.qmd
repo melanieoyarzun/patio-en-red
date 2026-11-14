@@ -59,6 +59,10 @@ The data use study codes. Variable definitions are in `data/codebook.md`.
 ```{r read-data}
 ```
 
+```{r display-data}
+```
+
+Head of dataframe with game (dyad) data
 ```{r}
 head(dyads)
 ```
@@ -179,12 +183,27 @@ ggplot(dyads, aes(rank_gap)) +
   theme_minimal()
 ```
 
-Attendance is standardized within classroom, for the balance test:
+# Step 6. Student covariates
+
+Some analyses use student characteristics: attendance, GPA and age, and the
+nominations each child received in each peer question. All of them are
+standardized here, within each classroom (mean 0 and SD 1 among
+classmates), so a value compares a child with her own classmates and not with
+children of other schools. The z-scores are saved in
+`analysis_students.csv`, and every script reads them from there.
+
+- `attendance_z` enters the balance check (Figure 1D, Table S16, Figures
+  S15–S17). GPA enters that check on its original 1–7 scale, as in the
+  paper.
+- The other z-scores are used in the correlates of Social Rank (Table S9,
+  Figure S8) and of Behavioral Social Rank (Figure S30).
+- The two computed ages above 15 years are birth-date errors (SI Table S1)
+  and are set to missing before standardizing.
 
 ```{r student-covariates}
 ```
 
-# Step 6. Null-model filtering (robustness)
+# Step 7. Null-model filtering (robustness)
 
 Some children give 5 tokens to everyone; others give 10 to some classmates
 and 0 to others. Only the second kind of giving says something about the
@@ -234,12 +253,10 @@ simulated %>%
 ```
 
 The differences are of the size expected from 1,000 random draws (they get
-smaller as the number of shuffles grows). The closed form is the exact limit
-of the simulation, so we use it: same scores, and no randomness in the
+smaller as the number of shuffles grows). The closed form is the exact limit of the simulation, so we use it: same scores, and no randomness in the
 results.
 
-Then we keep the 50% of transfers with the highest score (one cutoff for the
-whole sample). A pair enters the filtered Cooperation GAP only if *both*
+Then we keep the 50% of transfers with the highest score (one cutoff for the whole sample). A pair enters the filtered Cooperation GAP only if *both*
 directions are kept, so about a quarter of the pairs remain.
 
 ```{r null-model-filter}

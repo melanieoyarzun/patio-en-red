@@ -94,11 +94,6 @@ figure_s15_data <- balance_models %>%
          outcome = factor(outcomes[outcome], levels = outcomes),
          term = recode(term, female = "Female", attendance_z = "Attendance", gpa = "GPA"))
 
-# Quick look: balance coefficients with 95% CIs
-ggplot(figure_s15_data, aes(estimate, term)) +
-  geom_vline(xintercept = 0) +
-  geom_pointrange(aes(xmin = estimate - 1.96 * se, xmax = estimate + 1.96 * se)) +
-  facet_wrap(~ outcome)
 
 ## ---- s6-figure-s15-si ----
 # Supporting Information layout (plotting code in figures/S6_figures.R)
@@ -119,11 +114,6 @@ round_balance <- expand_grid(round_id = sort(unique(balance_data$round)),
   })) %>%
   unnest(result)
 
-# Quick look: one coefficient per round, outcome and covariate
-ggplot(round_balance, aes(round_id, estimate)) +
-  geom_hline(yintercept = 0) +
-  geom_point() +
-  facet_grid(outcome ~ covariate, scales = "free_y")
 
 ## ---- s6-figure-s16-si ----
 # Supporting Information layout (plotting code in figures/S6_figures.R)
@@ -141,10 +131,6 @@ density_data <- balance_data %>%
             `C. Sex`        = if_else(female == 1, "High", "Low")) %>%
   pivot_longer(-gap_demeaned, names_to = "covariate", values_to = "group")
 
-# Quick look: densities by covariate group
-ggplot(density_data, aes(gap_demeaned, fill = group)) +
-  geom_density(alpha = 0.4) +
-  facet_wrap(~ covariate)
 
 ## ---- s6-figure-s17-si ----
 # Supporting Information layout (plotting code in figures/S6_figures.R)
@@ -152,19 +138,11 @@ figure_s17 <- plot_figure_s17(density_data)
 figure_s17
 
 ## ---- s6-figures-s18-s19 ----
-# Quick look: Social Rank GAP by round
-ggplot(dyads, aes(factor(round), rank_gap)) +
-  geom_boxplot()
 
 # One classroom round by round. Class 20 (21 children, 31 rounds) is the
 # classroom shown in this SI figure.
 example_rounds <- 20
 
-dyads %>%
-  filter(class_id == example_rounds) %>%
-  ggplot(aes(rank_gap)) +
-  geom_density() +
-  facet_wrap(~ round)
 
 ## ---- s6-figures-s18-s19-si ----
 # Supporting Information layout (plotting code in figures/S6_figures.R)
@@ -173,12 +151,6 @@ figure_s18 <- plot_figure_s18(dyads)
 figure_s18
 
 ## ---- s6-figure-s20 ----
-# Quick look: Social Rank GAP by classroom
-ggplot(dyads, aes(factor(class_id), rank_gap)) +
-  geom_boxplot()
-
-## ---- s6-figure-s20-si ----
-# Supporting Information layout (plotting code in figures/S6_figures.R)
 figure_s20 <- plot_figure_s20(dyads)
 figure_s20
 

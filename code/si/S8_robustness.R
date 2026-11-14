@@ -62,7 +62,7 @@ term_estimate <- function(model, term = "rank_gap") {
 # 8.1 The main tables again, with the null-model filtered Cooperation GAP
 # (only pairs where both transfers survive the filter; see 01_build_measures.R)
 filtered <- dyads %>% filter(!is.na(coop_gap_filtered))
-nrow(filtered)
+cat("Decisions with both directions kept by the filter:", nrow(filtered), "\n")
 
 fe_filtered_all    <- fe_progression(filtered, outcome = "coop_gap_filtered")
 fe_filtered_non    <- fe_progression(filter(filtered, friendship == "Non-friends"), outcome = "coop_gap_filtered")
@@ -398,12 +398,6 @@ table_s36
 
 
 ## ---- s8-figure-s26 ----
-# Quick look: coefficient and 95% CI under each construction
-ggplot(table_s36, aes(estimate, construction)) +
-  geom_pointrange(aes(xmin = estimate - 1.96 * se, xmax = estimate + 1.96 * se))
-
-## ---- s8-figure-s26-si ----
-# Supporting Information layout (plotting code in figures/S8_figures.R)
 figure_s26 <- plot_figure_s26(table_s36)
 figure_s26
 
@@ -626,13 +620,6 @@ rank_robustness %>% select(measure, sample, estimate) %>%
 
 
 ## ---- s8-figure-s28 ----
-# Quick look: coefficient by rank construction and sample
-ggplot(rank_robustness, aes(estimate, measure)) +
-  geom_point() +
-  facet_wrap(~ sample, nrow = 1, scales = "free_x")
-
-## ---- s8-figure-s28-si ----
-# Supporting Information layout (plotting code in figures/S8_figures.R)
 figure_s28 <- plot_figure_s28(rank_robustness)
 figure_s28
 
@@ -714,7 +701,7 @@ pwalk(subgroup_tables, function(by, sample, outcome, table) {
 })
 save_table(rank_robustness, "S8_rank_constructions")
 save_table(table_s52, "S8_table_s52_affiliation_ranks")
-save_si_figure(figure_s25, "S8_figure_s25_filtered", 6.5, 9)
+save_si_figure(figure_s25, "S8_figure_s25_filtered", 6.5, 7.6)
 save_si_figure(figure_asymmetric_thresholds, "S8_figure_asymmetric_thresholds", 9, 6)
 save_si_figure(figure_s26, "S8_figure_s26_nomination_cap", 7, 3.4)
 save_si_figure(figure_s27, "S8_figure_s27_class_size", 10, 4)

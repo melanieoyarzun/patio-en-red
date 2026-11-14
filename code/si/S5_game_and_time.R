@@ -386,13 +386,6 @@ cor.test(class_slopes$slope, class_slopes$class_size)
 
 
 ## ---- s5-figure-s13 ----
-# Quick look: classroom-specific trends against classroom size
-ggplot(class_slopes, aes(class_size, slope)) +
-  geom_point() +
-  geom_smooth(method = "lm")
-
-## ---- s5-figure-s13-si ----
-# Supporting Information layout (plotting code in figures/S5_figures.R)
 figure_s13 <- plot_figure_s13(size_groups, class_slopes)
 figure_s13
 
@@ -419,13 +412,6 @@ pacing
 
 
 ## ---- s5-figure-s14 ----
-# Quick look: median interval (and interquartile range) by decile of the session
-ggplot(pacing, aes(decile, median)) +
-  geom_ribbon(aes(ymin = q25, ymax = q75), alpha = 0.2) +
-  geom_line()
-
-## ---- s5-figure-s14-si ----
-# Supporting Information layout (plotting code in figures/S5_figures.R)
 figure_s14 <- plot_figure_s14(intervals)
 figure_s14
 

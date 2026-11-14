@@ -24,8 +24,6 @@ of the partners they met, that rank differences are spread over the whole
 session, and that every classroom and friendship group has enough variation
 in rank gaps. Code: `code/si/S6_identification.R`.
 
-For the regression tables, † denotes p < 0.10, * p < 0.05, ** p < 0.01, and *** p < 0.001.
-
 ```{r s6-setup}
 ```
 
@@ -46,15 +44,7 @@ with the rank the child could expect in that classroom and round.
 ## Figure S15. Coefficients on a common scale
 
 ```{r s6-figure-s15}
-#| fig-width: 7
-#| fig-height: 2.8
 ```
-
-::: {.callout-note collapse="true" appearance="simple"}
-## Supporting Information layout
-
-Plotting code from `code/si/figures/S6_figures.R`. This is the version
-saved to `output/figures/si/`.
 
 ```{r plot-figure-s15}
 ```
@@ -63,20 +53,11 @@ saved to `output/figures/si/`.
 #| fig-width: 7
 #| fig-height: 2.8
 ```
-:::
 
 ## Figure S16. Round by round
 
 ```{r s6-figure-s16}
-#| fig-width: 7
-#| fig-height: 5
 ```
-
-::: {.callout-note collapse="true" appearance="simple"}
-## Supporting Information layout
-
-Plotting code from `code/si/figures/S6_figures.R`. This is the version
-saved to `output/figures/si/`.
 
 ```{r plot-figure-s16}
 ```
@@ -85,20 +66,11 @@ saved to `output/figures/si/`.
 #| fig-width: 8
 #| fig-height: 6
 ```
-:::
 
 ## Figure S17. Demeaned exposure by covariate groups
 
 ```{r s6-figure-s17}
-#| fig-width: 9
-#| fig-height: 3
 ```
-
-::: {.callout-note collapse="true" appearance="simple"}
-## Supporting Information layout
-
-Plotting code from `code/si/figures/S6_figures.R`. This is the version
-saved to `output/figures/si/`.
 
 ```{r plot-figure-s17}
 ```
@@ -107,20 +79,11 @@ saved to `output/figures/si/`.
 #| fig-width: 10
 #| fig-height: 3.2
 ```
-:::
 
 ## Figures S18–S19. Rank gaps by round
 
 ```{r s6-figures-s18-s19}
-#| fig-width: 7
-#| fig-height: 3.5
 ```
-
-::: {.callout-note collapse="true" appearance="simple"}
-## Supporting Information layout
-
-Plotting code from `code/si/figures/S6_figures.R`. This is the version
-saved to `output/figures/si/`.
 
 ```{r plot-figure-s18}
 ```
@@ -138,7 +101,6 @@ saved to `output/figures/si/`.
 #| fig-height: 10
 figure_s19
 ```
-:::
 
 Figure S19 shows one classroom round by round: class 20 (21 children, 31
 rounds), the classroom used for this figure in the SI.
@@ -146,25 +108,13 @@ rounds), the classroom used for this figure in the SI.
 
 ## Figure S20. By classroom
 
-```{r s6-figure-s20}
-#| fig-width: 9
-#| fig-height: 3.5
-```
-
-::: {.callout-note collapse="true" appearance="simple"}
-## Supporting Information layout
-
-Plotting code from `code/si/figures/S6_figures.R`. This is the version
-saved to `output/figures/si/`.
-
 ```{r plot-figure-s20}
 ```
 
-```{r s6-figure-s20-si}
+```{r s6-figure-s20}
 #| fig-width: 10
 #| fig-height: 6
 ```
-:::
 
 ## Figure S21. Support among mutual friends
 

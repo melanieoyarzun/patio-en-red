@@ -104,7 +104,7 @@ class_layout <- function(this_class, seed = 1) {
     filter(nom_q3 == 1 | nom_q4 == 1 | nom_q5 == 1) %>%
     transmute(from = as.character(sender_id), to = as.character(receiver_id))
   nodes <- students %>% filter(class_id == this_class) %>%
-    transmute(name = as.character(student_id), sex = if_else(female == 1, "Female", "Male"))
+    transmute(name = as.character(student_id), sex = factor(if_else(female == 1, "Female", "Male"), levels = c("Female", "Male")))
   set.seed(seed)
   xy <- layout_with_fr(graph_from_data_frame(links, vertices = nodes))
   nodes %>% mutate(x = xy[, 1], y = xy[, 2])

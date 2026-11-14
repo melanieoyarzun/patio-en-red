@@ -2,9 +2,11 @@
 
 All identifiers are study codes created for this release. The files contain no names or links to administrative records. Class codes follow the order of the SI tables, so `class_id = 16` is "Class ID 16" in Figure 2.
 
-See the [data README](README.md) for the input and output files and the commands that generate them.
+### RAW Data
 
-## `students.csv` — one row per child (859 rows)
+### `students.csv`
+
+#####  one row per child (859 rows)
 
 | Variable | Description |
 |---|---|
@@ -21,7 +23,9 @@ See the [data README](README.md) for the input and output files and the commands
 | `guardian_education` | Guardian education in four levels (primary incomplete or none; primary complete; secondary incomplete; secondary complete or more) |
 | `repeated_grade` | 1 = the child repeated a grade, 0 = never; missing when not recorded (249 children) |
 
-## `dyads.csv` — one row per directed decision (17,804 rows)
+### `dyads.csv`
+
+##### one row per directed decision (17,804 rows)
 
 | Variable | Description |
 |---|---|
@@ -45,7 +49,9 @@ Nomination questions (each child named 2 to 5 classmates):
 8. are kind to others
 9. cooperate
 
-## `figure2_layout.csv` — node positions for the assembled Figure 2 (9 rows)
+### `figure2_layout.csv`
+
+##### node positions for the assembled Figure 2 (9 rows)
 
 | Variable | Description |
 |---|---|
@@ -56,15 +62,28 @@ These coordinates reproduce the drawing in Figure 2 and are used only for plotti
 
 ## Generated measures
 
-`analysis_students.csv` adds three measures to the student input.
+### `analysis_students.csv`
+
+Adds the following measures to the student records.
 
 | Variable | Description |
 |---|---|
 | `pagerank` | Weighted PageRank on the popularity nomination network within each classroom, using damping 0.85 |
 | `social_rank` | PageRank rescaled to 0–1 within each classroom |
-| `attendance_z` | Standardized prior-semester attendance |
+| `received_q1` … `received_q9` | Nominations received in each peer question |
+| `net_popularity` | Nominations received in Q4 minus Q5 |
+| `aggression_total` | Nominations received in Q6 plus Q7 |
+| `attendance_z` | Prior-semester attendance, z-score within classroom (balance check) |
+| `gpa_z` | GPA, z-score within classroom |
+| `age_z` | Age, z-score within classroom; ages above 15 years (birth-date errors) set to missing |
+| `received_q1_z` … `received_q9_z` | Nominations received in each question, z-score within classroom |
+| `net_popularity_z`, `aggression_total_z` | The two sums above, z-score within classroom |
+| `aggression_z` | Mean of `received_q6_z` and `received_q7_z` |
+| `prosociality_z` | Mean of `received_q8_z` and `received_q9_z` |
 
-`analysis_dyads.csv` adds measures based on paired decisions, friendship nominations, and the sender's allocation history.
+### `analysis_dyads.csv`
+
+Adds measures based on paired decisions, friendship nominations, and the sender's allocation history.
 
 | Variable | Description |
 |---|---|

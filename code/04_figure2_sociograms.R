@@ -42,8 +42,8 @@ class_dyads <- dyads %>%
   filter(class_id == example_class) %>%
   mutate(from = as.character(sender_id), to = as.character(receiver_id))
 
-nrow(class_students)   # 9 children
-nrow(class_dyads)      # 72 directed pairs = 9 x 8
+cat("Children in the classroom:", nrow(class_students), "\n")   # 9
+cat("Directed pairs:          ", nrow(class_dyads), "\n")      # 72 = 9 x 8
 
 
 ## ---- sociogram-layout ----

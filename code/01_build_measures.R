@@ -14,7 +14,8 @@
 #   3. Friendship type from the best-friend question (Q3)
 #   4. Social Rank: PageRank on the popularity network (Q4 and Q5)
 #   5. Social Rank GAP = sender rank - receiver rank
-#   6. Null-model filtering of token exchanges (SI robustness)
+#   6. Student covariates: within-classroom z-scores
+#   7. Null-model filtering of token exchanges (SI robustness)
 #
 # The notebook notebooks/main/01_data_and_measures.qmd walks through these steps.
 # =============================================================================
@@ -29,9 +30,10 @@ library(here)
 dyads    <- read_csv(here("data", "raw", "dyads.csv"),    show_col_types = FALSE)
 students <- read_csv(here("data", "raw", "students.csv"), show_col_types = FALSE)
 
-nrow(dyads)      # 17,804 directed decisions
-nrow(students)   # 859 children
-n_distinct(dyads$class_id)   # 45 classrooms
+## ---- display-data ----
+cat("Directed decisions:", format(nrow(dyads), big.mark = ","), "\n")   # 17,804
+cat("Children:          ", nrow(students), "\n")                         # 859
+cat("Classrooms:        ", n_distinct(dyads$class_id), "\n")             # 45
 
 
 ## ---- tokens-received ----
@@ -84,6 +86,7 @@ dyads <- dyads %>%
     nom_q3 == 0 & friend_reverse == 0 ~ "Non-friends"
   ))
 
+cat("Decisions by friendship type:\n")
 dyads %>% count(friendship) %>% mutate(percent = round(100 * n / sum(n), 2))
 
 
@@ -102,6 +105,7 @@ popularity_edges <- dyads %>%
             to   = as.character(receiver_id),
             weight = nom_q4 - nom_q5 + 1)
 
+cat("Edges of the popularity network by weight (2 popular, 0 not popular, 1 not named):\n")
 count(popularity_edges, weight)
 
 
@@ -127,6 +131,7 @@ students <- students %>%
   left_join(social_rank %>% select(student_id, pagerank, social_rank),
             by = "student_id")
 
+cat("Social Rank (0 to 1 within each classroom):\n")
 summary(social_rank$social_rank)
 
 
@@ -144,17 +149,58 @@ dyads <- dyads %>%
          # same rank have a gap of exactly 0 (and not 1e-16)
          rank_gap = round(rank_gap, 10))
 
+cat("Social Rank GAP (sender - receiver):\n")
 summary(dyads$rank_gap)
 
 
 ## ---- student-covariates ----
-# Attendance is standardized within each classroom (mean 0, SD 1), so it
-# compares a child with her own classmates. Used in the balance check.
+# Every standardized covariate used in the paper is built here, so all scripts
+# read the same values from analysis_students.csv. Each variable is turned into
+# a z-score within the classroom (mean 0, SD 1 among classmates), so it
+# compares a child with her own classmates. Missing values stay missing.
+#
+#   attendance_z            balance check (Figure 1D, Table S16, Figures S15-S17)
+#   gpa_z, age_z            correlates of Social Rank (Table S9, Figures S8, S30)
+#   received_q1_z ... q9_z  nominations received in each question (same)
+#   net_popularity_z        nominations received in Q4 minus Q5
+#   aggression_z            mean of received_q6_z and received_q7_z (Table S9)
+#   prosociality_z          mean of received_q8_z and received_q9_z (Table S9)
+#   aggression_total_z      Q6 + Q7 nominations received, standardized (Figure S30)
+#
+# The balance regressions use GPA on its original 1-7 scale, as in the paper;
+# gpa_z is used only in the correlates of Social Rank.
+# Two computed ages above 15 years are birth-date errors (SI Table S1) and are
+# set to missing before standardizing.
+
+z_within <- function(x) (x - mean(x, na.rm = TRUE)) / sd(x, na.rm = TRUE)
+
+nominations_received <- dyads %>%
+  group_by(student_id = receiver_id) %>%
+  summarise(across(starts_with("nom_q"), sum, .names = "received_{str_remove(.col, 'nom_')}"))
 
 students <- students %>%
+  left_join(nominations_received, by = "student_id") %>%
+  mutate(age_clean = if_else(age > 15, NA_real_, age),
+         net_popularity  = received_q4 - received_q5,
+         aggression_total = received_q6 + received_q7) %>%
   group_by(class_id) %>%
-  mutate(attendance_z = (attendance - mean(attendance)) / sd(attendance)) %>%
-  ungroup()
+  mutate(attendance_z = z_within(attendance),
+         gpa_z        = z_within(gpa),
+         age_z        = z_within(age_clean),
+         across(c(starts_with("received_q"), net_popularity, aggression_total), z_within,
+                .names = "{.col}_z"),
+         aggression_z   = (received_q6_z + received_q7_z) / 2,
+         prosociality_z = (received_q8_z + received_q9_z) / 2) %>%
+  ungroup() %>%
+  select(-age_clean)
+
+cat("Within-classroom z-scores saved:\n")
+students %>%
+  select(ends_with("_z")) %>%
+  pivot_longer(everything(), names_to = "variable") %>%
+  group_by(variable) %>%
+  summarise(n = sum(!is.na(value)), mean = round(mean(value, na.rm = TRUE), 3),
+            sd = round(sd(value, na.rm = TRUE), 3))
 
 
 ## ---- null-model-score ----
@@ -203,8 +249,10 @@ dyads <- dyads %>%
     coop_gap_filtered        = tokens_received_filtered - tokens_sent_filtered
   )
 
-mean(!is.na(dyads$tokens_sent_filtered))   # share of transfers kept (about 0.50)
-mean(!is.na(dyads$coop_gap_filtered))      # share of dyads kept     (about 0.26)
+cat(sprintf("Share of transfers kept:                     %.3f\n",
+            mean(!is.na(dyads$tokens_sent_filtered))))   # about 0.50
+cat(sprintf("Share of decisions with both directions kept: %.3f\n",
+            mean(!is.na(dyads$coop_gap_filtered))))      # about 0.26
 
 
 ## ---- save ----

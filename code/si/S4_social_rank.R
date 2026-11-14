@@ -180,7 +180,7 @@ reference_weight_agreement %>%
   group_by(w) %>%
   summarise(median = median(spearman), min = min(spearman))
 
-example_class <- 40   # an 18-child classroom, as in the SI
+example_class <- 21   # the 18-child classroom shown in the SI
 
 # a finer grid of weights for the drawing
 fine_weights <- seq(0, 2, by = 0.05)
@@ -227,21 +227,16 @@ figure_s7
 # within-classroom z-scores. "Within-class" correlations remove the classroom
 # mean of both variables first. SE = sqrt((1 - r^2) / (n - 2)).
 
-nominations_received <- dyads %>%
-  group_by(student_id = receiver_id) %>%
-  summarise(across(starts_with("nom_q"), sum))
-
-z_score_na <- function(x) (x - mean(x, na.rm = TRUE)) / sd(x, na.rm = TRUE)
-
+# The within-classroom z-scores come from 01_build_measures.R (step
+# "student-covariates"); here they only get the short names used below.
 correlates <- students %>%
-  left_join(nominations_received, by = "student_id") %>%
-  mutate(age = if_else(age > 15, NA_real_, age),
-         net_popularity = nom_q4 - nom_q5) %>%
-  group_by(class_id) %>%
-  mutate(across(c(starts_with("nom_q"), net_popularity, attendance, gpa, age), z_score_na),
-         aggression   = (nom_q6 + nom_q7) / 2,
-         prosociality = (nom_q8 + nom_q9) / 2) %>%
-  ungroup()
+  transmute(student_id, class_id, social_rank, female, repeated_grade,
+            nom_q1 = received_q1_z, nom_q2 = received_q2_z, nom_q3 = received_q3_z,
+            nom_q4 = received_q4_z, nom_q5 = received_q5_z, nom_q6 = received_q6_z,
+            nom_q7 = received_q7_z, nom_q8 = received_q8_z, nom_q9 = received_q9_z,
+            net_popularity = net_popularity_z,
+            aggression = aggression_z, prosociality = prosociality_z,
+            attendance = attendance_z, gpa = gpa_z, age = age_z)
 
 correlate_labels <- c(
   nom_q3 = "Best-friend nominations", nom_q1 = "Most-like-to-hang-out nominations",

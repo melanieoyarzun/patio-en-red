@@ -107,7 +107,7 @@ saved to `output/figures/si/`.
 
 ```{r s8-figure-s25-si}
 #| fig-width: 6.5
-#| fig-height: 9
+#| fig-height: 7.6
 ```
 :::
 
@@ -167,25 +167,13 @@ saved to `output/figures/si/`.
 ```{r s8-nomination-cap}
 ```
 
-```{r s8-figure-s26}
-#| fig-width: 7
-#| fig-height: 3
-```
-
-::: {.callout-note collapse="true" appearance="simple"}
-## Supporting Information layout
-
-Plotting code from `code/si/figures/S8_figures.R`. This is the version
-saved to `output/figures/si/`.
-
 ```{r plot-figure-s26}
 ```
 
-```{r s8-figure-s26-si}
+```{r s8-figure-s26}
 #| fig-width: 7
 #| fig-height: 3.4
 ```
-:::
 
 ## 8.4 Classroom size (Figure S27)
 
@@ -335,25 +323,13 @@ knitr::kable(subgroup_table("grade", "Non-friends", "coop_gap_filtered"))
 ```{r s8-alternative-ranks}
 ```
 
-```{r s8-figure-s28}
-#| fig-width: 10
-#| fig-height: 3
-```
-
-::: {.callout-note collapse="true" appearance="simple"}
-## Supporting Information layout
-
-Plotting code from `code/si/figures/S8_figures.R`. This is the version
-saved to `output/figures/si/`.
-
 ```{r plot-figure-s28}
 ```
 
-```{r s8-figure-s28-si}
+```{r s8-figure-s28}
 #| fig-width: 11
 #| fig-height: 3.4
 ```
-:::
 
 ## 8.9 Rank from affiliation networks (Table S52)
 

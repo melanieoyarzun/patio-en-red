@@ -23,11 +23,28 @@ plot_figure_s25 <- function() {
     "III    Sender-declared friendship", "Sender declares", color_asymmetric, -8.5
   )
 
+  # "Sent" above and "Received" below the first bin of panel A
+  first_bins <- figure3$binned %>%
+    filter(version == "Filtered") %>%
+    group_by(group) %>% slice_min(gap, n = 1) %>% ungroup()
+  sent_received <- function(group, color) {
+    first <- first_bins %>% filter(group == !!group)
+    annotate("text", x = first$gap + 0.1, size = 2.3, fontface = "bold", color = color,
+             y = c(max(first$mean_sent, first$mean_received) + 1.6,
+                   min(first$mean_sent, first$mean_received) - 1.4),
+             label = c("Sent", "Received"))
+  }
+  s25_theme <- theme(text = element_text(size = 7), axis.text = element_text(size = 6.5),
+                     plot.title = element_text(face = "bold", size = 7, margin = margin(b = 1)),
+                     plot.margin = margin(1, 4, 1, 2))
+
   figure_s25 <- pmap(s25_rows, function(label, group, color, y_min) {
     header_bar(label, color) /
-      (figure3$plot_tokens(group, color, version = "Filtered") + labs(title = "A") |
-       figure3$plot_coop_gap(group, color, y_limits = c(y_min, 6), main = "Filtered") + labs(title = "B")) +
-      plot_layout(heights = c(0.1, 1))
+      (figure3$plot_tokens(group, color, version = "Filtered") + sent_received(group, color) +
+         labs(title = "A", x = "Social Ranking GAP") + s25_theme |
+       figure3$plot_coop_gap(group, color, y_limits = c(y_min, 6), main = "Filtered", short_labels = TRUE) +
+         labs(title = "B", x = "Social Ranking GAP") + s25_theme) +
+      plot_layout(heights = c(0.08, 1))
   }) %>%
     wrap_plots(ncol = 1)
   figure_s25
@@ -114,32 +131,37 @@ plot_figure_s27 <- function(dyads, size_slopes) {
   quartile_cuts <- quantile(c(dyads$sender_rank, dyads$receiver_rank), c(0.25, 0.5, 0.75))
   size_titles <- size_slopes %>%
     left_join(dyads %>% distinct(class_id, size_group) %>% count(size_group, name = "classes"), by = "size_group") %>%
-    mutate(panel = paste0(c("A. Small (n \u2264 15)", "B. Medium (16-21)", "C. Large (n > 21)"),
-                          "\n", sprintf("beta = %.2f \u00b7 %d classes", estimate, classes)))
+    mutate(title = c("A. Small (n \u2264 15)", "B. Medium (16\u201321)", "C. Large (n > 21)"))
 
-  figure_s27 <- dyads %>%
+  cells <- dyads %>%
     mutate(sender_q   = findInterval(sender_rank, quartile_cuts, left.open = TRUE) + 1,
            receiver_q = findInterval(receiver_rank, quartile_cuts, left.open = TRUE) + 1) %>%
     group_by(size_group, sender_q, receiver_q) %>%
-    summarise(observed = mean(coop_gap), .groups = "drop") %>%
-    left_join(size_titles %>% select(size_group, panel), by = "size_group") %>%
-    ggplot(aes(factor(receiver_q, labels = quartile_labels), factor(sender_q, labels = quartile_labels),
-               fill = observed)) +
-    geom_tile(color = "white", linewidth = 0.6) +
-    geom_text(aes(label = sprintf("%+.2f", observed), color = abs(observed) > 1.1),
-              fontface = "bold", size = 2.8) +
-    scale_fill_coop_gap() +
-    scale_color_manual(values = c(`FALSE` = "grey15", `TRUE` = "white"), guide = "none") +
-    facet_wrap(~ panel) +
-    coord_fixed() +
-    labs(title = "Observed Cooperation GAP by rank quartile, across classroom sizes",
-         x = "Receiver's rank quartile", y = "Sender's rank quartile") +
-    theme_minimal(base_size = 9) +
-    theme(panel.grid = element_blank(), strip.text = element_text(face = "bold", hjust = 0),
-          plot.title = element_text(face = "bold", hjust = 0.5),
-          legend.key.height = unit(1.4, "cm")) +
-    guides(fill = guide_colorbar(title.position = "right",
-                                 title.theme = element_text(angle = 90, size = 8)))
+    summarise(observed = mean(coop_gap), .groups = "drop")
+
+  # one heatmap per size group, with the slope and number of classes below the title
+  size_panel <- function(i) {
+    info <- size_titles[i, ]
+    cells %>% filter(size_group == info$size_group) %>%
+      ggplot(aes(factor(receiver_q, labels = quartile_labels), factor(sender_q, labels = quartile_labels),
+                 fill = observed)) +
+      geom_tile(color = "white", linewidth = 0.6) +
+      geom_text(aes(label = sprintf("%+.2f", observed), color = abs(observed) > 1.1),
+                fontface = "bold", size = 3.4) +
+      scale_fill_coop_gap() +
+      scale_color_manual(values = c(`FALSE` = "grey15", `TRUE` = "white"), guide = "none") +
+      scale_x_discrete(expand = c(0, 0)) + scale_y_discrete(expand = c(0, 0)) +
+      coord_fixed() +
+      labs(title = info$title,
+           subtitle = bquote(hat(beta) == .(sprintf("%.2f", info$estimate)) %.% .(info$classes) ~ "classes"),
+           x = "Receiver's rank quartile", y = if (i == 1) "Sender's rank quartile" else NULL) +
+      theme_heatmap(9) +
+      guides(fill = guide_colorbar(title.position = "right",
+                                   title.theme = element_text(angle = 90, size = 8)))
+  }
+
+  figure_s27 <- wrap_plots(map(seq_len(nrow(size_titles)), size_panel), nrow = 1, guides = "collect") +
+    figure_title("Observed Cooperation GAP by rank quartile, across classroom sizes", size = 12)
   figure_s27
 }
 

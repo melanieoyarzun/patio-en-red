@@ -9,8 +9,8 @@
 # =============================================================================
 
 ## ---- plot-figure-s2 ----
-# Figure S2 as in the SI: the layers of one classroom drawn as tilted planes,
-# stacked from top to bottom and grouped by kind (game, friendship, positive
+# Figure S2 as in the SI: the layers of one classroom drawn as flat planes,
+# stacked from top to bottom like a staircase and grouped by kind (game, friendship, positive
 # and negative nominations). Each child keeps the same position in every plane.
 plot_figure_s2 <- function(dyads, nodes_20) {
   nodes_20 <- nodes_20 %>%
@@ -31,13 +31,13 @@ plot_figure_s2 <- function(dyads, nodes_20) {
     "nom_q6",          "Q6  Starts fights",             "Negative nominations"
   ) %>%
     mutate(row    = row_number(),
-           center = -1.15 * (row - 1),       # vertical position of each plane
-           shift  = -0.08 * (row - 1),       # each plane a little to the left
+           center = -0.92 * (row - 1),       # vertical position of each plane
+           shift  = -0.09 * (row - 1),       # each plane a little to the left
            color  = c(`Cooperation game` = "grey25", Friendship = color_mutual,
                       `Positive nominations` = "#1F3A5F", `Negative nominations` = color_highlight)[group])
 
   tilt_plane <- function(x, y, center, shift) {
-    tibble(X = 1.6 * x + 0.35 * y + shift, Y = 0.36 * y + center)
+    tibble(X = 1.6 * x + shift, Y = 0.34 * y + center)
   }
 
   class20 <- dyads %>% filter(class_id == 20) %>%
@@ -62,7 +62,7 @@ plot_figure_s2 <- function(dyads, nodes_20) {
     } else {
       class20 %>% group_by(name = to) %>% summarise(value = sum(.data[[this_layer]]))
     }
-  } %>% mutate(layer = this_layer, size = 0.6 + 2.6 * sqrt(value / max(value))))
+  } %>% mutate(layer = this_layer, size = 0.5 + 3 * sqrt(value / max(value))))
 
   # share of same-sex ties (for tokens, weighted by the number of tokens)
   same_sex <- layer_links %>%
@@ -71,7 +71,7 @@ plot_figure_s2 <- function(dyads, nodes_20) {
 
   plane_frames <- layer_info %>%
     rowwise() %>%
-    reframe(layer, color, tilt_plane(c(-1.15, 1.15, 1.15, -1.15), c(-1.25, -1.25, 1.25, 1.25), center, shift))
+    reframe(layer, color, tilt_plane(c(-1.15, 1.15, 1.15, -1.15), c(-1.33, -1.33, 1.33, 1.33), center, shift))
 
   plane_nodes <- layer_sizes %>%
     left_join(nodes_20, by = "name") %>%
@@ -87,25 +87,30 @@ plot_figure_s2 <- function(dyads, nodes_20) {
            # friendship: mutual ties in green, one-way ties light
            link_color = case_when(layer == "nom_q3" & mutual ~ color_mutual,
                                   layer == "nom_q3"           ~ "#9FCFC8",
-                                  TRUE                        ~ "grey55"))
+                                  TRUE                        ~ "grey55"),
+           tie = if_else(mutual, "Mutual", "Unilateral"))
 
   plane_labels <- layer_info %>%
     left_join(same_sex, by = "layer") %>%
     mutate(text = paste0(label, if_else(str_starts(layer, "tokens"), " | ", "\n"),
                          same_sex, "% same-sex"),
-           X = 1.6 * 1.15 + 0.35 * 1.25 + shift + 0.15)
+           X = 1.6 * 1.15 + shift + 0.12)
 
   group_brackets <- layer_info %>%
     group_by(group, color) %>%
     summarise(top = max(center) + 0.5, bottom = min(center) - 0.5, .groups = "drop") %>%
-    mutate(X = -3.25)
+    mutate(X = -2.95)
 
   figure_s2 <- ggplot() +
-    geom_polygon(data = plane_frames, aes(X, Y, group = layer, color = I(color)),
-                 fill = "grey99", linewidth = 0.5) +
-    geom_segment(data = plane_links, aes(x = X0, y = Y0, xend = X1, yend = Y1, color = I(link_color)),
+    geom_polygon(data = plane_frames, aes(X, Y, group = layer, color = I(color),
+                                          fill = I(alpha(color, 0.03))), linewidth = 0.5) +
+    geom_segment(data = filter(plane_links, layer != "nom_q3"),
+                 aes(x = X0, y = Y0, xend = X1, yend = Y1, color = I(link_color)),
                  linewidth = 0.15, alpha = 0.7,
                  arrow = arrow(length = unit(0.6, "mm"), type = "closed")) +
+    geom_segment(data = filter(plane_links, layer == "nom_q3"),
+                 aes(x = X0, y = Y0, xend = X1, yend = Y1, color = I(link_color), linetype = tie),
+                 linewidth = 0.35, arrow = arrow(length = unit(0.6, "mm"), type = "closed")) +
     geom_point(data = plane_nodes, aes(X, Y, size = I(size), fill = sex),
                shape = 21, color = "grey20", stroke = 0.15) +
     geom_text(data = plane_labels, aes(X, center, label = text, color = I(color)),
@@ -119,11 +124,16 @@ plot_figure_s2 <- function(dyads, nodes_20) {
     geom_text(data = group_brackets, aes(X - 0.12, (top + bottom) / 2, label = group, color = I(color)),
               angle = 90, fontface = "bold", size = 2.4) +
     scale_fill_manual(values = c(Female = color_female, Male = color_male), name = NULL) +
-    coord_fixed(clip = "off", xlim = c(-3.5, 4.1)) +
+    scale_linetype_manual(values = c(Mutual = "solid", Unilateral = "solid"), name = "Friendship tie") +
+    guides(fill = guide_legend(order = 1, override.aes = list(size = 3)),
+           linetype = guide_legend(order = 2, override.aes = list(color = c(color_mutual, "#9FCFC8"),
+                                                                  linewidth = 0.8))) +
+    coord_fixed(clip = "off", xlim = c(-3.1, 4.3)) +
     labs(title = "Relational layers in one classroom") +
     theme_void(base_size = 9) +
     theme(plot.title = element_text(face = "bold"), legend.position = "top",
-          legend.justification = "left")
+          plot.background = element_rect(fill = "white", color = NA),
+          legend.text = element_text(size = 7), legend.title = element_text(size = 7))
   figure_s2
 }
 
@@ -153,15 +163,16 @@ draw_focal_layer <- function(dyads, this_class, question, nodes, title, max_size
   arrow_head <- function(ends) arrow(length = unit(1.4, "mm"), type = "closed", ends = ends)
 
   ggraph(network, layout = "manual", x = V(network)$x, y = V(network)$y) +
-    geom_edge_arc(aes(filter = !mutual), strength = 0.1, color = "grey50",
-                  arrow = arrow_head("last"), end_cap = circle(2.2, "mm"), width = 0.35) +
+    geom_edge_link(aes(filter = !mutual), color = "grey50",
+                   arrow = arrow_head("last"), end_cap = circle(2.6, "mm"), width = 0.35) +
     geom_edge_arc(aes(filter = mutual), strength = 0.25, color = "grey50",
-                  arrow = arrow_head("both"), start_cap = circle(2.2, "mm"),
-                  end_cap = circle(2.2, "mm"), width = 0.35) +
+                  arrow = arrow_head("both"), start_cap = circle(2.6, "mm"),
+                  end_cap = circle(2.6, "mm"), width = 0.35) +
     geom_node_point(aes(size = received, fill = sex), shape = 21, color = "grey20", stroke = 0.3) +
-    scale_fill_manual(values = c(Female = color_female, Male = color_male), name = NULL) +
-    scale_size(range = c(1, 6), limits = c(0, max_size), name = "Nominations received",
-               breaks = pretty(c(0, max_size), n = 4)) +
+    scale_fill_manual(values = c(Female = color_female, Male = color_male), name = NULL,
+                      drop = FALSE) +
+    scale_size(range = c(1.2, 9), limits = c(0, max_size), name = "Nominations received",
+               breaks = unique(c(pretty(c(0, max_size), n = 4), max_size))) +
     labs(title = paste0(title, "\n", ties, " ties, ", isolates, " isolates")) +
     theme_void(base_size = 8) +
     theme(plot.title = element_text(face = "bold", hjust = 0.5, size = 8, color = color_text))
@@ -176,5 +187,6 @@ plot_focal_layers <- function(dyads, nodes, this_class) {
   map2(names(focal), focal, ~ draw_focal_layer(dyads, this_class, .x, nodes, .y, max_received)) %>%
     wrap_plots(nrow = 1, guides = "collect") &
     theme(legend.position = "bottom") &
-    guides(size = guide_legend(nrow = 1), fill = guide_legend(override.aes = list(size = 3)))
+    guides(size = guide_legend(nrow = 1, override.aes = list(fill = "white")),
+           fill = guide_legend(override.aes = list(size = 3)))
 }

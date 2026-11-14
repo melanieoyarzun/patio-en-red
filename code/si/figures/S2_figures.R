@@ -34,14 +34,24 @@ plot_figure_s1 <- function(out_nominations, question_labels) {
     geom_text(data = filter(bars, n >= 40),
               aes(label = paste0(round(percent), "%"),
                   fontface = if_else(at_cap, "bold", "plain")),
-              vjust = 1.5, color = "white", size = 2.6) +
+              vjust = 1.5, color = "white", size = 2.4) +
     geom_text(data = filter(bars, n < 40), aes(label = paste0(round(percent), "%")),
-              vjust = -0.5, color = color_text, size = 2.6) +
-    geom_vline(data = medians, aes(xintercept = median), linetype = "dotted") +
+              vjust = -0.5, color = color_text, size = 2.4) +
+    geom_vline(data = medians, aes(xintercept = median, linetype = "Median"), linewidth = 0.4,
+               key_glyph = "path") +
     facet_wrap(~ panel) +
-    scale_fill_manual(values = c(`FALSE` = color_slate, `TRUE` = color_highlight)) +
+    scale_fill_manual(values = c(`FALSE` = color_slate, `TRUE` = color_highlight),
+                      breaks = "TRUE", labels = "At cap (5)", name = NULL) +
+    scale_linetype_manual(values = c(Median = "dotted"), name = NULL) +
     scale_x_continuous(breaks = 0:5) +
+    scale_y_continuous(expand = expansion(mult = c(0, 0.05))) +
     labs(x = "Nominations sent (out-degree)", y = "Students") +
-    theme_si()
+    theme_si_frame(base_size = 9) +
+    theme(strip.text = element_text(face = "bold", hjust = 0, size = 9),
+          panel.border = element_rect(color = "grey70", fill = NA),
+          axis.line.x = element_line(color = "grey20"),
+          legend.position = c(0.005, 0.99), legend.justification = c(0, 1),
+          legend.spacing.y = unit(0, "pt"), legend.key.height = unit(0.3, "cm"),
+          legend.text = element_text(size = 7), legend.background = element_blank())
   figure_s1
 }

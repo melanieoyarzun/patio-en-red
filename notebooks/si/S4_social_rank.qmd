@@ -109,14 +109,14 @@ saved to `output/figures/si/`.
 
 ### Panel A. Correlations with Social Rank
 
-The within-classroom correlations remove classroom means. Nomination counts and continuous variables are standardized within classrooms.
+`01_build_measures.R` standardizes nomination counts and continuous variables within classrooms. The within-classroom correlations remove classroom means.
 
 ```{r s4-correlates}
 ```
 
 ### Panel B. Differences by guardian education
 
-The table reports tests for differences in Social Rank by guardian education. The public data do not include religion.
+The public data support the guardian education comparison.
 
 ```{r s4-background}
 ```

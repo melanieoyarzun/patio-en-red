@@ -90,6 +90,8 @@ samples <- list("All dyads" = dyads,
 table_s53 <- map(samples, ~ regression_table(bsr_models(.x, "coop_gap"), terms = "bsr_gap"))
 table_s54 <- map(samples, ~ regression_table(bsr_models(.x, "coop_gap_filtered"), terms = "bsr_gap"))
 
+
+
 ## ---- s9-asymmetric ----
 # Table S55: one-sided friendships (filtered tokens), split by who has the
 # higher behavioral rank
@@ -100,6 +102,8 @@ asymmetric <- dyads %>%
 table_s55 <- asymmetric %>%
   split(.$direction) %>%
   map(~ regression_table(bsr_models(.x, "coop_gap_filtered"), terms = "bsr_gap"))
+
+
 ## ---- s9-figure-s29 ----
 # Figure 3 panels B and C with the behavioral rank gap: per-child averages,
 # 7 equal-width bins (as in 05_figure3_cooperation.R), 95% CIs across children
@@ -140,21 +144,15 @@ figure_s29
 # Figure S30: (A) the two PageRank scores, log scales; (B-H) Behavioral Social
 # Rank against other characteristics (within-class z-scores), with binned
 # means, a linear fit and the pooled Pearson correlation
-nominations_received <- dyads %>%
-  group_by(student_id = receiver_id) %>%
-  summarise(friendship = sum(nom_q3), popular = sum(nom_q4),
-            liked = sum(nom_q1), disliked = sum(nom_q2),
-            aggression = sum(nom_q6) + sum(nom_q7))
-
 s30_titles <- c(friendship = "B. Friendship nominations", attendance = "C. Attendance previous term",
                 gpa = "D. Overall GPA previous term", liked = "E. Liked", disliked = "F. Disliked",
                 aggression = "G. Aggression", popular = "H. Popularity")
 
+# within-classroom z-scores from 01_build_measures.R (step "student-covariates")
 bsr_correlates <- students %>%
-  left_join(nominations_received, by = "student_id") %>%
-  group_by(class_id) %>%
-  mutate(across(all_of(names(s30_titles)), ~ (.x - mean(.x, na.rm = TRUE)) / sd(.x, na.rm = TRUE))) %>%
-  ungroup() %>%
+  transmute(bsr, friendship = received_q3_z, attendance = attendance_z, gpa = gpa_z,
+            liked = received_q1_z, disliked = received_q2_z,
+            aggression = aggression_total_z, popular = received_q4_z) %>%
   select(bsr, all_of(names(s30_titles))) %>%
   pivot_longer(-bsr) %>%
   filter(!is.na(value)) %>%

@@ -178,8 +178,10 @@ plot_tokens <- function(this_group, color, version = "Observed") {
 
 ## ---- panel-c-plot ----
 # main = "Filtered" puts the filtered curve in front and the observed one
-# behind (SI Figure S25)
-plot_coop_gap <- function(this_group, color, y_limits = c(-6, 6), main = "Observed") {
+# behind (SI Figure S25); short_labels = TRUE writes "Filtered  Observed" on
+# one line at the bottom right, as in that figure
+plot_coop_gap <- function(this_group, color, y_limits = c(-6, 6), main = "Observed",
+                          short_labels = FALSE) {
   bins <- binned %>% filter(group == this_group)
   back <- setdiff(c("Observed", "Filtered"), main)
   curve_labels <- c(Observed = "Observed data", Filtered = "Null-model filtered")
@@ -194,9 +196,13 @@ plot_coop_gap <- function(this_group, color, y_limits = c(-6, 6), main = "Observ
     scale_alpha_manual(values = setNames(c(1, 0.4), c(main, back))) +
     annotate("text", x = c(-0.55, 0.55), y = y_limits[1] + 0.4, size = 2.3, fontface = "bold",
              label = c("Receiver higher rank", "Sender higher rank")) +
-    annotate("text", x = 1.05, y = y_limits[2] - c(0.3, 1.1), hjust = 1, size = 2.5,
-             fontface = "bold", color = color, alpha = c(1, 0.4),
-             label = curve_labels[c(main, back)]) +
+    {if (short_labels)
+      annotate("text", x = c(0.42, 1.08), y = y_limits[1] + 1.4, hjust = 1, size = 2.2,
+               fontface = "bold", color = color, alpha = c(1, 0.5), label = c(main, back))
+     else
+      annotate("text", x = 1.05, y = y_limits[2] - c(0.3, 1.1), hjust = 1, size = 2.5,
+               fontface = "bold", color = color, alpha = c(1, 0.4),
+               label = curve_labels[c(main, back)])} +
     scale_x_continuous(limits = c(-1.1, 1.1), breaks = seq(-1, 1, 0.5)) +
     scale_y_continuous(breaks = seq(-7.5, 5, 2.5)) +
     coord_cartesian(ylim = y_limits, clip = "on") +

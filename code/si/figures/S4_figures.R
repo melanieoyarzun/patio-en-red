@@ -32,18 +32,19 @@ plot_figure_s6 <- function(alternative_ranks) {
 
   figure_s6 <- ggplot(correlation_cells, aes(column, row, fill = rho)) +
     geom_tile(color = "white", linewidth = 0.8) +
-    geom_text(aes(label = sprintf("%.2f", rho), fontface = if_else(rho == 1, "bold", "plain"),
-                  color = if_else(rho > 0.95, "white", "grey15")), size = 3.6) +
+    geom_text(aes(label = sprintf("%.2f", rho), fontface = if_else(rho == 1, "bold", "plain")),
+              color = "white", size = 3.6) +
     annotate("rect", xmin = 0.5, xmax = 6.5, ymin = 5.5, ymax = 6.5,
-             fill = NA, color = "grey20", linewidth = 1.2) +
-    scale_fill_gradientn(colors = c("#F7F4EC", "#F2D98C", "#E39A55", "#C95A3A", "#B03A2E"),
-                         limits = c(0, 1), name = "Spearman correlation") +
-    scale_color_identity() +
+             fill = NA, color = color_highlight, linewidth = 1.2) +
+    scale_fill_gradientn(colors = c("#F5F6F7", "#A7C0CF", "#2E6A8E"), limits = c(0, 1),
+                         name = "Spearman correlation") +
+    coord_fixed(expand = FALSE) +
     labs(title = "Popularity-rank alternatives", x = NULL, y = NULL) +
     theme_minimal(base_size = 9) +
     theme(panel.grid = element_blank(), plot.title = element_text(face = "bold"),
-          legend.key.height = unit(1.6, "cm")) +
-    guides(fill = guide_colorbar(title.position = "right",
+          axis.line = element_line(color = "grey75", linewidth = 0.3),
+          legend.key.height = unit(1.9, "cm"), legend.key.width = unit(0.35, "cm")) +
+    guides(fill = guide_colorbar(title.position = "right", frame.colour = "grey75",
                                  title.theme = element_text(angle = 90, size = 8)))
   figure_s6
 }
@@ -54,20 +55,27 @@ plot_figure_s6 <- function(alternative_ranks) {
 # changes; (B) agreement with the primary order in that classroom; (C) all
 # classrooms, median in orange.
 plot_figure_s7 <- function(fine_ranks, agreement_by_weight, example_class) {
-  primary_line <- geom_vline(xintercept = 1, linetype = "dashed", color = "grey40")
+  primary_line <- geom_vline(xintercept = 1, linetype = "dashed", color = "grey20", linewidth = 0.4)
+  w_label <- expression("Reference weight for non-nominations (" * italic(w) * ")")
+  theme_s7 <- theme_si_frame(base_size = 8, l_axes = TRUE) +
+    theme(plot.title = element_text(hjust = 0), plot.title.position = "panel")
+  x_axis <- scale_x_continuous(limits = c(0, 2), breaks = c(0.5, 1, 1.5, 2), expand = c(0, 0))
+  y_agreement <- scale_y_continuous(limits = c(0.5, 1.01), breaks = c(0.5, 0.75, 1),
+                                    labels = c("0.5", "0.75", "1"), expand = c(0, 0))
+  example <- fine_ranks %>% filter(class_id == example_class)
+  n_example <- n_distinct(example$student_id)
 
-  panel_a <- fine_ranks %>%
-    filter(class_id == example_class) %>%
-    ggplot(aes(w, rank, group = student_id, color = social_rank)) +
-    geom_line(linewidth = 0.45) +
+  panel_a <- ggplot(example, aes(w, rank, group = student_id, color = social_rank)) +
+    geom_line(linewidth = 0.6) +
     primary_line +
-    annotate("text", x = 1, y = 1.06, label = "primary (w = 1)", size = 2.6, color = color_text) +
+    annotate("text", x = 1, y = 1.04, label = "primary~(italic(w) == 1)", parse = TRUE,
+             size = 2.6, color = color_text) +
     scale_color_gradient(low = "#C9D0DE", high = "#2E4A6B") +
-    scale_y_continuous(breaks = c(0, 0.5, 1)) +
-    labs(title = "A. One classroom: Social Rank vs. w (n = 18)",
-         x = "Reference weight for non-nominations (w)",
-         y = "Social Rank (normalized PageRank)") +
-    theme_si(base_size = 8)
+    scale_y_continuous(breaks = c(0, 0.5, 1), labels = c("0", "0.5", "1")) +
+    x_axis +
+    labs(title = bquote(bold("A. One classroom: Social Rank vs.") ~ italic(w) ~ (italic(n) == .(n_example))),
+         x = w_label, y = "Social Rank (normalized PageRank)") +
+    theme_s7
 
   panel_b <- agreement_by_weight %>%
     filter(class_id == example_class) %>%
@@ -75,33 +83,46 @@ plot_figure_s7 <- function(fine_ranks, agreement_by_weight, example_class) {
     mutate(measure = factor(measure, levels = c("spearman", "pairs"),
                             labels = c("Spearman rank correlation", "Pairwise orderings preserved"))) %>%
     ggplot(aes(w, value, color = measure, linetype = measure)) +
-    geom_line(linewidth = 0.8) +
+    geom_line(linewidth = 0.9) +
     primary_line +
-    scale_color_manual(values = c(color_highlight, color_slate), name = NULL) +
+    scale_color_manual(values = c(color_highlight, "#7A86A8"), name = NULL) +
     scale_linetype_manual(values = c("solid", "dotted"), name = NULL) +
-    scale_y_continuous(limits = c(0.5, 1.01), breaks = c(0.5, 0.75, 1)) +
-    labs(title = "B. One classroom: order is preserved",
-         x = "Reference weight for non-nominations (w)", y = "Agreement with primary order") +
-    theme_si(base_size = 8) +
-    theme(legend.position = c(0.5, 0.15), legend.key.width = unit(0.8, "cm"))
+    x_axis + y_agreement +
+    labs(title = "B. One classroom: order is preserved", x = w_label,
+         y = "Agreement with primary order") +
+    theme_s7 +
+    theme(legend.position = c(0.55, 0.12), legend.key.width = unit(0.7, "cm"),
+          legend.key.height = unit(0.3, "cm"), legend.spacing.y = unit(0, "pt"),
+          legend.text = element_text(size = 6.5))
 
   band <- agreement_by_weight %>%
     group_by(w) %>%
     summarise(median = median(spearman), low = quantile(spearman, 0.1), high = quantile(spearman, 0.9))
+  legend_c <- c("Median across classrooms", "10\u201390th percentile", "Individual classrooms")
 
   panel_c <- ggplot() +
-    geom_line(data = agreement_by_weight, aes(w, spearman, group = class_id),
+    geom_line(data = agreement_by_weight, aes(w, spearman, group = class_id, linetype = legend_c[3]),
               color = "#C9D0DE", linewidth = 0.25) +
-    geom_ribbon(data = band, aes(w, ymin = low, ymax = high), fill = color_highlight, alpha = 0.2) +
-    geom_line(data = band, aes(w, median), color = color_highlight, linewidth = 1) +
+    geom_ribbon(data = band, aes(w, ymin = low, ymax = high, fill = legend_c[2]), alpha = 0.25) +
+    geom_line(data = band, aes(w, median, color = legend_c[1]), linewidth = 1) +
     primary_line +
-    scale_y_continuous(limits = c(0.5, 1.01), breaks = c(0.5, 0.75, 1)) +
-    labs(title = "C. All classrooms (k = 45)",
-         subtitle = "Median (orange) and 10-90th percentile; gray: each classroom",
-         x = "Reference weight for non-nominations (w)", y = "Spearman vs. primary order") +
-    theme_si(base_size = 8)
+    scale_color_manual(values = setNames(color_highlight, legend_c[1]), name = NULL) +
+    scale_fill_manual(values = setNames(color_highlight, legend_c[2]), name = NULL) +
+    scale_linetype_manual(values = setNames("solid", legend_c[3]), name = NULL) +
+    x_axis + y_agreement +
+    labs(title = bquote(bold("C. All classrooms") ~ (italic(k) == .(n_distinct(agreement_by_weight$class_id)))),
+         x = w_label, y = "Spearman vs. primary order") +
+    guides(color = guide_legend(order = 1), fill = guide_legend(order = 2),
+           linetype = guide_legend(order = 3, override.aes = list(color = "#C9D0DE", linewidth = 0.5))) +
+    theme_s7 +
+    theme(legend.position = c(0.55, 0.14), legend.spacing.y = unit(0, "pt"),
+          legend.margin = margin(0, 2, 0, 2), legend.key.height = unit(0.3, "cm"),
+          legend.key.width = unit(0.7, "cm"), legend.text = element_text(size = 6.5),
+          legend.background = element_rect(fill = alpha("white", 0.85), color = NA))
 
-  figure_s7 <- panel_a + panel_b + panel_c
+  figure_s7 <- (panel_a + panel_b + panel_c) +
+    figure_title(paste("Reference-weight robustness of popularity-based Social Rank:",
+                       "the within-class ordering is preserved"), size = 10)
   figure_s7
 }
 
@@ -121,35 +142,36 @@ plot_figure_s8 <- function(correlates, students) {
     attendance = "M. Attendance previous term", gpa = "N. Overall GPA previous term",
     age = "O. Age (within-class)"
   )
+  theme_s8 <- theme_si_frame(base_size = 7) +
+    theme(axis.title.y = element_text(size = 6))
+  x_rank <- scale_x_continuous(limits = c(0, 1), breaks = seq(0, 1, 0.2))
 
-  scatter_data <- correlates %>%
-    select(social_rank, all_of(names(s8_titles))) %>%
-    pivot_longer(-social_rank, names_to = "variable", values_to = "value") %>%
-    filter(!is.na(value)) %>%
-    mutate(panel = factor(s8_titles[variable], levels = s8_titles))
+  # One scatter panel: children (gray), binned means with 95% CI (black),
+  # linear fit and Pearson correlation (orange)
+  scatter_panel <- function(variable, y_title = NULL) {
+    data <- correlates %>%
+      transmute(social_rank, value = .data[[variable]]) %>%
+      filter(!is.na(value))
+    test <- cor.test(data$social_rank, data$value)
+    label <- sprintf("R = %.2f, %s", test$estimate, format_p(test$p.value))
+    ggplot(data, aes(social_rank, value)) +
+      geom_point(color = color_slate, alpha = 0.25, size = 0.4,
+                 position = position_jitter(width = 0.005, height = 0.05, seed = 1)) +
+      geom_smooth(method = "lm", formula = y ~ x, color = color_highlight, fill = color_highlight,
+                  alpha = 0.2, linewidth = 0.6) +
+      stat_summary_bin(fun.data = mean_cl_normal, bins = 10, size = 0.15, linewidth = 0.3) +
+      annotate("label", x = 0.5, y = -2.7, label = label, color = color_highlight, size = 2.1,
+               fontface = "bold", label.size = 0.3, label.padding = unit(0.12, "lines")) +
+      coord_cartesian(ylim = c(-3, 3.2)) +
+      scale_y_continuous(breaks = -3:3) +
+      x_rank +
+      labs(title = s8_titles[[variable]], x = NULL, y = y_title) +
+      theme_s8
+  }
 
-  scatter_labels <- scatter_data %>%
-    group_by(panel) %>%
-    summarise(test = list(cor.test(social_rank, value))) %>%
-    mutate(label = map_chr(test, ~ sprintf("R = %.2f, %s", .x$estimate, format_p(.x$p.value))))
-
-  scatter_panels <- ggplot(scatter_data, aes(social_rank, value)) +
-    geom_jitter(color = color_slate, alpha = 0.25, size = 0.4, width = 0.005, height = 0.05) +
-    geom_smooth(method = "lm", color = color_highlight, fill = color_highlight,
-                alpha = 0.2, linewidth = 0.6) +
-    stat_summary_bin(fun.data = mean_cl_normal, bins = 10, size = 0.15, linewidth = 0.3) +
-    geom_label(data = scatter_labels, aes(x = 0.5, y = -2.75, label = label),
-               color = color_highlight, size = 2.1, fontface = "bold",
-               label.size = 0.3, label.padding = unit(0.12, "lines")) +
-    facet_wrap(~ panel, ncol = 4) +
-    coord_cartesian(ylim = c(-3, 3)) +
-    scale_x_continuous(breaks = seq(0, 1, 0.2)) +
-    labs(x = NULL, y = "Peer nominations / characteristic (z-score)") +
-    theme_si(base_size = 7)
-
-  # Categorical characteristics: box plots with a classroom-clustered joint
-  # test and partial R2 conditional on classroom fixed effects.
-  box_panel <- function(data, group, title) {
+  # One box-plot panel for a categorical characteristic, group labels above
+  # the boxes, a classroom-clustered joint test, and partial R2.
+  box_panel <- function(data, group, title, fills, y_title = NULL) {
     data <- data %>%
       filter(!is.na(.data[[group]])) %>%
       mutate(group = .data[[group]], class_id = factor(class_id))
@@ -158,39 +180,53 @@ plot_figure_s8 <- function(correlates, students) {
     group_p <- lfe::waldtest(fit, seq_along(coef(fit)), type = "cluster")[["p.F"]]
     partial_r2 <- 1 - sum(residuals(fit)^2) / sum(residuals(classroom_only)^2)
     counts <- data %>% count(group) %>%
-      mutate(label = paste0(group, " (n=", n, ")"), label = factor(label, levels = label))
+      mutate(y = rev(seq_along(group)), label = paste0(group, " (n=", n, ")"))
     data <- data %>% left_join(counts, by = "group")
-    ggplot(data, aes(social_rank, label)) +
-      geom_jitter(color = color_slate, alpha = 0.25, size = 0.4, height = 0.15) +
-      geom_boxplot(fill = color_slate_light, color = "grey25", alpha = 0.8, width = 0.45,
-                   outlier.shape = NA, linewidth = 0.3) +
-      annotate("label", x = 0.5, y = 0.45,
-               label = sprintf("group p = %.2f,  partial R2 = %.3f", group_p, partial_r2),
+    stats <- sprintf("'group p = %.2f,  partial '*italic(R)^2*' = %.3f'", group_p, partial_r2)
+    ggplot(data, aes(social_rank, y)) +
+      geom_point(color = color_slate, alpha = 0.25, size = 0.4,
+                 position = position_jitter(height = 0.12, seed = 1)) +
+      geom_boxplot(aes(group = y, fill = group), color = "grey25", alpha = 0.75, width = 0.45,
+                   outlier.shape = NA, linewidth = 0.3, coef = Inf) +
+      geom_text(data = counts, aes(x = 0.5, y = y + 0.42, label = label),
+                fontface = "bold", size = 2.2, color = "grey20") +
+      annotate("label", x = 0.5, y = 0.35, label = stats, parse = TRUE,
                color = color_highlight, size = 2.1, fontface = "bold", label.size = 0.3) +
-      scale_y_discrete(limits = rev, expand = expansion(add = c(0.9, 0.5))) +
-      scale_x_continuous(limits = c(0, 1), breaks = seq(0, 1, 0.2)) +
-      labs(title = title, x = NULL, y = NULL) +
-      theme_si(base_size = 7) +
-      theme(panel.grid.major.y = element_blank())
+      scale_fill_manual(values = setNames(fills, counts$group)) +
+      scale_y_continuous(limits = c(0.1, nrow(counts) + 0.6), breaks = NULL) +
+      x_rank +
+      labs(title = title, x = NULL, y = y_title) +
+      theme_s8
   }
+  blues <- function(n) colorRampPalette(c("#DCE6F0", "#4E6E8E"))(n)
 
   categorical <- students %>%
-    mutate(sex = if_else(female == 1, "Female", "Male"),
-           guardian = factor(guardian_education,
-                             levels = sort(unique(guardian_education)),
-                             labels = str_remove(sort(unique(guardian_education)), "^[0-9]+ ")),
-           repetition = if_else(repeated_grade == 1, "Repeated", "Not repeated"))
+    mutate(sex = factor(if_else(female == 1, "Female", "Male"), levels = c("Male", "Female")),
+           # the two primary categories are merged into "Primary or less", as in the SI
+           guardian = str_remove(guardian_education, "^[0-9]+ "),
+           guardian = if_else(str_detect(guardian, "^Primary"), "Primary or less", guardian),
+           guardian = factor(guardian, levels = unique(guardian[order(guardian_education)])),
+           repetition = factor(if_else(repeated_grade == 1, "Repeated", "Not repeated"),
+                               levels = c("Not repeated", "Repeated")))
+  n_guardian <- n_distinct(na.omit(categorical$guardian))
 
-  box_panels <- box_panel(categorical, "sex", "P. Sex") +
-    box_panel(categorical, "guardian", "Q. Guardian education") +
-    box_panel(categorical, "repetition", "S. Grade repetition") +
-    plot_layout(widths = c(1, 1.4, 1))
+  y_titles <- c(nom_q3 = "Peer nominations (Z-score)", nom_q4 = "Peer nominations (Z-score)",
+                nom_q8 = "Peer nominations (Z-score)", attendance = "Z-score")
+  grid_panels <- map(names(s8_titles), function(v) {
+    scatter_panel(v, if (v %in% names(y_titles)) y_titles[[v]] else NULL)
+  })
+  sex_panel <- box_panel(categorical, "sex", "P. Sex", c(color_male, color_female), "Sex")
 
-  figure_s8 <- (scatter_panels / box_panels) +
-    plot_layout(heights = c(4, 1)) +
+  # Religion (Panel R in the SI) is not part of the public data
+  bottom_row <- box_panel(categorical, "guardian", "Q. Guardian education", blues(n_guardian)) +
+    box_panel(categorical, "repetition", "S. Grade repetition", blues(3)[2:3]) +
+    plot_layout(widths = c(2.6, 1))
+
+  figure_s8 <- (wrap_plots(c(grid_panels, list(sex_panel)), ncol = 4) / bottom_row) +
+    plot_layout(heights = c(4, 1.25)) +
     plot_annotation(title = "Popularity-based Social Rank and related student characteristics",
                     caption = "Popularity-based Social Rank (normalized PageRank)",
-                    theme = theme(plot.title = element_text(face = "bold", hjust = 0.5),
+                    theme = theme(plot.title = element_text(face = "bold", hjust = 0.5, size = 10),
                                   plot.caption = element_text(hjust = 0.5, size = 9)))
   figure_s8
 }

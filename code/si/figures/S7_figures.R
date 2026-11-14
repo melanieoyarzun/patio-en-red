@@ -44,22 +44,30 @@ plot_figure_s23 <- function(dyads, beta_main) {
   figure_s23 <- ggplot() +
     geom_rect(data = bands, aes(xmin = low, xmax = high, ymin = -Inf, ymax = Inf, fill = share)) +
     geom_vline(xintercept = 0, color = "grey45", linewidth = 0.3) +
-    geom_abline(aes(slope = beta_main, intercept = 0,
-                    linetype = sprintf("Linear prediction (beta = %.2f)", beta_main)),
-                color = color_highlight, linewidth = 1) +
+    geom_abline(aes(slope = beta_main, intercept = 0, linetype = "prediction"),
+                color = color_highlight, linewidth = 1, key_glyph = "path") +
     geom_errorbar(data = binned, aes(gap, ymin = mean - 1.96 * se, ymax = mean + 1.96 * se),
                   width = 0.015, color = "grey25") +
     geom_point(data = binned, aes(gap, mean, shape = "Binned means (95% CI)"), color = "grey20", size = 1.8) +
     scale_fill_manual(values = c("50% of dyads" = "#C3CAD8", "80% of dyads" = "#D9DEE7",
                                  "90% of dyads" = "#ECEEF3"), name = NULL) +
-    scale_linetype_manual(values = "solid", name = NULL) +
+    scale_linetype_manual(values = "solid", name = NULL,
+                          labels = as.expression(list(
+                            bquote("Linear prediction (" * hat(beta) == .(sprintf("%.2f", beta_main)) * ")")))) +
     scale_shape_manual(values = 16, name = NULL) +
-    scale_x_continuous(limits = c(-1, 1), breaks = seq(-1, 1, 0.25)) +
+    scale_x_continuous(breaks = seq(-1, 1, 0.25), labels = function(x) sprintf("%.2f", x)) +
+    scale_y_continuous(breaks = -2:2) +
+    coord_cartesian(xlim = c(-1, 1), ylim = c(-2.8, 2.8), expand = FALSE) +
     labs(title = "Predicted Cooperation GAP over the observed range",
          x = "Social Rank GAP (sender - receiver)", y = "Predicted Cooperation GAP (tokens)") +
     theme_si(10) +
-    theme(legend.position = c(0.2, 0.8), legend.spacing.y = unit(0, "mm"),
-          legend.key.size = unit(3.5, "mm"), legend.text = element_text(size = 7)) +
+    theme(legend.position = c(0.005, 0.995), legend.justification = c(0, 1),
+          legend.spacing.y = unit(0, "mm"), legend.key.size = unit(3.5, "mm"),
+          legend.text = element_text(size = 7.5),
+          legend.background = element_blank(), legend.margin = margin(0, 4, 0, 4),
+          legend.box.background = element_rect(fill = alpha("white", 0.8), color = "grey80"),
+          plot.margin = margin(5, 12, 5, 5),
+          axis.line.x = element_line(color = "grey15")) +
     guides(linetype = guide_legend(order = 1), shape = guide_legend(order = 2),
            fill = guide_legend(order = 3))
   figure_s23
@@ -80,11 +88,11 @@ plot_figure_s24 <- function(quartile_cells) {
       scale_fill_coop_gap() +
       scale_color_manual(values = c(`FALSE` = "grey15", `TRUE` = "white"), guide = "none") +
       coord_fixed() +
-      labs(title = title, x = "Receiver's rank quartile", y = "Sender's rank quartile") +
-      theme_minimal(base_size = 9) +
-      theme(panel.grid = element_blank(), plot.title = element_text(face = "bold"),
-            legend.position = if (legend) "right" else "none",
-            legend.key.height = unit(1.4, "cm")) +
+      scale_x_discrete(expand = c(0, 0)) + scale_y_discrete(expand = c(0, 0)) +
+      labs(title = title, x = "Receiver's rank quartile",
+           y = if (legend) NULL else "Sender's rank quartile") +
+      theme_heatmap(9) +
+      theme(legend.position = if (legend) "right" else "none") +
       guides(fill = guide_colorbar(title.position = "right",
                                    title.theme = element_text(angle = 90, size = 8)))
   }

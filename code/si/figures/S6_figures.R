@@ -103,21 +103,29 @@ plot_figure_s18 <- function(dyads) {
 ## ---- plot-figure-s19 ----
 # Figure S19: rank gap distribution round by round in one classroom.
 plot_figure_s19 <- function(dyads, example_rounds) {
-  figure_s19 <- dyads %>% filter(class_id == example_rounds) %>%
-    mutate(round_label = factor(paste("Round", round), levels = paste("Round", sort(unique(round))))) %>%
-    ggplot(aes(rank_gap)) +
-    geom_density(fill = color_slate_light, color = "#6F7A93", alpha = 0.8, bw = "nrd0", adjust = 0.6) +
+  # Kernel density with half of Scott's bandwidth (sd * n^-1/5), close to the
+  # smoothing of the SI figure
+  densities <- dyads %>% filter(class_id == example_rounds) %>%
+    group_by(round) %>%
+    reframe(as_tibble(density(rank_gap, bw = 0.5 * sd(rank_gap) * length(rank_gap)^(-1 / 5),
+                              from = -1, to = 1, n = 256)[c("x", "y")])) %>%
+    mutate(round_label = factor(paste("Round", round), levels = paste("Round", sort(unique(round)))))
+
+  figure_s19 <- ggplot(densities, aes(x, pmin(y, 4.5))) +
+    geom_area(fill = color_slate_light, color = "#6F7A93", alpha = 0.8, linewidth = 0.4) +
     geom_vline(xintercept = 0, linetype = "dashed", color = "grey50", linewidth = 0.3) +
-    facet_wrap(~ round_label, ncol = 5) +
-    scale_x_continuous(limits = c(-1, 1), breaks = c(-1, 0, 1)) +
-    scale_y_continuous(breaks = c(0, 1.5, 3, 4.5)) +
-    coord_cartesian(ylim = c(0, 4.5)) +
+    # "free" scales only to draw the axes in every panel; the limits are fixed
+    facet_wrap(~ round_label, ncol = 5, scales = "free") +
+    scale_x_continuous(limits = c(-1, 1), breaks = c(-1, 0, 1), expand = c(0, 0)) +
+    scale_y_continuous(limits = c(0, 4.5), breaks = c(0, 1.5, 3, 4.5), expand = c(0, 0),
+                       labels = function(x) sprintf("%.1f", x)) +
     labs(title = sprintf("Rank gap distribution, Class %d", example_rounds),
          x = "Social Rank GAP", y = "Density") +
-    theme_si(7) +
-    theme(strip.text = element_text(hjust = 0.5), plot.title = element_text(hjust = 0.5),
-          plot.title.position = "panel", panel.border = element_blank(),
-          axis.line = element_line(color = "grey40", linewidth = 0.3), panel.grid.major.y = element_blank())
+    theme_si_frame(6, l_axes = TRUE) +
+    theme(strip.text = element_text(face = "bold", size = 7),
+          plot.title = element_text(size = 13),
+          axis.title = element_text(size = 10),
+          panel.spacing.y = unit(4, "mm"))
   figure_s19
 }
 
@@ -178,8 +186,8 @@ plot_figure_s21 <- function(dyads, support) {
     geom_hline(yintercept = c(-0.25, 0.25), linetype = "dashed", color = "#1F3A5F", linewidth = 0.4) +
     geom_hline(yintercept = c(-0.5, 0.5), linetype = "dotted", color = "#B03A2E", linewidth = 0.6) +
     geom_hline(yintercept = 0, color = "grey40", linewidth = 0.3) +
-    geom_jitter(data = rain, aes(x - 0.3, rank_gap, color = group),
-                width = 0.07, height = 0, size = 0.05, alpha = 0.3) +
+    geom_point(data = rain, aes(x - 0.3, rank_gap, color = group), size = 0.05, alpha = 0.3,
+               position = position_jitter(width = 0.07, height = 0, seed = 1)) +
     geom_boxplot(data = rain, aes(x, rank_gap, group = group, color = group, fill = group),
                  width = 0.12, alpha = 0.15, outlier.shape = NA) +
     geom_polygon(data = half_density %>% group_by(group) %>%

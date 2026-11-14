@@ -24,8 +24,6 @@ table is the corresponding column of Table 1.
 Code: `code/si/S7_main_regressions.R` and the helper `fe_progression()` in
 `code/00_helpers.R`. (The wild-cluster bootstrap takes about a minute.)
 
-For the regression tables, † denotes p < 0.10, * p < 0.05, ** p < 0.01, and *** p < 0.001.
-
 ```{r s7-setup}
 ```
 
@@ -117,25 +115,13 @@ The observed mean Cooperation GAP is shown alongside the value predicted by the 
 ```{r s7-quartiles-extremes}
 ```
 
-```{r s7-figure-s22}
-#| fig-width: 7
-#| fig-height: 3.5
-```
-
-::: {.callout-note collapse="true" appearance="simple"}
-## Supporting Information layout
-
-Plotting code from `code/si/figures/S7_figures.R`. This is the version
-saved to `output/figures/si/`.
-
 ```{r plot-figure-s22}
 ```
 
-```{r s7-figure-s22-si}
+```{r s7-figure-s22}
 #| fig-width: 8
 #| fig-height: 3.6
 ```
-:::
 
 ```{r s7-figure-s23}
 #| fig-width: 7
@@ -157,25 +143,13 @@ saved to `output/figures/si/`.
 ```
 :::
 
-```{r s7-figure-s24}
-#| fig-width: 6
-#| fig-height: 4
-```
-
-::: {.callout-note collapse="true" appearance="simple"}
-## Supporting Information layout
-
-Plotting code from `code/si/figures/S7_figures.R`. This is the version
-saved to `output/figures/si/`.
-
 ```{r plot-figure-s24}
 ```
 
-```{r s7-figure-s24-si}
+```{r s7-figure-s24}
 #| fig-width: 9
 #| fig-height: 4.6
 ```
-:::
 
 ```{r s7-save}
 ```

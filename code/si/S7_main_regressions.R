@@ -219,12 +219,7 @@ quartile_cells %>% filter(sender_q == 4, receiver_q == 1)
 ## ---- s7-figure-s22 ----
 # Figure S22: distribution of the Social Rank GAP; orange lines at the 90th
 # percentile of |GAP|, dashed lines at the extreme top-vs-bottom contrast
-# Quick look: histogram of the Social Rank GAP
-ggplot(dyads, aes(rank_gap)) +
-  geom_histogram(binwidth = 0.05)
 
-## ---- s7-figure-s22-si ----
-# Supporting Information layout (plotting code in figures/S7_figures.R)
 figure_s22 <- plot_figure_s22(dyads, abs_gap)
 figure_s22
 
@@ -246,13 +241,7 @@ figure_s23
 
 ## ---- s7-figure-s24 ----
 # Figure S24: Cooperation GAP by sender and receiver rank quartile
-# Quick look: observed Cooperation GAP in each quartile cell
-ggplot(quartile_cells, aes(receiver_q, sender_q, fill = observed)) +
-  geom_tile() +
-  geom_text(aes(label = round(observed, 2)))
 
-## ---- s7-figure-s24-si ----
-# Supporting Information layout (plotting code in figures/S7_figures.R)
 figure_s24 <- plot_figure_s24(quartile_cells)
 figure_s24
 

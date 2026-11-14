@@ -12,6 +12,12 @@
 # Figure S9: (A) tokens sent, (B) the two allocations of each pair, (C) the
 # Cooperation GAP with zero gaps in orange, (D) what the zero gaps are made of.
 plot_figure_s9 <- function(dyads, pairs) {
+  # large centered titles, bold axis titles, dark left and bottom axes
+  theme_s9 <- theme_si(9) +
+    theme(plot.title = element_text(hjust = 0.5, size = 13),
+          plot.title.position = "panel",
+          axis.title = element_text(face = "bold"),
+          axis.line = element_line(color = "grey15", linewidth = 0.5))
   percent_axis <- scale_y_continuous(labels = function(x) paste0(x, "%"),
                                      expand = expansion(mult = c(0, 0.05)))
 
@@ -22,7 +28,7 @@ plot_figure_s9 <- function(dyads, pairs) {
     geom_col(fill = color_slate, width = 0.8) +
     scale_x_continuous(breaks = 0:10) + percent_axis +
     labs(title = "A. Tokens sent", x = "Tokens sent", y = "Directed decisions (%)") +
-    theme_si(9)
+    theme_s9
 
   pair_cells <- pairs %>%
     count(high = pmax(tokens_sent, tokens_received), low = pmin(tokens_sent, tokens_received)) %>%
@@ -39,7 +45,7 @@ plot_figure_s9 <- function(dyads, pairs) {
     coord_fixed() +
     labs(title = "B. Bivariate token distribution",
          x = "Tokens sent from j to i", y = "Tokens sent from i to j") +
-    theme_si(9) +
+    theme_s9 +
     theme(panel.grid = element_blank(), panel.border = element_blank(),
           legend.position = c(0.25, 0.85), legend.direction = "horizontal",
           legend.title.align = 0, legend.key.height = unit(2, "mm"),
@@ -61,7 +67,7 @@ plot_figure_s9 <- function(dyads, pairs) {
     scale_x_continuous(breaks = seq(-10, 10, 2)) + percent_axis +
     labs(title = "C. Cooperation GAP", x = "Tokens received - tokens sent",
          y = "Directed decisions (%)") +
-    theme_si(9)
+    theme_s9
 
   zero_gap <- pairs %>%
     filter(coop_gap == 0) %>%
@@ -98,11 +104,14 @@ plot_figure_s9 <- function(dyads, pairs) {
     coord_cartesian(ylim = c(0, 63)) +
     labs(title = "D. Zero GAP decomposition", x = "Tokens sent by both students",
          y = "Zero-GAP dyads (%)") +
-    theme_si(9) +
-    theme(legend.position = c(0.3, 0.6), legend.title = element_text(face = "bold", size = 8),
-          legend.key.size = unit(3, "mm"), legend.text = element_text(size = 7))
+    theme_s9 +
+    # legend as colored text, as in the SI
+    annotate("text", x = -0.4, y = c(48.5, 44.5, 41, 37.5), hjust = 0, fontface = "bold",
+             size = c(3.1, 2.9, 2.9, 2.9),
+             label = c("Friendship type", "Non-friends", "Mutual friends", "Asymmetric ties"),
+             color = c("grey15", "#9B86C9", "#7FCDBB", "#8FD3EC"))
 
-  figure_s9 <- (panel_a | panel_b) / (panel_c | panel_d)
+  figure_s9 <- (panel_a | panel_b) / (panel_c | panel_d) & plot_layout(widths = c(1, 1))
   figure_s9
 }
 
@@ -205,55 +214,99 @@ plot_figure_s11 <- function(by_round_f, by_order_f, by_fifth_f, by_round, by_ord
 plot_s12_panel_a <- function(decomposition, n_children) {
   group_colors <- friend_colors[c("Non-friends", "Asymmetric ties", "Mutual friends")]
   overall_change <- sum(decomposition$within + decomposition$composition)
+  rows <- c("Category shares", "Category means", "Overall\nchange")
 
   components <- decomposition %>%
     select(friend_group, `Category means` = within, `Category shares` = composition) %>%
     pivot_longer(-friend_group, names_to = "component") %>%
-    mutate(friend_group = factor(friend_group, levels = c("Asymmetric ties", "Non-friends", "Mutual friends")))
+    # stacked from left to right: asymmetric ties, non-friends, mutual friends
+    mutate(friend_group = factor(friend_group, levels = c("Mutual friends", "Non-friends", "Asymmetric ties")),
+           component = factor(component, levels = rows))
 
   component_totals <- components %>% group_by(component) %>% summarise(total = sum(value)) %>%
     add_row(component = "Overall\nchange", total = overall_change) %>%
-    mutate(component = factor(component, levels = c("Category shares", "Category means", "Overall\nchange")))
+    mutate(component = factor(component, levels = rows))
+
+  # small box with the contribution of each group to the composition term
+  composition <- components %>%
+    filter(component == "Category shares") %>%
+    mutate(friend_group = factor(friend_group, levels = c("Non-friends", "Mutual friends", "Asymmetric ties"))) %>%
+    arrange(friend_group) %>%
+    mutate(y = 1.33 - 0.13 * row_number())
 
   figure_s12_a <- ggplot() +
     geom_col(data = filter(component_totals, component == "Overall\nchange"),
-             aes(total, component), fill = color_slate, width = 0.5) +
-    geom_col(data = components, aes(value, factor(component, levels = levels(component_totals$component)),
-                                    fill = friend_group), width = 0.5) +
+             aes(total, component), fill = color_slate, width = 0.55) +
+    geom_col(data = components, aes(value, component, fill = friend_group), width = 0.55) +
     geom_text(data = filter(components, component == "Category means"),
               aes(value, component, label = sprintf("%.3f", value), group = friend_group),
-              position = position_stack(vjust = 0.5), color = "white", size = 2.2, fontface = "bold") +
+              position = position_stack(vjust = 0.5), color = "white", size = 2.1, fontface = "bold") +
     geom_point(data = component_totals, aes(total, component), size = 1) +
-    geom_text(data = component_totals, aes(total, component, label = sprintf("%+.3f", total)),
-              hjust = -0.3, size = 2.4) +
-    geom_vline(xintercept = 0, linetype = "dashed", color = "grey50") +
+    geom_text(data = component_totals, aes(pmax(total, 0.06), component, label = sprintf("%+.3f", total)),
+              hjust = -0.25, size = 2.3) +
+    annotate("text", x = 0.88, y = 1.45, label = "Composition contributions", hjust = 1, size = 2.2) +
+    geom_text(data = composition, aes(0.66, y, label = friend_group, color = friend_group),
+              hjust = 1, size = 2.2, fontface = "bold") +
+    geom_text(data = composition, aes(0.88, y, label = sprintf("%+.3f", value), color = friend_group),
+              hjust = 1, size = 2.2, fontface = "bold") +
+    geom_vline(xintercept = 0, linetype = "dotted", color = "grey20") +
     scale_fill_manual(values = group_colors) +
-    scale_x_continuous(limits = c(-0.1, 1.05)) +
-    scale_y_discrete(limits = c("Category shares", "Category means", "Overall\nchange")) +
+    scale_color_manual(values = group_colors) +
+    scale_x_continuous(limits = c(-0.12, 1), breaks = seq(0, 0.8, 0.2), expand = c(0, 0)) +
+    scale_y_discrete(limits = rows, labels = function(x) sub("Category ", "Category\n", x)) +
     labs(title = "A. Aggregate change components",
          subtitle = sprintf("%s children | 45 classrooms | Equal weight per decision", n_children),
          x = "Change in mean tokens sent", y = NULL) +
-    theme_si(8) + theme(panel.grid.major.y = element_blank())
+    theme_s12(l_axes = TRUE)
   figure_s12_a
+}
+
+# Shared look of the three panels: left-aligned titles over the panel
+theme_s12 <- function(l_axes = FALSE) {
+  theme_si_frame(base_size = 8, l_axes = l_axes) +
+    theme(plot.title = element_text(hjust = 0), plot.subtitle = element_text(hjust = 0),
+          plot.title.position = "plot")
 }
 
 
 ## ---- plot-s12-panel-b ----
 # Figure S12, panel B: giving of the same children toward the classmates
 # they named and toward the others, first and final fifth of the session.
+# The dashed line is the counterfactual: sender-nominated giving if it had
+# changed as much as giving to the others.
 plot_s12_panel_b <- function(child_means, child_level) {
-  figure_s12_b <- ggplot(child_means, aes(period, mean, color = receiver_type, group = receiver_type)) +
-    geom_line(aes(linetype = receiver_type)) +
+  types <- c("Sender-nominated", "Not sender-nominated")
+  child_means <- child_means %>% mutate(receiver_type = factor(receiver_type, levels = types))
+  value_at <- function(type, when) child_means$mean[child_means$receiver_type == type &
+                                                      as.integer(child_means$period) == when]
+  counterfactual <- value_at(types[1], 1) + value_at(types[2], 2) - value_at(types[2], 1)
+  observed_final <- value_at(types[1], 2)
+  extra <- tibble(x = c(1, 2), y = c(value_at(types[1], 1), counterfactual))
+
+  figure_s12_b <- ggplot(child_means, aes(as.integer(period), mean, color = receiver_type,
+                                          group = receiver_type)) +
+    geom_line(data = extra, aes(x, y), inherit.aes = FALSE, linetype = "dashed", color = "grey20") +
+    geom_point(data = extra[2, ], aes(x, y), inherit.aes = FALSE, shape = 21, fill = "white",
+               color = "grey20", size = 1.8) +
+    geom_line(linewidth = 0.7) +
     geom_errorbar(aes(ymin = mean - 1.96 * se, ymax = mean + 1.96 * se), width = 0.06) +
     geom_point(aes(shape = receiver_type), size = 2, fill = "white") +
-    scale_color_manual(values = c("Sender-nominated" = color_highlight, "Not sender-nominated" = color_slate), name = NULL) +
-    scale_linetype_manual(values = c("Sender-nominated" = "solid", "Not sender-nominated" = "dashed"), name = NULL) +
-    scale_shape_manual(values = c("Sender-nominated" = 16, "Not sender-nominated" = 21), name = NULL) +
+    annotate("segment", x = 2.09, xend = 2.09, y = counterfactual, yend = observed_final,
+             color = color_highlight, linewidth = 0.6) +
+    annotate("text", x = 2.12, y = (counterfactual + observed_final) / 2,
+             label = sprintf("%+.2f", observed_final - counterfactual),
+             color = color_highlight, hjust = 0, size = 2.3) +
+    scale_color_manual(values = setNames(c(color_highlight, color_slate), types), name = NULL) +
+    scale_shape_manual(values = setNames(c(16, 21), types), name = NULL) +
+    scale_x_continuous(breaks = 1:2, labels = levels(child_means$period), limits = c(0.95, 2.25)) +
+    scale_y_continuous(limits = c(3, 8)) +
     labs(title = "B. Giving within the same children",
          subtitle = sprintf("%d children | %d classrooms | Equal weight per child",
                             nrow(child_level), n_distinct(child_level$class_id)),
          x = "Personal session progress", y = "Mean tokens sent") +
-    theme_si(8) + theme(legend.position = c(0.65, 0.12))
+    theme_s12() +
+    theme(legend.position = c(0.68, 0.1), legend.key.height = unit(0.3, "cm"),
+          legend.text = element_text(size = 6.5), legend.background = element_blank())
   figure_s12_b
 }
 
@@ -262,16 +315,16 @@ plot_s12_panel_b <- function(child_means, child_level) {
 # Figure S12, panel C: within-child changes with classroom-bootstrap 95% CIs.
 plot_s12_panel_c <- function(change_components, child_level) {
   figure_s12_c <- ggplot(change_components, aes(estimate, term, color = highlight)) +
-    geom_vline(xintercept = 0, linetype = "dashed", color = "grey50") +
+    geom_vline(xintercept = 0, linetype = "dotted", color = "grey20") +
     geom_errorbarh(aes(xmin = low, xmax = high), height = 0.15) +
     geom_point(size = 1.8) +
-    geom_text(aes(x = high, label = sprintf("%+.2f", estimate)), hjust = -0.2, size = 2.4) +
+    geom_text(aes(x = high, label = sprintf("%+.2f", estimate)), hjust = -0.2, size = 2.3) +
     scale_color_manual(values = c(`FALSE` = "grey20", `TRUE` = color_highlight)) +
-    scale_x_continuous(expand = expansion(mult = c(0.05, 0.15))) +
+    scale_x_continuous(limits = c(-0.1, 2.6), breaks = seq(0, 2.5, 0.5)) +
     labs(title = "C. Within-child change components",
          subtitle = sprintf("%d children | First vs. final 20%% of personal session progress", nrow(child_level)),
          x = "Mean within-child change (tokens)", y = NULL) +
-    theme_si(8) + theme(panel.grid.major.y = element_blank())
+    theme_s12()
   figure_s12_c
 }
 
