@@ -1,0 +1,68 @@
+project:
+  type: website
+  output-dir: _site
+  execute-dir: project
+  render:
+    - index.qmd
+    - main/index.qmd
+    - main/01_data_and_measures.qmd
+    - main/02_main_results.qmd
+    - si/index.qmd
+    - si/S1_study_design.qmd
+    - si/S2_nomination_survey.qmd
+    - si/S3_relational_structure.qmd
+    - si/S4_social_rank.qmd
+    - si/S5_game_and_time.qmd
+    - si/S6_identification.qmd
+    - si/S7_main_regressions.qmd
+    - si/S8_robustness.qmd
+    - si/S9_behavioral_rank.qmd
+
+website:
+  title: "Friendship & Hierarchy · Replication"
+  # Update this and the notebook code-links when publishing from a new repository or branch.
+  repo-url: https://github.com/melanieoyarzun/patio-en-red
+  repo-branch: main
+  repo-subdir: notebooks
+  repo-actions: [source, issue]
+  sidebar:
+    style: docked
+    search: true
+    tools:
+      - icon: github
+        href: https://github.com/melanieoyarzun/patio-en-red
+        aria-label: GitHub repository
+    contents:
+      - href: index.qmd
+        text: Overview
+      - section: "Main Results"
+        href: main/index.qmd
+        contents:
+          - main/01_data_and_measures.qmd
+          - main/02_main_results.qmd
+      - section: "Supporting Information"
+        href: si/index.qmd
+        contents:
+          - si/S1_study_design.qmd
+          - si/S2_nomination_survey.qmd
+          - si/S3_relational_structure.qmd
+          - si/S4_social_rank.qmd
+          - si/S5_game_and_time.qmd
+          - si/S6_identification.qmd
+          - si/S7_main_regressions.qmd
+          - si/S8_robustness.qmd
+          - si/S9_behavioral_rank.qmd
+
+format:
+  html:
+    theme: cosmo
+    toc: true
+    code-fold: true          # code hidden behind a "Show code" arrow
+    code-summary: "Show code"
+    code-tools: true         # menu to show or hide all code on a page
+    lightbox: auto           # click on a figure to see it large
+    df-print: kable
+
+execute:
+  warning: false
+  message: false

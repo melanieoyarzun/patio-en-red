@@ -1,0 +1,107 @@
+---
+title: "S5 · Social-dilemma game and cooperation over time"
+code-links:
+  - text: Jupyter notebook on GitHub
+    icon: journal-code
+    href: https://github.com/melanieoyarzun/patio-en-red/blob/main/notebooks/si/S5_game_and_time.ipynb
+  - text: "S5_game_and_time.R"
+    icon: file-code
+    href: https://github.com/melanieoyarzun/patio-en-red/blob/main/code/si/S5_game_and_time.R
+---
+
+```{r setup}
+#| include: false
+here::i_am("notebooks/si/S5_game_and_time.qmd")
+knitr::read_chunk(here::here("code", "si", "S5_game_and_time.R"))
+```
+
+This notebook describes the game data and how giving changed during the
+session, overall, by friendship type and by classroom size.
+Code: `code/si/S5_game_and_time.R`. (The classroom bootstrap with 4,999 draws
+takes about half a minute.)
+
+```{r s5-setup}
+```
+
+## When did each decision happen?
+
+```{r s5-session-position}
+```
+
+## Table S11. Matching schedule (A) and temporal trends (B)
+
+```{r s5-schedule}
+```
+
+```{r s5-temporal-models}
+```
+
+## Table S12 and Figure S9. Game behavior
+
+```{r s5-game-descriptives}
+```
+
+```{r s5-figure-s9}
+#| fig-width: 9
+#| fig-height: 7
+```
+
+## Figure S10 and Table S13. Giving over the session
+
+```{r s5-round-means}
+```
+
+```{r s5-figure-s10}
+#| fig-width: 9
+#| fig-height: 6
+```
+
+```{r s5-coverage}
+```
+
+## Figure S11 and Table S14. By friendship type
+
+```{r s5-by-friendship}
+#| fig-width: 9
+#| fig-height: 6.5
+```
+
+```{r s5-friendship-slopes}
+```
+
+## Figure S12 and Table S15. Composition and within-child change
+
+The rise in giving from the first to the final fifth is split into changes
+within friendship groups and changes in the mix of groups. Then, within the
+same children, we compare the change toward classmates they named with the
+change toward the others.
+
+```{r s5-decomposition}
+```
+
+```{r s5-within-child}
+```
+
+```{r s5-figure-s12}
+#| fig-width: 9
+#| fig-height: 3.8
+```
+
+## Figure S13. Classroom size
+
+```{r s5-class-size}
+#| fig-width: 9
+#| fig-height: 3.6
+```
+
+## Figure S14. Time between decisions
+
+Only the 29 classrooms where the tablets recorded the time of each decision.
+
+```{r s5-pacing}
+#| fig-width: 6
+#| fig-height: 3.5
+```
+
+```{r s5-save}
+```

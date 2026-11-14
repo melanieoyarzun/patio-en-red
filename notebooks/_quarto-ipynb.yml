@@ -1,0 +1,20 @@
+# Profile that writes the same pages as Jupyter notebooks (R code, with
+# outputs), for reading directly on GitHub:
+#
+#   quarto render notebooks --profile ipynb --to ipynb
+#
+# The post-render script places the .ipynb files beside the .qmd sources.
+project:
+  output-dir: _notebook-build
+  render:
+    - '!index.qmd'
+    - '!main/index.qmd'
+    - '!si/index.qmd'
+  post-render: _tools/finish_ipynb.R
+
+format:
+  ipynb:
+    df-print: kable
+    # keep each HTML table as it is (one output per table)
+    html-table-processing: none
+    from: markdown-markdown_in_html_blocks

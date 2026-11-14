@@ -1,0 +1,23 @@
+# Data
+
+The [codebook](codebook.md) defines the fields in the replication inputs and the measures computed by the analysis.
+
+## Inputs
+
+| File | Contents |
+|---|---|
+| [`raw/students.csv`](raw/students.csv) | Pseudonymized student records (859 rows) |
+| [`raw/dyads.csv`](raw/dyads.csv) | Pseudonymized directed decisions and peer nominations (17,804 rows) |
+| [`raw/figure2_layout.csv`](raw/figure2_layout.csv) | Coordinates for the classroom illustration in Figure 2 |
+
+The archival dataset is planned for OSF. This page will link to its record when the identifier is available.
+
+## Generated files
+
+| File in `data/generated/` | Script |
+|---|---|
+| `analysis_students.csv` and `analysis_dyads.csv` | [`code/01_build_measures.R`](../code/01_build_measures.R) |
+| `alternative_ranks.csv` | [`code/si/S4_social_rank.R`](../code/si/S4_social_rank.R) |
+| `behavioral_rank.csv` | [`code/si/S9_behavioral_rank.R`](../code/si/S9_behavioral_rank.R) |
+
+Run `Rscript code/run_all.R main` for the main results or `Rscript code/run_all.R` for the main results and Supporting Information. See the [setup instructions](../README.md#clone-and-reproduce).

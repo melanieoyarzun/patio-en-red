@@ -1,0 +1,51 @@
+---
+title: "S1 · Study design and data description"
+code-links:
+  - text: Jupyter notebook on GitHub
+    icon: journal-code
+    href: https://github.com/melanieoyarzun/patio-en-red/blob/main/notebooks/si/S1_study_design.ipynb
+  - text: "S1_study_design.R"
+    icon: file-code
+    href: https://github.com/melanieoyarzun/patio-en-red/blob/main/code/si/S1_study_design.R
+---
+
+```{r setup}
+#| include: false
+here::i_am("notebooks/si/S1_study_design.qmd")
+knitr::read_chunk(here::here("code", "si", "S1_study_design.R"))
+```
+
+This section describes the sample: who took part, in which classrooms, and
+how complete the data are. Code: `code/si/S1_study_design.R`.
+
+```{r s1-setup}
+```
+
+## Table S1. Classroom-level descriptive statistics
+
+One row per classroom. Two computed ages above 15 years are birth-date
+errors and are left out of the age summaries, as stated in the SI.
+
+```{r s1-table-classrooms}
+```
+
+```{r}
+knitr::kable(table_s1, digits = c(0, 0, 2, 2, 1, 1, 1, 0, 1, 2))
+```
+
+Totals for the whole sample, and the sex composition of the classrooms
+(32 mixed, 10 all-girls, 3 all-boys):
+
+```{r s1-sample-totals}
+```
+
+## Table S2. Completeness
+
+All variables used in the analyses are complete. Every classroom has the full
+census of directed decisions, $n(n-1)$.
+
+```{r s1-table-completeness}
+```
+
+```{r s1-save}
+```

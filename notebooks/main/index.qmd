@@ -1,0 +1,22 @@
+---
+title: "Main Results"
+---
+
+## Notebook index
+
+| Notebook | What it covers |
+|---|---|
+| [Data and measures](01_data_and_measures.qmd) | How the student and dyad data are used to construct friendship type, Social Rank, Social Rank GAP, and Cooperation GAP. |
+| [Table 1 and Figures 1D, 2, and 3](02_main_results.qmd) | The main regressions, the partner-rank balance check, the classroom sociogram, and cooperation patterns by friendship type. |
+
+## Reproduce the main results
+
+After installing the R dependencies listed in the repository README, run this command from the repository root.
+
+```sh
+Rscript code/run_all.R main
+```
+
+The scripts write the analysis datasets to `data/generated/`, the tables to `output/tables/`, and the figures to `output/figures/`. The formatted Table 1 is `output/tables/table1_display.csv`.
+
+In Jupyter, run **Data and measures** first, followed by **Table 1 and Figures 1D, 2, and 3**. Each notebook page links to the rendered `.ipynb` and its R scripts on GitHub.

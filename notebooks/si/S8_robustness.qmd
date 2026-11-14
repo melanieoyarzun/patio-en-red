@@ -1,0 +1,94 @@
+---
+title: "S8 · Robustness and sensitivity analyses"
+code-links:
+  - text: Jupyter notebook on GitHub
+    icon: journal-code
+    href: https://github.com/melanieoyarzun/patio-en-red/blob/main/notebooks/si/S8_robustness.ipynb
+  - text: "S8_robustness.R"
+    icon: file-code
+    href: https://github.com/melanieoyarzun/patio-en-red/blob/main/code/si/S8_robustness.R
+---
+
+```{r setup}
+#| include: false
+here::i_am("notebooks/si/S8_robustness.qmd")
+knitr::read_chunk(here::here("code", "si", "S8_robustness.R"))
+```
+
+Code: `code/si/S8_robustness.R`. Each block repeats the main model under one
+change: filtered tokens, another filtering threshold, another treatment of
+the nomination limit, subsamples by classroom size, sex or grade, temporal
+controls, a lagged placebo, and other ways of measuring rank.
+
+```{r s8-setup}
+```
+
+## 8.1 Filtered tokens (Tables S25–S30, Figure S25)
+
+```{r s8-filtered-tables}
+```
+
+```{r s8-figure-s25}
+#| fig-width: 9
+#| fig-height: 3.2
+```
+
+## 8.2 Filtering threshold and cutoff (Tables S31–S34)
+
+"global" = one cutoff for all transfers (primary); "sender" = each child
+keeps her own top share. n.e. (NA) marks models that cannot be estimated
+(fewer than 10 residual degrees of freedom).
+
+```{r s8-threshold-function}
+```
+
+```{r s8-thresholds}
+```
+
+## 8.3 Nomination limit (Table S35, Figure S26)
+
+```{r s8-nomination-cap}
+```
+
+```{r}
+#| fig-width: 6
+#| fig-height: 3
+figure_s26
+```
+
+## 8.4 Classroom size (Figure S27)
+
+```{r s8-class-size}
+#| fig-width: 9
+#| fig-height: 3.2
+```
+
+## 8.5 Temporal robustness (Table S36)
+
+```{r s8-temporal}
+```
+
+## 8.6 Lagged placebo (Tables S37–S38)
+
+```{r s8-placebo}
+```
+
+## 8.7 Sex and grade level (Tables S39–S50)
+
+```{r s8-sex-grade}
+```
+
+## 8.8 Alternative Social Rank constructions (Figure S28)
+
+```{r s8-alternative-ranks}
+#| fig-width: 9
+#| fig-height: 3.5
+```
+
+## 8.9 Rank from affiliation networks (Table S51)
+
+```{r s8-affiliation-ranks}
+```
+
+```{r s8-save}
+```

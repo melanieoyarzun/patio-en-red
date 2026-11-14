@@ -1,0 +1,63 @@
+---
+title: "S9 · Game-based Behavioral Social Rank"
+code-links:
+  - text: Jupyter notebook on GitHub
+    icon: journal-code
+    href: https://github.com/melanieoyarzun/patio-en-red/blob/main/notebooks/si/S9_behavioral_rank.ipynb
+  - text: "S9_behavioral_rank.R"
+    icon: file-code
+    href: https://github.com/melanieoyarzun/patio-en-red/blob/main/code/si/S9_behavioral_rank.R
+---
+
+```{r setup}
+#| include: false
+here::i_am("notebooks/si/S9_behavioral_rank.qmd")
+knitr::read_chunk(here::here("code", "si", "S9_behavioral_rank.R"))
+```
+
+Instead of asking children who is popular, we can read rank off the game:
+PageRank on the network of tokens sent. Code: `code/si/S9_behavioral_rank.R`.
+
+```{r s9-setup}
+```
+
+```{r s9-bsr}
+```
+
+## How close is it to the nomination-based rank?
+
+```{r s9-correlation}
+```
+
+## Tables S52–S53. Cooperation GAP on the behavioral rank gap
+
+```{r s9-regressions}
+```
+
+## Table S54. Asymmetric friendships
+
+```{r s9-asymmetric}
+```
+
+## Figure S29
+
+```{r s9-figure-s29}
+#| fig-width: 9
+#| fig-height: 6
+```
+
+## Figure S30
+
+```{r s9-figure-s30}
+#| fig-width: 9
+#| fig-height: 4.5
+```
+
+```{r}
+#| fig-width: 9
+#| fig-height: 4.5
+figure_s30
+```
+
+```{r s9-save}
+```

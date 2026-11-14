@@ -1,0 +1,84 @@
+---
+title: "S6 · Identification and empirical support"
+code-links:
+  - text: Jupyter notebook on GitHub
+    icon: journal-code
+    href: https://github.com/melanieoyarzun/patio-en-red/blob/main/notebooks/si/S6_identification.ipynb
+  - text: "S6_identification.R"
+    icon: file-code
+    href: https://github.com/melanieoyarzun/patio-en-red/blob/main/code/si/S6_identification.R
+---
+
+```{r setup}
+#| include: false
+here::i_am("notebooks/si/S6_identification.qmd")
+knitr::read_chunk(here::here("code", "si", "S6_identification.R"))
+```
+
+Partners were assigned at random within each classroom and round. This
+notebook checks that children's own characteristics do not predict the rank
+of the partners they met, that rank differences are spread over the whole
+session, and that every classroom and friendship group has enough variation
+in rank gaps. Code: `code/si/S6_identification.R`.
+
+```{r s6-setup}
+```
+
+## Three measures of exposure
+
+The raw gap mixes the partner's rank with the child's own rank, so it is
+not a clean balance check. The demeaned partner rank compares the partner
+with the rank the child could expect in that classroom and round.
+
+```{r s6-exposure}
+```
+
+## Table S16. Balance
+
+```{r s6-balance-table}
+```
+
+## Figure S15. Coefficients on a common scale
+
+```{r s6-figure-s15}
+#| fig-width: 8
+#| fig-height: 2.6
+```
+
+## Figure S16. Round by round
+
+```{r s6-figure-s16}
+#| fig-width: 9
+#| fig-height: 6
+```
+
+## Figure S17. Demeaned exposure by covariate groups
+
+```{r s6-figure-s17}
+#| fig-width: 9
+#| fig-height: 3
+```
+
+## Figures S18–S19. Rank gaps by round
+
+```{r s6-figures-s18-s19}
+#| fig-width: 8
+#| fig-height: 3.5
+```
+
+## Figure S20. By classroom
+
+```{r s6-figure-s20}
+#| fig-width: 10
+#| fig-height: 5
+```
+
+## Figure S21. Support among mutual friends
+
+```{r s6-support}
+#| fig-width: 7
+#| fig-height: 3.5
+```
+
+```{r s6-save}
+```

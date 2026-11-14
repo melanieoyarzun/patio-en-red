@@ -1,0 +1,29 @@
+---
+title: "Supporting Information"
+---
+
+## Notebook index
+
+| Section | What it covers |
+|---|---|
+| [S1 · Study design and data description](S1_study_design.qmd) | Classroom characteristics, sample coverage, and data completeness. |
+| [S2 · Peer-nomination survey](S2_nomination_survey.qmd) | Nomination counts, the nomination cap, and consistency of the popularity questions. |
+| [S3 · Classroom relational structure](S3_relational_structure.qmd) | Network statistics and classroom sociograms. |
+| [S4 · Construction and validation of Social Rank](S4_social_rank.qmd) | Coding of nominations, alternative rank measures, and associations with student characteristics. |
+| [S5 · Social-dilemma game and cooperation over time](S5_game_and_time.qmd) | Pairing and game descriptives, giving over rounds, and changes by friendship type. |
+| [S6 · Identification and empirical support](S6_identification.qmd) | Balance of assigned partner ranks and support for comparisons across friendship groups. |
+| [S7 · Main regression framework and results](S7_main_regressions.qmd) | Regression specifications, friendship moderation, and directional contrasts. |
+| [S8 · Robustness and sensitivity analyses](S8_robustness.qmd) | Null-model filtering, nomination caps, classroom size, timing, and alternative ranks. |
+| [S9 · Game-based Behavioral Social Rank](S9_behavioral_rank.qmd) | Rank estimated from game transfers and its relationship to cooperation. |
+
+## Reproduce the Supporting Information
+
+After installing the R dependencies listed in the repository README, run this command from the repository root.
+
+```sh
+Rscript code/run_all.R
+```
+
+This runs the main analyses and sections S1–S9 in order. The SI tables are written to `output/tables/si/` and the SI figures to `output/figures/si/`.
+
+In Jupyter, start with [Data and measures](../main/01_data_and_measures.qmd). Run S4 before S8 to generate the alternative Social Rank measures used in the robustness checks.

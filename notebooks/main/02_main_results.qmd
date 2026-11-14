@@ -1,0 +1,460 @@
+---
+title: "2 · Table 1 and Figures 1D, 2 and 3"
+code-links:
+  - text: Jupyter notebook on GitHub
+    icon: journal-code
+    href: https://github.com/melanieoyarzun/patio-en-red/blob/main/notebooks/main/02_main_results.ipynb
+  - text: "02_table1.R"
+    icon: file-code
+    href: https://github.com/melanieoyarzun/patio-en-red/blob/main/code/02_table1.R
+  - text: "03_figure1_balance.R"
+    icon: file-code
+    href: https://github.com/melanieoyarzun/patio-en-red/blob/main/code/03_figure1_balance.R
+  - text: "04_figure2_sociograms.R"
+    icon: file-code
+    href: https://github.com/melanieoyarzun/patio-en-red/blob/main/code/04_figure2_sociograms.R
+  - text: "05_figure3_cooperation.R"
+    icon: file-code
+    href: https://github.com/melanieoyarzun/patio-en-red/blob/main/code/05_figure3_cooperation.R
+  - text: "06_numbers_in_text.R"
+    icon: file-code
+    href: https://github.com/melanieoyarzun/patio-en-red/blob/main/code/06_numbers_in_text.R
+---
+
+
+```{r setup}
+#| include: false
+here::i_am("notebooks/main/02_main_results.qmd")
+library(here)
+for (script in c("02_table1.R", "03_figure1_balance.R", "04_figure2_sociograms.R",
+                 "05_figure3_cooperation.R", "06_numbers_in_text.R")) {
+  knitr::read_chunk(here("code", script))
+}
+# small helpers to quote results in the text
+num  <- function(x, digits = 2) formatC(x, format = "f", digits = digits, big.mark = ",")
+pval <- function(p) if (p < 0.001) "< 0.001" else paste("=", num(p, 3))
+```
+
+This page reproduces the results of the main text. It starts from the two
+files written by the first page ([Data and measures](01_data_and_measures.qmd)):
+`data/generated/analysis_dyads.csv`, one row per decision with the Cooperation GAP,
+friendship type and Social Rank GAP already computed, and
+`data/generated/analysis_students.csv`, one row per child.
+
+The page follows the order of the paper:
+
+1. **Table 1**: how the Cooperation GAP changes with the Social Rank GAP, in
+   each type of relationship.
+2. **Figure 1D**: a check that partners were indeed assigned at random with
+   respect to rank.
+3. **Figure 2**: what the four networks look like in one small classroom.
+4. **Figure 3**: the exchanges behind the regressions, plotted directly.
+5. **Other numbers quoted in the text.**
+
+# Table 1: the rank gradient in cooperation
+
+## What we want to measure
+
+Take one decision: child $i$ meets classmate $j$. Two things describe the
+pair:
+
+- the **Social Rank GAP**, $\text{Rank}_i - \text{Rank}_j$, between $-1$ and
+  $1$. It is positive when $i$ is the higher-ranked child of the two;
+- the **Cooperation GAP**, tokens $i$ received from $j$ minus tokens $i$
+  sent to $j$, between $-10$ and $10$. It is positive when $i$ came out
+  ahead.
+
+If cooperation were blind to rank, the Cooperation GAP would be unrelated to
+the rank gap. If lower-ranked children give more to higher-ranked
+classmates than they get back, the Cooperation GAP rises with the rank gap.
+The slope of that relation is the quantity of interest.
+
+Each pair appears twice in the data, once from each side, with both gaps
+changing sign. This is what we want: every child is a sender in some rows,
+and the model compares the same sender across her different partners.
+
+## The model
+
+For a decision of sender $i$ toward partner $j$, in classroom $c$ and round $t$:
+
+$$
+\text{Coop GAP}_{ijct} = \beta\, \text{RankGAP}_{ij} + \eta_i + \kappa_{c \times t} + u_{ijct}
+$$
+
+Each term has a job:
+
+- $\eta_i$, **sender fixed effects**. Some children are generous with
+  everyone, others with no one. The sender fixed effect absorbs each child's
+  own level, so $\beta$ is estimated only from how the *same* child's
+  exchanges differ across her partners.
+- $\kappa_{c\times t}$, **classroom-by-round fixed effects**. A classroom
+  may be more cooperative overall, and giving may drift during the session.
+  These fixed effects compare only decisions made in the same classroom and
+  round, the unit within which partners were drawn at random.
+- **Standard errors clustered by classroom.** Decisions from the same
+  classroom share children, teachers and nomination networks, so they are
+  not independent. Clustering by classroom (45 clusters) allows for any
+  correlation within a classroom.
+
+Because partners were assigned at random within each classroom and round,
+the rank of the partner a child met is unrelated to her own characteristics
+(Figure 1D below checks this). So $\beta$ can be read as how the same child's
+exchanges change when she happens to meet a higher- or lower-ranked
+classmate.
+
+The model is estimated separately in five samples, one per column of Table 1:
+all pairs, non-friends, mutual friends, and the two kinds of one-sided
+friendships, seen from the side of the child who named the other: a
+lower-ranked child naming a higher-ranked one (L→H) or the reverse (H→L).
+
+```{r table1-packages}
+```
+
+```{r table1-samples}
+```
+
+The two one-sided samples are small (fewer than 1,000 decisions each, and
+few decisions per classroom and round), so they use classroom fixed effects
+instead of classroom-by-round fixed effects.
+
+The function `felm()` from the package **lfe** estimates linear models with
+many fixed effects. Its formula has four parts separated by `|`: the
+regression, the fixed effects, instruments (none here, `0`) and the
+variable that defines the clusters.
+
+```{r table1-models}
+```
+
+## Panel B: effects in more intuitive units
+
+A slope of $\beta$ tokens per unit of rank gap is hard to picture, because a
+full unit (from the bottom to the top of a classroom) is rare. Panel B
+expresses the same estimate in three other ways:
+
+- **in tokens**, for a typical difference in rank (one standard deviation of
+  the Social Rank GAP);
+- **in standard deviations of the Cooperation GAP**, which makes the effect
+  comparable across samples;
+- **model-adjusted**, using only the variation in the rank gap that remains
+  after removing the fixed effects. This is the variation the model actually
+  uses, so this number is the most conservative of the three.
+
+```{r table1-panel-b}
+```
+
+## The table
+
+```{r table1-assemble}
+```
+
+```{r table1-display}
+```
+
+```{r}
+#| include: false
+b <- function(sample, what = "beta") table1[[what]][table1$sample == sample]
+```
+
+**How to read it.** Among non-friends, a one-unit increase in the Social Rank
+GAP raises the Cooperation GAP by `r num(b("Non-friends"))` tokens
+(SE `r num(b("Non-friends", "se"))`, P `r pval(b("Non-friends", "p_value"))`),
+in favor of the higher-ranked child. Over the full range, from the lowest-
+to the highest-ranked child of a classroom (a gap of 2), this is about
+`r num(2 * b("Non-friends"), 1)` tokens out of 10. Among mutual friends the
+slope is `r num(b("Mutual friends"))` and not distinguishable from zero.
+The column with all pairs is close to the non-friends column, because
+non-friends are 78% of the pairs.
+
+In the one-sided friendships, the L→H slope (`r num(b("Asym. (L->H)"))`) looks
+like the non-friend slope. The H→L estimate is imprecise
+(SE `r num(b("Asym. (H->L)", "se"))`), as this sample is the smallest.
+
+The $R^2$ is high in the small samples because the many fixed effects
+explain much of the variation when each child contributes only a few
+decisions; the adjusted $R^2$ corrects for the number of fixed effects.
+
+## Is the slope flatter among mutual friends?
+
+Separate regressions describe each group but do not test whether two slopes
+differ. For that we pool non-friends and mutual friends in a single model
+and let the slope change with friendship:
+
+$$
+\text{Coop GAP}_{ijct} = \beta_1 \text{RankGAP}_{ij} + \beta_2\, \text{Mutual}_{ij}
+ + \beta_3 \,(\text{RankGAP}_{ij} \times \text{Mutual}_{ij}) + \eta_i + \kappa_{c\times t} + u_{ijct}
+$$
+
+$\beta_1$ is the slope among non-friends, and $\beta_1 + \beta_3$ the slope
+among mutual friends. The test of interest is $\beta_3 = 0$.
+
+```{r pooled-interaction}
+```
+
+```{r}
+#| include: false
+b3   <- pooled_table$Estimate[pooled_table$term == "rank_gap:mutual"]
+b3_p <- pooled_table$`Pr(>|t|)`[pooled_table$term == "rank_gap:mutual"]
+b1   <- pooled_table$Estimate[pooled_table$term == "rank_gap"]
+```
+
+The interaction is $\beta_3$ = `r num(b3, 3)` (P `r pval(b3_p)`): among
+mutual friends the rank gradient is `r num(b1 + b3)` tokens instead of
+`r num(b1)`, a reduction of about `r round(100 * -b3 / b1)`%. The level
+difference $\beta_2$ is close to zero. This is expected: the two decisions of
+a pair have Cooperation GAPs of opposite sign, so a characteristic shared by
+both children of the pair, such as being mutual friends, can hardly shift the
+level of the Cooperation GAP; what it can change is the slope.
+
+```{r table1-save}
+```
+
+# Figure 1D: was partner rank really random?
+
+The interpretation of Table 1 rests on random assignment: which classmate a
+child met in a round should not depend on who the child is. Here we check
+this for three characteristics of the sender: sex, attendance and grade
+point average (GPA).
+
+One detail matters. In a given round a child can only be paired with the
+other children who play in that round. So the benchmark is not the average
+rank of the whole classroom but the average rank of the *other* active
+children in that classroom and round. The outcome is the partner's rank
+minus that benchmark: positive means the child met a partner of higher rank
+than expected by chance.
+
+```{r balance-packages}
+```
+
+```{r balance-data}
+```
+
+```{r expected-partner-rank}
+```
+
+We then regress that outcome on the sender's characteristics, with
+classroom-by-round fixed effects and standard errors clustered by
+classroom. If assignment is random, all coefficients should be close to
+zero.
+
+```{r balance-model}
+```
+
+```{r balance-plot}
+#| fig-width: 4
+#| fig-height: 2.8
+```
+
+All three coefficients are close to zero and their confidence intervals
+include zero; the $R^2$ is about $10^{-6}$. Girls and boys, and children
+with high or low attendance and grades, met partners of the same expected
+rank.
+
+```{r balance-save}
+```
+
+# Figure 2: four layers of one classroom
+
+Figure 2 shows, in one small classroom (9 children), the four networks the
+analysis combines:
+
+- **A. Friendship**: who named whom as a best friend. Green arrows are
+  mutual friendships; blue arrows are one-sided.
+- **B. Popularity** and **C. non-popularity**: who named whom as popular or
+  as not popular. Social Rank is computed from these two layers.
+- **D. Tokens**: every transfer in the game, darker for more tokens.
+
+The same child keeps the same position in all four layers, so one can follow
+how a child who is central in one layer fares in the others.
+
+```{r sociogram-packages}
+```
+
+```{r sociogram-data}
+```
+
+To draw the four panels, we first fix one position for each child, computed
+on the network that joins all four layers.
+
+```{r sociogram-layout}
+```
+
+A small function draws one layer; it is called four times.
+
+```{r sociogram-function}
+```
+
+Node size is the number of nominations received in A–C and the number of
+tokens received in D.
+
+```{r sociogram-panels}
+#| fig-width: 5
+#| fig-height: 11
+```
+
+## The assembled figure
+
+The published figure shows the same four layers as tilted planes stacked on
+top of each other, with one legend. The node positions are the ones chosen
+for that drawing (`data/raw/figure2_layout.csv`); they are a drawing choice and
+play no role in any calculation. Each plane is the layout stretched,
+flattened and slanted.
+
+```{r sociogram-assembled-layout}
+```
+
+Nodes and arrows of the four planes. Mutual friendships are drawn once, with
+two heads.
+
+```{r sociogram-assembled-pieces}
+```
+
+```{r sociogram-assembled-legend}
+```
+
+```{r sociogram-assembled-plot}
+#| fig-width: 5.4
+#| fig-height: 7.2
+```
+
+```{r sociogram-save}
+```
+
+# Figure 3: the exchanges behind the regressions
+
+Table 1 summarizes the rank gradient in one number per sample. Figure 3 shows
+the data behind it, in three columns, separately for non-friends (row I),
+mutual friends (row II) and one-sided friendships (row III):
+
+- **A. What pairs exchange.** For each pair, the two transfers (what $i$
+  sent to $j$ and what $j$ sent to $i$) form one cell of an 11 × 11 grid. The
+  heatmap shows the share of pairs in each cell. Since the order of the two
+  children does not matter, the grid is folded into a triangle. Outlined
+  regions mark low or no cooperation, very unequal exchanges, and full
+  mutual cooperation (both send 10).
+- **B. Tokens sent and received along the rank gap.** Average tokens sent
+  (rhombi) and received (squares), in seven equal-width bins of the Social
+  Rank GAP; the area between the two curves is the Cooperation GAP.
+- **C. The Cooperation GAP along the rank gap.** The difference itself,
+  from the observed data (solid) and from the null-model filtered data
+  (semi-transparent; see the first page).
+
+```{r fig3-packages}
+```
+
+## Panel A: what pairs exchange
+
+```{r heatmap-data}
+```
+
+```{r heatmap-plot}
+#| fig-width: 4
+#| fig-height: 3.5
+```
+
+## Panels B and C: exchanges along the Social Rank GAP
+
+Each child counts once. For each child we average her exchanges with the
+partners in the group and take the median rank gap of those partners. The
+children are then grouped into seven equal-width bins of that median rank
+gap, and each point is the average across the children of a bin, with a 95%
+confidence interval.
+
+```{r binned-data}
+```
+
+```{r panel-b-plot}
+#| fig-width: 3.5
+#| fig-height: 3
+```
+
+```{r panel-c-plot}
+#| fig-width: 3.5
+#| fig-height: 3
+```
+
+Among non-friends, the two curves cross: a child who meets a higher-ranked
+classmate (left side) sends more than she receives; one who meets a
+lower-ranked classmate (right side) receives more than she sends. So the
+Cooperation GAP rises from negative to positive. Among mutual friends both
+curves are higher (more giving overall) and they nearly overlap, so the
+Cooperation GAP stays close to zero along the whole range.
+
+## All nine panels
+
+```{r all-panels}
+```
+
+```{r}
+#| fig-width: 11
+#| fig-height: 10
+library(patchwork)
+(plot_heatmap("Non-friends")    | plot_tokens("Non-friends", color_non_friends)    | plot_coop_gap("Non-friends", color_non_friends)) /
+(plot_heatmap("Mutual friends") | plot_tokens("Mutual", color_mutual)              | plot_coop_gap("Mutual", color_mutual)) /
+(plot_heatmap("Asymmetric")     | plot_tokens("Sender declares", color_asymmetric) | plot_coop_gap("Sender declares", color_asymmetric, c(-8.5, 6)))
+```
+
+```{r fig3-save}
+```
+
+# Other numbers in the text
+
+The remaining numbers quoted in the text are computed here, grouped by
+topic. Each block of code says where in the text the number appears.
+
+**Sample and design.** Size of the sample, number of decisions per child and
+rounds per classroom.
+
+```{r numbers-packages}
+```
+
+```{r numbers-sample}
+```
+
+```{r numbers-design}
+```
+
+**Friendship.** Share of non-friend, mutual and one-sided pairs.
+
+```{r numbers-friendship}
+```
+
+**Rank differences children actually meet.** The full range of the rank gap
+(from bottom to top of a classroom) occurs for only one pair per classroom.
+This block looks at a more common contrast: pairs between a child in the top
+quarter of the classroom ranking and one in the bottom quarter, and the
+Cooperation GAP that Table 1 predicts for them.
+
+```{r numbers-quartiles}
+```
+
+**Filtered analysis.** The Table 1 model on the null-model filtered sample.
+
+```{r numbers-filtered}
+```
+
+**One-sided friendships.** How often the exchanges fall in each region of
+Figure 3A.
+
+```{r numbers-asymmetric}
+```
+
+**A rank read off the game.** Instead of nominations, rank can be computed
+from the token network itself (PageRank on who gives to whom). This block
+correlates that behavioral rank with the nomination-based Social Rank
+(SI Section 9 has the full analysis).
+
+```{r numbers-behavioral-rank}
+```
+
+**Response quality.** Children who named the same classmate as both popular
+and not popular, and the time between consecutive decisions.
+
+```{r numbers-quality}
+```
+
+```{r numbers-save}
+```
+
+```{r}
+sessionInfo()
+```

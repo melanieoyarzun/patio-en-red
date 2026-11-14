@@ -1,0 +1,13 @@
+---
+title: "Friendship Modulates the Expression of Hierarchy in Cooperation"
+subtitle: "Replication notebooks"
+repo-actions: false
+toc: false
+---
+
+**Melanie Oyarzun, Carlos Rodriguez-Sickert, and Cristian Candia**
+
+- [**Main Results**](main/index.qmd) covers data preparation, Table 1, and Figures 1D, 2, and 3.
+- [**Supporting Information**](si/index.qmd) covers sections S1–S9, from study design to robustness checks.
+
+Each index gives the notebook order and the command to reproduce its results. The analysis pages link to their R scripts and rendered Jupyter notebooks on GitHub.

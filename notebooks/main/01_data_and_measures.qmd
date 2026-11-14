@@ -1,0 +1,255 @@
+---
+title: "1 · Data and measures"
+code-links:
+  - text: Jupyter notebook on GitHub
+    icon: journal-code
+    href: https://github.com/melanieoyarzun/patio-en-red/blob/main/notebooks/main/01_data_and_measures.ipynb
+  - text: "01_build_measures.R"
+    icon: file-code
+    href: https://github.com/melanieoyarzun/patio-en-red/blob/main/code/01_build_measures.R
+---
+
+
+```{r setup}
+#| include: false
+here::i_am("notebooks/main/01_data_and_measures.qmd")
+library(here)
+knitr::read_chunk(here("code", "01_build_measures.R"))
+```
+
+This page builds every variable used in the analysis, one step at a time,
+starting from the children's decisions in the game and their answers to the
+nomination survey:
+
+| Step | Measure | What it captures |
+|---|---|---|
+| 1–2 | Cooperation GAP | who came out ahead in a pair's exchange |
+| 3 | Friendship type | whether the two children named each other as best friends |
+| 4 | Social Rank | each child's standing in the classroom, from popularity nominations |
+| 5 | Social Rank GAP | the rank difference between the two children of a pair |
+| 6 | Null-model filter | a robustness check that keeps the most partner-specific transfers |
+
+The code shown here is the code in `code/01_build_measures.R`: the page reads
+it chunk by chunk (with `knitr::read_chunk`), so the script and the page can
+never drift apart. Running this page also writes the two files used by the
+[main results](02_main_results.qmd).
+
+# The data
+
+The experiment took place in 45 classrooms. In each classroom, children were
+paired with every classmate once, across several rounds. In each pair, the
+child received 10 tokens and decided how many to give to the partner (tokens
+given were doubled for the receiver). After the game, each child answered
+nine peer-nomination questions (name 2 to 5 classmates who...).
+
+There are two files:
+
+- `data/raw/dyads.csv`: one row per **decision**, sender $i$ → receiver $j$. It has
+  the tokens $i$ sent to $j$, the round, and nine 0/1 columns `nom_q1` to
+  `nom_q9` that say whether $i$ named $j$ in each question.
+- `data/raw/students.csv`: one row per child, with sex, age, GPA and attendance.
+
+The data use study codes. Variable definitions are in `data/codebook.md`.
+
+```{r packages}
+```
+
+```{r read-data}
+```
+
+```{r}
+head(dyads)
+```
+
+# Step 1. Tokens received
+
+A decision tells us what $i$ sent to $j$. What $i$ *received* from $j$ is
+$j$'s decision toward $i$, which is another row of the same file. We find it
+by swapping sender and receiver and joining.
+
+```{r tokens-received}
+```
+
+Both decisions of a pair are always in the same round: each pair of
+classmates played together once, and in that round each one decided for the
+other. We can also check directly that no pair played more than once:
+
+```{r}
+dyads %>%
+  mutate(child_a = pmin(sender_id, receiver_id),
+         child_b = pmax(sender_id, receiver_id)) %>%
+  group_by(child_a, child_b) %>%
+  summarise(rounds = n_distinct(round), decisions = n(), .groups = "drop") %>%
+  count(rounds, decisions)
+```
+
+8,902 pairs, each with two decisions in a single round.
+
+# Step 2. Cooperation GAP
+
+$$
+\text{Coop GAP}_{ij} = w_{ji} - w_{ij} \quad \text{(tokens received minus tokens sent)}
+$$
+
+```{r cooperation-gap}
+```
+
+```{r}
+summary(dyads$coop_gap)
+```
+
+The Cooperation GAP of $j \to i$ is the Cooperation GAP of $i \to j$ with the
+opposite sign, so it averages exactly zero over the whole sample. What
+matters is not its level but *who* ends up ahead: the analysis asks whether
+the child who comes out ahead tends to be the higher-ranked one.
+
+# Step 3. Friendship type
+
+Question 3 asked for the child's **best friends**. A pair is *mutual* if both
+named each other, *one-sided* if only one did, and *non-friends* if neither
+did. For one-sided pairs we keep track of who named whom.
+
+```{r friendship-type}
+```
+
+Each one-sided pair appears twice: once as "Sender declares" (seen from the
+child who named the other) and once as "Receiver declares" (seen from the
+other child). Together they are the 14.6% of asymmetric friendships.
+
+# Step 4. Social Rank
+
+Social Rank comes from questions 4 (*most popular and well-known*) and 5
+(*not popular or well-known*). We combine them in one network per classroom,
+where the edge $i \to j$ has weight
+
+$$
+a_{ij} = P^+_{ij} - P^-_{ij} + 1 \in \{0, 1, 2\}.
+$$
+
+```{r popularity-network}
+```
+
+The $+1$ keeps every weight non-negative, as PageRank requires: a
+popularity nomination gives weight 2, no nomination weight 1, and a
+non-popularity nomination weight 0.
+
+Why PageRank rather than a simple count of nominations? PageRank gives more
+weight to nominations that come from children who are themselves highly
+regarded, in the same way that a web page linked by important pages is
+important. A child named as popular by well-regarded classmates ranks higher
+than one named by classmates whom few regard as popular.
+
+We compute PageRank in each classroom and rescale it from 0 (lowest in the
+class) to 1 (highest in the class), so that ranks are comparable across
+classrooms of different size.
+
+```{r pagerank}
+```
+
+As an illustration, the ranks in the small classroom used in Figure 2:
+
+```{r}
+students %>%
+  filter(class_id == 16) %>%
+  select(student_id, female, pagerank, social_rank) %>%
+  arrange(desc(social_rank))
+```
+
+# Step 5. Social Rank GAP
+
+$$
+\text{RankGAP}_{ij} = \text{Rank}_i - \text{Rank}_j
+$$
+
+Positive values mean the sender has the higher rank. Since both ranks run
+from 0 to 1 within a classroom, the gap runs from $-1$ (the lowest-ranked
+child meets the highest-ranked one) to $1$ (the reverse). Most pairs are
+much closer: 83% of the decisions have a gap between $-0.5$ and $0.5$.
+
+```{r rank-gap}
+```
+
+```{r}
+#| fig-height: 3
+ggplot(dyads, aes(rank_gap)) +
+  geom_histogram(binwidth = 0.05, fill = "grey60", color = "white") +
+  labs(x = "Social Rank GAP", y = "Decisions") +
+  theme_minimal()
+```
+
+Attendance is standardized within classroom, for the balance test:
+
+```{r student-covariates}
+```
+
+# Step 6. Null-model filtering (robustness)
+
+Some children give 5 tokens to everyone; others give 10 to some classmates
+and 0 to others. Only the second kind of giving says something about the
+partner. The filtered analysis asks whether the rank pattern is still there
+when we look only at the transfers that depart most from each child's usual
+way of giving. It is a robustness check: the main regressions already absorb
+each child's average generosity with sender fixed effects.
+
+The null model shuffles, for each sender, *who* receives each of her
+allocations, keeping the allocations themselves. Under this shuffle the
+expected value and the standard deviation of any cell $i \to j$ are just the
+mean and the standard deviation of the sender's own allocations. Each
+transfer is scored by
+
+$$
+d_{ij} = \frac{|w_{ij} - \bar{w}_i|}{\text{SD}(w_i)}.
+$$
+
+```{r null-model-score}
+```
+
+**Check with actual shuffles.** The SI describes the null model with 1,000
+random shuffles. Here we do them for one classroom and compare the
+simulated mean and standard deviation of each cell with the closed form
+used above.
+
+```{r}
+set.seed(2026)
+one_class <- dyads %>% filter(class_id == 16)
+
+simulated <- one_class %>%
+  group_by(sender_id) %>%
+  group_modify(function(rows, key) {
+    shuffles <- replicate(1000, sample(rows$tokens_sent))   # one column per shuffle
+    tibble(receiver_id = rows$receiver_id,
+           tokens_sent = rows$tokens_sent,
+           mean_sim    = rowMeans(shuffles),
+           sd_sim      = apply(shuffles, 1, function(x) sqrt(mean((x - mean(x))^2))))
+  }) %>%
+  ungroup() %>%
+  left_join(one_class %>% select(sender_id, receiver_id, sender_mean, sender_sd),
+            by = c("sender_id", "receiver_id"))
+
+simulated %>%
+  summarise(max_difference_mean = max(abs(mean_sim - sender_mean)),
+            max_difference_sd   = max(abs(sd_sim - sender_sd)))
+```
+
+The differences are of the size expected from 1,000 random draws (they get
+smaller as the number of shuffles grows). The closed form is the exact limit
+of the simulation, so we use it: same scores, and no randomness in the
+results.
+
+Then we keep the 50% of transfers with the highest score (one cutoff for the
+whole sample). A pair enters the filtered Cooperation GAP only if *both*
+directions are kept, so about a quarter of the pairs remain.
+
+```{r null-model-filter}
+```
+
+# Save
+
+```{r save}
+```
+
+The next notebook, `02_main_results.qmd`, uses these two files.
+
+```{r}
+sessionInfo()
+```

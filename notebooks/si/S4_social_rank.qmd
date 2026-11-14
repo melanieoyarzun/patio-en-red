@@ -1,0 +1,93 @@
+---
+title: "S4 · Construction and validation of Social Rank"
+code-links:
+  - text: Jupyter notebook on GitHub
+    icon: journal-code
+    href: https://github.com/melanieoyarzun/patio-en-red/blob/main/notebooks/si/S4_social_rank.ipynb
+  - text: "S4_social_rank.R"
+    icon: file-code
+    href: https://github.com/melanieoyarzun/patio-en-red/blob/main/code/si/S4_social_rank.R
+---
+
+```{r setup}
+#| include: false
+here::i_am("notebooks/si/S4_social_rank.qmd")
+knitr::read_chunk(here::here("code", "si", "S4_social_rank.R"))
+```
+
+Social Rank is PageRank on the signed popularity network, with weights
+$a_{ij} = P^+_{ij} - P^-_{ij} + 1$ (see `code/01_build_measures.R`). This
+notebook documents that coding, compares it with alternative constructions,
+and relates it to other student characteristics.
+Code: `code/si/S4_social_rank.R`.
+
+```{r s4-setup}
+```
+
+## Table S7. Coding of the popularity nominations
+
+```{r s4-coding}
+```
+
+The $+1$ shift adds the same constant ($N-1$) to every child's incoming
+weight, so before PageRank the ordering is exactly the ordering by net
+nominations:
+
+```{r s4-incoming-weight}
+```
+
+## Alternative constructions (Table S8)
+
+```{r s4-pagerank-function}
+```
+
+```{r s4-alternative-ranks}
+```
+
+## Figure S6. Agreement with the primary Social Rank
+
+The median within-classroom Spearman correlation is the number quoted in
+the SI text; the pooled correlation is plotted.
+
+```{r s4-construction-correlations}
+#| fig-width: 6
+#| fig-height: 3
+```
+
+## Figure S7. Weight given to non-nominations
+
+Explicit negative = 0 and explicit positive = 2 are kept; the weight of
+"not named" goes from 0 to 2. The primary measure is $w = 1$.
+
+```{r s4-reference-weight}
+#| fig-width: 9
+#| fig-height: 3.5
+```
+
+## Table S9. Social Rank and student characteristics
+
+Panel A: correlations (nomination counts and continuous variables as
+within-classroom z-scores; "within" removes classroom means).
+Panel B: differences by guardian education. Religion, also in the SI table,
+is not part of the public data.
+
+```{r s4-correlates}
+```
+
+```{r s4-background}
+```
+
+## Figure S8
+
+```{r s4-figure-s8}
+#| fig-width: 9
+#| fig-height: 9
+```
+
+## Table S10. Distribution of the Social Rank GAP
+
+```{r s4-gap-distribution}
+```
+
+```{r s4-save}
+```

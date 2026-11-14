@@ -1,0 +1,12 @@
+output/
+/data/generated/
+.quarto/
+.Rproj.user/
+.Rhistory
+.RData
+*_files/
+
+/.quarto/
+
+Rplots.pdf
+data-raw/

@@ -1,0 +1,81 @@
+---
+title: "S7 · Main regression framework and results"
+code-links:
+  - text: Jupyter notebook on GitHub
+    icon: journal-code
+    href: https://github.com/melanieoyarzun/patio-en-red/blob/main/notebooks/si/S7_main_regressions.ipynb
+  - text: "S7_main_regressions.R"
+    icon: file-code
+    href: https://github.com/melanieoyarzun/patio-en-red/blob/main/code/si/S7_main_regressions.R
+---
+
+```{r setup}
+#| include: false
+here::i_am("notebooks/si/S7_main_regressions.qmd")
+knitr::read_chunk(here::here("code", "si", "S7_main_regressions.R"))
+```
+
+The model of Table 1, now shown across five sets of fixed effects, from
+none to the preferred one (sender + classroom-by-round). Column (5) of each
+table is the corresponding column of Table 1.
+Code: `code/si/S7_main_regressions.R` and the helper `fe_progression()` in
+`code/00_helpers.R`. (The wild-cluster bootstrap takes about a minute.)
+
+```{r s7-setup}
+```
+
+## Tables S17–S19. All dyads, non-friends, mutual friends
+
+```{r s7-fe-tables}
+```
+
+## Table S20. Pooled friendship moderation
+
+```{r s7-pooled}
+```
+
+## Table S21. Support for the two asymmetric directions
+
+```{r s7-asymmetric-support}
+```
+
+## Table S22. Asymmetric friendships by direction
+
+```{r s7-asymmetric-directions}
+```
+
+## Table S23. Direct contrast between the two directions
+
+```{r s7-direction-contrast}
+```
+
+```{r s7-wild-bootstrap}
+```
+
+## Table S24 and Figures S22–S24. Size of the effect
+
+```{r s7-magnitudes}
+```
+
+```{r s7-quartiles}
+```
+
+```{r s7-figures}
+#| fig-width: 6
+#| fig-height: 4
+```
+
+```{r}
+#| fig-width: 7
+#| fig-height: 3.5
+figure_s22
+```
+
+```{r}
+#| fig-width: 9
+#| fig-height: 4
+figure_s24
+```
+
+```{r s7-save}
+```
